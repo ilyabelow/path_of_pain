@@ -25,7 +25,7 @@ class Box(pygame.sprite.Sprite):
         self.image = game.BOX_SPRITE
         self.game = game
         # TODO better randomizer
-        if random.randint(0, 1) == 0 and not game.painful:
+        if random.randint(0, 5) == 0 and not game.painful:
             if random.randint(0, 2) == 0:
                 self.mode = constants.BOX_WEAK_HEALTH
             else:
