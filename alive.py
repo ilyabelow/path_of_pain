@@ -63,11 +63,17 @@ class Alive(pygame.sprite.Sprite):
                 self.rect.bottom = wall.rect.top
                 self.pos.y = self.rect.centery
 
+    def pickup(self):
+        pick = pygame.sprite.spritecollide(self, self.game.pickupable_group, False)
+        for p in pick:
+            p.pickup(self)
+
     def update(self):
         # woo hoo, shared update!
         # TODO add function for additional actions?
         self.clock_ticker.tick_all()
         self.move()
+        self.pickup()
         self.compose_image()
 
     # TODO merge throw back and stun because of conflict of can_be_moved????
