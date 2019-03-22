@@ -11,7 +11,7 @@ import random
 class Game:
     def __init__(self, painful=False):
         # GAME INITIALIZING
-        pygame.mixer.pre_init(22050, -16, 2, 64)
+        pygame.mixer.pre_init(22050, -16, 4, 64)
         pygame.init()
         pygame.mouse.set_visible(False)
         self.clock = pygame.time.Clock()
@@ -35,6 +35,8 @@ class Game:
         self.HEART_SPRITE = pygame.image.load("images/heart.png").convert_alpha()
         self.HEART_EMPTY_SPRITE = pygame.image.load("images/heart_empty.png").convert_alpha()
         self.HEART_WEAK_SPRITE = pygame.image.load("images/weak_heart.png").convert_alpha()
+        self.LITTLE_HEART_SPRITE = pygame.image.load("images/little_heart.png").convert_alpha()
+        self.LITTLE_HEART_WEAK_SPRITE = pygame.image.load("images/little_weak_heart.png").convert_alpha()
         self.SWORD_SPRITE = pygame.image.load("images/sword.png").convert_alpha()
         self.SWORD_SWANG_SPRITE = pygame.image.load("images/sword_swang.png").convert_alpha()
         self.BOX_SPRITE = pygame.image.load("images/box.png").convert_alpha()
@@ -203,6 +205,8 @@ class Game:
         )
         self.hitter_group = pygame.sprite.Group()
         self.hud_group = pygame.sprite.Group()
+        self.pickupable_group = pygame.sprite.Group()
+
         self.hittable_group = pygame.sprite.Group(*self.enemy_group, *self.box_group)
 
         # PLAYER INITIALIZING
@@ -217,14 +221,17 @@ class Game:
         # TODO reorganize groups (make new group types or start using advanced groups)
         self.player_group = pygame.sprite.GroupSingle(self.player)
         self.particle_group = pygame.sprite.Group()
-        self.common_group = pygame.sprite.RenderPlain(*self.wall_group, *self.enemy_group, *self.player_group)
+        self.common_group = pygame.sprite.RenderPlain(*self.wall_group,
+                                                      *self.enemy_group,
+                                                      *self.player_group,
+                                                      *self.pickupable_group)
         self.fade = None
 
     def win(self):
         for i in range(15):
             direction = constants.V_RIGHT.rotate(random.randint(-180, 180))
             self.particle_group.add(particle.Blood(self.player.pos + constants.V_ZERO,
-                                                   direction*5,
+                                                   direction * 5,
                                                    random.randint(10, 20),
                                                    0.5,
                                                    constants.C_GOLDEN))

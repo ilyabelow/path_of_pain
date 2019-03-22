@@ -3,7 +3,7 @@ import random
 import constants
 import particle
 import enemy
-
+import pickupable
 
 # TODO common base class Static for non-moving sprites
 class Wall(pygame.sprite.Sprite):
@@ -25,7 +25,7 @@ class Box(pygame.sprite.Sprite):
         self.image = game.BOX_SPRITE
         self.game = game
         # TODO better randomizer
-        if random.randint(0, 5) == 0 and not game.painful:
+        if random.randint(0, 1) == 0 and not game.painful:
             if random.randint(0, 2) == 0:
                 self.mode = constants.BOX_WEAK_HEALTH
             else:
@@ -40,9 +40,8 @@ class Box(pygame.sprite.Sprite):
 
     def hit(self, who):
         # SOUND AND VISUAL EFFECTS
-        # TODO find better sound effect for breaking and healing
+        # TODO find better sound effect for breaking
         random.choice(self.game.BOX_BREAK_SOUND).play()
-        # TODO make beautiful
         for i in range(10):
             direction = constants.V_LEFT.rotate(random.randint(-180, 180))
             self.game.particle_group.add(particle.Blood(pygame.Vector2(self.rect.centerx, self.rect.centery),
@@ -52,18 +51,11 @@ class Box(pygame.sprite.Sprite):
                                                         constants.C_BOX, False))
 
         # BOX ACTION
-        # TODO box healing directly is a temporal solution, should drop out healing item
         if self.mode == constants.BOX_HEALTH or self.mode == constants.BOX_WEAK_HEALTH:
-            # TODO what if entity hit with itself and you need to heal who and not its wielder???
-            who.owner.heal(1, self.mode == constants.BOX_WEAK_HEALTH)
-
-            for i in range(5):
-                direction = constants.V_LEFT.rotate(random.randint(-180, 180))
-                self.game.particle_group.add(particle.Blood(pygame.Vector2(self.rect.centerx, self.rect.centery),
-                                                            direction * 6,
-                                                            random.randint(15, 20),
-                                                            2,
-                                                            constants.C_RED))
+            heal = pickupable.Heart(self.game, self.rect.move(10, 10), self.mode == constants.BOX_WEAK_HEALTH)
+            # TODO add group manager
+            self.game.pickupable_group.add(heal)
+            self.game.common_group.add(heal)
         if self.mode == constants.BOX_ENEMY:
             # TODO temp solution, should sort out groups
             # TODO factory here

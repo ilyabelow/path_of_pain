@@ -85,6 +85,11 @@ class Enemy(alive.Alive):
             self.face.rotate_ip(random.randint(-180, 180))
             self.idle_clock.wind_up(random.randint(20, 40))
 
+    # TODO move to interface already!
+    def heal(self, amount, weak_mode=False):
+        if not weak_mode:
+            self.health = min(self.max_health, self.health + amount)
+
     # TODO turn into draw function or something
     def compose_image(self):
         if self.stun_clock.is_running():
