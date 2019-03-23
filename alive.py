@@ -6,7 +6,7 @@ import clock
 
 # TODO all common properties of Player and Anemy is bunched up here, needs disassembling to interfaces
 class Alive(pygame.sprite.Sprite):
-    def __init__(self, game, pos, health, face=None):  # TODO think about values sent to this __init__
+    def __init__(self, game, pos, face=None):  # TODO think about values sent to this __init__
         super(Alive, self).__init__()
         self.game = game
         # TODO remove dull inits??? (we have to init fields in init}
@@ -24,8 +24,7 @@ class Alive(pygame.sprite.Sprite):
         self.can_be_moved = True  # object's ability to make decision about its movement!!!
         # HEALTH
         # TODO move to interface?
-        self.max_health = health
-        self.health = health
+
         # BASE CLOCKS
         # TODO move to interfaces as well
         self.dash_clock = clock.Clock(self.unblock_movement)
@@ -42,7 +41,7 @@ class Alive(pygame.sprite.Sprite):
         # move horizontally
         self.pos.x += self.speed.x
         self.rect.centerx = self.pos.x
-        intersected = pygame.sprite.spritecollide(self, self.game.wall_group, False)
+        intersected = pygame.sprite.spritecollide(self, self.game.obstacle_group, False)
         for wall in intersected:
             if self.speed.x < 0:
                 self.rect.left = wall.rect.right
@@ -54,7 +53,7 @@ class Alive(pygame.sprite.Sprite):
         # move vertically
         self.pos.y += self.speed.y
         self.rect.centery = self.pos.y
-        intersected = pygame.sprite.spritecollide(self, self.game.wall_group, False)
+        intersected = pygame.sprite.spritecollide(self, self.game.obstacle_group, False)
         for wall in intersected:
             if self.speed.y < 0:
                 self.rect.top = wall.rect.bottom
@@ -85,10 +84,6 @@ class Alive(pygame.sprite.Sprite):
     def stun(self, duration):
         self.stun_clock.wind_up(duration)
         self.can_be_moved = False
-
-    # TODO make common and split to on_ok_health, on_low_health and on_zero_health or something
-    def hit(self, who):
-        pass
 
     def dash(self):
         pass

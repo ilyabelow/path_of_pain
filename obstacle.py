@@ -4,6 +4,8 @@ import constants
 import particle
 import enemy
 import pickupable
+import interface
+
 
 # TODO common base class Static for non-moving sprites
 class Wall(pygame.sprite.Sprite):
@@ -18,9 +20,10 @@ class Wall(pygame.sprite.Sprite):
 
 
 # TODO make this class more general to allow different boxes: jars, skulls, etc
-class Box(pygame.sprite.Sprite):
+class Box(pygame.sprite.Sprite, interface.Healthy):
     def __init__(self, game, pos):
-        super(Box, self).__init__()
+        pygame.sprite.Sprite.__init__(self)
+        interface.Healthy.__init__(self, random.randint(1, 3), None, game.BOX_BREAK_SOUNDS, None)
         self.rect = pygame.Rect(*pos, 50, 50)
         self.image = game.BOX_SPRITE
         self.game = game
@@ -38,11 +41,17 @@ class Box(pygame.sprite.Sprite):
         # TODO health>1 for sturdy boxes
         # TODO stacked boxes!
 
-    def hit(self, who):
-        # SOUND AND VISUAL EFFECTS
-        # TODO find better sound effect for breaking
-        random.choice(self.game.BOX_BREAK_SOUND).play()
-        for i in range(10):
+    def on_ok_health(self, who):
+        for i in range(5):
+            direction = constants.V_LEFT.rotate(random.randint(-180, 180))
+            self.game.particle_group.add(particle.Blood(pygame.Vector2(self.rect.centerx, self.rect.centery),
+                                                        direction * 6,
+                                                        random.randint(10, 15),
+                                                        2,
+                                                        constants.C_BOX, False))
+
+    def on_zero_health(self, who):
+        for i in range(15):
             direction = constants.V_LEFT.rotate(random.randint(-180, 180))
             self.game.particle_group.add(particle.Blood(pygame.Vector2(self.rect.centerx, self.rect.centery),
                                                         direction * 6,

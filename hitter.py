@@ -46,7 +46,7 @@ class Sword(pygame.sprite.Sprite):
             self.rect.centery = self.pos.y
             got_hit = pygame.sprite.spritecollide(self, self.game.hittable_group, False)
             for entity in got_hit:
-                entity.hit(self)
+                entity.hit(1, self)
 
             # SOUND EFFECTS
             random.choice(self.game.SWORD_SOUNDS).play()
