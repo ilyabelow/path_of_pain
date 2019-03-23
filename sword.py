@@ -65,6 +65,7 @@ class Sword(base.AdvancedSprite):
             self.pos = self.owner.pos + self.owner.face.rotate(90) * (80 * self.right_hand - 40)
         else:
             self.pos = self.owner.pos + self.owner.face * 70
+        self.fetch_layer(self.owner.pos.y)  # TODO make better layer calculation
 
     def swinging_stopped(self):
         self.swing_count = 0
@@ -79,4 +80,4 @@ class Sword(base.AdvancedSprite):
             else:
                 image = pygame.transform.rotate(SWANG_SPRITE, self.owner.face.angle_to(constants.V_UP) + 45)
         rect = image.get_rect(centerx=self.pos.x, centery=self.pos.y)
-        screen.blit(image, (rect.x - window.x, rect.y - window.y))
+        return screen.blit(image, (rect.x - window.x, rect.y - window.y))

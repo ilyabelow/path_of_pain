@@ -9,10 +9,11 @@ HEART_WEAK_SPRITE = None
 # TODO base class for hud?
 class HealthHUD(base.AdvancedSprite):
     def __init__(self, obj):
-        super(HealthHUD, self).__init__()
+        base.AdvancedSprite.__init__(self)
         self.obj = obj
         # TODO move adding to group?
-        self.obj.game.hud_group.add(self)
+        self.y = 3000  # +inf
+        self.obj.game.common_group.add(self)
         self.image = None
         self.makeup()
 
@@ -30,4 +31,4 @@ class HealthHUD(base.AdvancedSprite):
             self.image.blit(HEART_WEAK_SPRITE, ((i + self.obj.max_health) * 100, 0))
 
     def draw(self, screen, window):
-        screen.blit(self.image, (30, 30))
+        return screen.blit(self.image, (30, 30))

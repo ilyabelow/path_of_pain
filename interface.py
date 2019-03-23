@@ -105,6 +105,7 @@ class Pickupable:
         pass
 
 
+# TODO make pickuping for several groups
 class Pickuping:
     def __init__(self, what_to_pickup):
         self.what_to_pickup = what_to_pickup

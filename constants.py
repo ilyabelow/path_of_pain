@@ -63,7 +63,7 @@ enemy_throwback_length = 15
 enemy_throwback_speed = 3
 enemy_stun_duration = 7
 
-player_health = 6
+player_health = 5
 player_move_speed = 12
 player_invulnerability_duration = 25
 player_throwback_length = 144

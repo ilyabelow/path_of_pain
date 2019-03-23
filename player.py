@@ -72,6 +72,7 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
         if self.speed:
             self.move_and_collide()
         self.fetch_screen()
+        self.fetch_layer(self.pos.y)
 
     def draw(self, screen, window):
         if self.stun_clock.is_running():
@@ -82,8 +83,8 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
             image = SPRITE
         rotated_image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
         center_rect = rotated_image.get_rect()
-        screen.blit(rotated_image,
-                    (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
+        return screen.blit(rotated_image,
+                           (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
 
     def on_any_health(self, who):
         self.bleed_one_dir(self.pos, (self.pos - who.pos).normalize())

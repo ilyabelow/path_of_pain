@@ -109,6 +109,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             self.speed = self.moving * self.face * speed_abs
 
         self.move_and_collide()
+        self.fetch_layer(self.pos.y)
         if self.game.player.rect.colliderect(self.rect):
             self.game.player.hit(1, self)
 
@@ -130,8 +131,8 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             image = SPRITE
         rotated_image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
         center_rect = rotated_image.get_rect(centerx=25, centery=25)
-        screen.blit(rotated_image,
-                    (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
+        return screen.blit(rotated_image,
+                           (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
 
     def on_any_health(self, who):
         self.bleed_one_dir(self.pos, (self.pos - who.pos).normalize())
