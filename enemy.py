@@ -1,10 +1,10 @@
-import alive
 import pygame
 import random
 import constants
 import particle
 import clock
 import interface
+import base
 
 SPRITE = None
 STUNNED_SPRITE = None
@@ -16,12 +16,20 @@ HIT_SOUND = None
 DEATH_SOUNDS = None
 STARTLE_SOUNDS = None
 HEAL_SOUND = None
+
+DASH_STATS = {"speed": 20, "length": 100, "rest": 30, "sound": DASH_SOUND}
+BACK_DASH_STATS = None
+BLEED_ONE_DIR_STATS = {'amount': 7, 'splash': 15, 'fade': 0.5, 'sizes': [6, 8], 'speed': 10, 'offset': 50}
+BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1, 'offset': 0}
+
+
 # TODO make this class more abstract to make building more types of enemies
 # TODO MORE ENEMIES MORE CONTENT
-class Enemy(alive.Alive, interface.Healthy):
+class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.Bleeding):
 
     def __init__(self, game, coords):
-        alive.Alive.__init__(self, game, coords)
+        base.AdvancedSprite.__init__(self)
+        interface.Moving.__init__(self, coords, game.obstacle_group, DASH_STATS, None)
         interface.Healthy.__init__(
             self,
             constants.enemy_health,
@@ -29,12 +37,20 @@ class Enemy(alive.Alive, interface.Healthy):
             [HIT_SOUND],
             DEATH_SOUNDS
         )
+        interface.Bleeding.__init__(
+            self,
+            game.particle_group,
+            BLEED_ONE_DIR_STATS,
+            BLEED_ALL_DIR_STATS,
+            constants.C_RED
+        )
+        self.game = game
         game.enemies_count += 1
         self.rect = pygame.Rect(0, 0, 50, 50)
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
         # CLOCKS
         self.spot_clock = clock.Clock(self.unblock_movement, constants.enemy_spot_time)
-        self.prepare_to_dash_clock = clock.Clock(self.dash, constants.enemy_dash_time)
+        self.prepare_to_dash_clock = clock.Clock(self.dash, constants.enemy_attack_time)
         self.idle_clock = clock.Clock(self.move_in_idle)
 
         # INITIAL IDLE
@@ -42,7 +58,11 @@ class Enemy(alive.Alive, interface.Healthy):
         self.idle = True
         self.moving = random.randint(0, 2)
 
-        self.clock_ticker.add_clock(*[getattr(self, attr) for attr in dir(self) if '_clock' in attr])
+        self.clock_ticker = clock.ClockTicker(*[getattr(self, attr) for attr in dir(self) if '_clock' in attr])
+
+    def update(self):
+        self.clock_ticker.tick_all()
+        self.move()
 
     def move(self):
         # TODO remove reference to main player to add compatibility of several players
@@ -88,7 +108,7 @@ class Enemy(alive.Alive, interface.Healthy):
                 speed_abs = constants.enemy_move_speed
             self.speed = self.moving * self.face * speed_abs
 
-        self.move_and_collide_with_walls()
+        self.move_and_collide()
         if self.game.player.rect.colliderect(self.rect):
             self.game.player.hit(1, self)
 
@@ -114,42 +134,15 @@ class Enemy(alive.Alive, interface.Healthy):
                     (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
 
     def on_any_health(self, who):
-        self.bleed_one_dir((self.pos - who.pos).normalize())
+        self.bleed_one_dir(self.pos, (self.pos - who.pos).normalize())
 
     def on_zero_health(self, who):
-        self.bleed_all_dir()
+        self.bleed_all_dir(self.pos)
         self.game.enemies_count -= 1
         self.kill()
 
     def on_ok_health(self, who):
         self.throw_back((self.pos - who.pos).normalize(),
                         constants.enemy_throwback_speed,
-                        constants.enemy_throwback_duration,
+                        constants.enemy_throwback_length,
                         constants.enemy_stun_duration)
-
-    # TODO this is so similar to player's dash! merge???
-    def dash(self):
-        self.dash_clock.wind_up(constants.enemy_dash_duration)
-        self.next_dash_clock.wind_up(constants.enemy_next_dash_wait)
-        self.speed = self.face * constants.enemy_dash_speed
-        self.can_be_moved = False
-        DASH_SOUND.play()
-
-    # TODO MOVE up to base class or to interface
-    def bleed_one_dir(self, main_direction):
-        for i in range(7):
-            direction = main_direction.rotate(random.randint(-15, 15))
-            self.game.particle_group.add(particle.Blood(self.pos + direction * 50,
-                                                        direction * 10,
-                                                        random.randint(6, 8),
-                                                        0.5,
-                                                        constants.C_RED))
-
-    def bleed_all_dir(self):
-        for i in range(14):
-            direction = constants.V_LEFT.rotate(random.randint(-180, 180))
-            self.game.particle_group.add(particle.Blood(self.pos + constants.V_ZERO,
-                                                        direction,
-                                                        random.randint(15, 25),
-                                                        1,
-                                                        constants.C_RED))

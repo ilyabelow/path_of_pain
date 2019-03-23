@@ -9,10 +9,13 @@ import base
 
 BOX_SPRITE = None
 BOX_BREAK_SOUNDS = None
+BLEED_ONE_DIR_STATS = {'amount': 5, 'splash': 45, 'fade': 2, 'sizes': [10, 15], 'speed': 6, 'offset': 10}
+BLEED_ALL_DIR_STATS = {'amount': 15, 'fade': 2, 'sizes': [15, 20], 'speed': 6, 'offset': 0}
+
 # TODO common base class Static for non-moving sprites
 class Wall(base.AdvancedSprite):
     def __init__(self, rect, has_down=False):
-        super(Wall, self).__init__()
+        base.AdvancedSprite.__init__(self)
         self.image = pygame.Surface(tuple(rect)[2:4])
         self.image.fill((137, 107, 77))
         self.rect = rect
@@ -25,10 +28,17 @@ class Wall(base.AdvancedSprite):
 
 
 # TODO make this class more general to allow different boxes: jars, skulls, etc
-class Box(base.AdvancedSprite, interface.Healthy):
+class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
     def __init__(self, game, pos):
         pygame.sprite.Sprite.__init__(self)
         interface.Healthy.__init__(self, random.randint(1, 2), None, BOX_BREAK_SOUNDS, None)
+        interface.Bleeding.__init__(
+            self,
+            game.particle_group,
+            BLEED_ONE_DIR_STATS,
+            BLEED_ALL_DIR_STATS,
+            constants.C_BOX
+        )  # TODO square blood
         self.rect = pygame.Rect(*pos, 50, 50)
         self.game = game
         # TODO better randomizer
@@ -46,22 +56,12 @@ class Box(base.AdvancedSprite, interface.Healthy):
         # TODO stacked boxes!
 
     def on_ok_health(self, who):
-        for i in range(5):
-            direction = constants.V_LEFT.rotate(random.randint(-180, 180))
-            self.game.particle_group.add(particle.Blood(pygame.Vector2(self.rect.centerx, self.rect.centery),
-                                                        direction * 6,
-                                                        random.randint(10, 15),
-                                                        2,
-                                                        constants.C_BOX, False))
+        pos = pygame.Vector2((self.rect.centerx, self.rect.centery))
+        self.bleed_one_dir(pos, (pos - who.pos).normalize())
 
     def on_zero_health(self, who):
-        for i in range(15):
-            direction = constants.V_LEFT.rotate(random.randint(-180, 180))
-            self.game.particle_group.add(particle.Blood(pygame.Vector2(self.rect.centerx, self.rect.centery),
-                                                        direction * 6,
-                                                        random.randint(15, 20),
-                                                        2,
-                                                        constants.C_BOX, False))
+        pos = pygame.Vector2((self.rect.centerx, self.rect.centery))
+        self.bleed_all_dir(pos)
 
         # BOX ACTION
         if self.mode == constants.BOX_HEALTH or self.mode == constants.BOX_WEAK_HEALTH:
