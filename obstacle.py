@@ -5,10 +5,12 @@ import particle
 import enemy
 import pickupable
 import interface
+import base
 
-
+BOX_SPRITE = None
+BOX_BREAK_SOUNDS = None
 # TODO common base class Static for non-moving sprites
-class Wall(pygame.sprite.Sprite):
+class Wall(base.AdvancedSprite):
     def __init__(self, rect, has_down=False):
         super(Wall, self).__init__()
         self.image = pygame.Surface(tuple(rect)[2:4])
@@ -18,14 +20,16 @@ class Wall(pygame.sprite.Sprite):
         if has_down:
             pygame.draw.rect(self.image, (117, 90, 63), (0, rect.h - 50, rect.w, 50))
 
+    def draw(self, screen, window):
+        screen.blit(self.image, (self.rect.x - window.x, self.rect.y - window.y))
+
 
 # TODO make this class more general to allow different boxes: jars, skulls, etc
-class Box(pygame.sprite.Sprite, interface.Healthy):
+class Box(base.AdvancedSprite, interface.Healthy):
     def __init__(self, game, pos):
         pygame.sprite.Sprite.__init__(self)
-        interface.Healthy.__init__(self, random.randint(1, 3), None, game.BOX_BREAK_SOUNDS, None)
+        interface.Healthy.__init__(self, random.randint(1, 2), None, BOX_BREAK_SOUNDS, None)
         self.rect = pygame.Rect(*pos, 50, 50)
-        self.image = game.BOX_SPRITE
         self.game = game
         # TODO better randomizer
         if random.randint(0, 5) == 0 and not game.painful:
@@ -61,7 +65,7 @@ class Box(pygame.sprite.Sprite, interface.Healthy):
 
         # BOX ACTION
         if self.mode == constants.BOX_HEALTH or self.mode == constants.BOX_WEAK_HEALTH:
-            heal = pickupable.Heart(self.game, self.rect.move(10, 10), self.mode == constants.BOX_WEAK_HEALTH)
+            heal = pickupable.Heart(self.rect.move(10, 10), self.mode == constants.BOX_WEAK_HEALTH)
             # TODO add group manager
             self.game.pickupable_group.add(heal)
             self.game.common_group.add(heal)
@@ -76,3 +80,6 @@ class Box(pygame.sprite.Sprite, interface.Healthy):
             en.stun(15)
 
         self.kill()
+
+    def draw(self, screen, window):
+        screen.blit(BOX_SPRITE, (self.rect.x - window.x, self.rect.y - window.y))

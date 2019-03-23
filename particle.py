@@ -1,15 +1,13 @@
 import pygame
 import constants
+import base
 
 
 # TODO CLEAR UP THIS FILE
 
-class Particle(pygame.sprite.Sprite):
+class Particle(base.AdvancedSprite):
     def __init__(self, countdown):
         super(Particle, self).__init__()
-        # TODO remove dull rect and image inits
-        self.rect = pygame.Rect(10, 10, 10, 10)
-        self.image = None
         # TODO move to clocks?
         self.countdown = countdown
 
@@ -31,22 +29,20 @@ class Blood(Particle):
         # TODO optimize positioning
         self.pos.x += self.speed.x
         self.pos.y += self.speed.y
-
-        self.rect.centerx = self.pos.x
-        self.rect.centery = self.pos.y
         # TIMER HANDLING
         # TODO make countdown class?
         self.countdown -= self.fadeout
         if self.countdown < 0:
             self.kill()
             return
-        # IMAGE COMPOSING
-        # TODO move drawing
-        self.image = pygame.Surface((int(self.countdown * 2), int(self.countdown * 2)), pygame.SRCALPHA, 32)
+
+    def draw(self, screen, window):
+        image = pygame.Surface((int(self.countdown * 2), int(self.countdown * 2)), pygame.SRCALPHA, 32)
         if self.round_shape:
-            pygame.draw.circle(self.image, self.color, [i // 2 for i in self.image.get_size()], int(self.countdown))
+            pygame.draw.circle(image, self.color, [i // 2 for i in image.get_size()], int(self.countdown))
         else:
-            self.image.fill(constants.C_BOX)
+            image.fill(constants.C_BOX)
+        screen.blit(image, (self.pos.x - window.x, self.pos.y - window.y))
 
 
 class Exclamation(Particle):
@@ -67,6 +63,9 @@ class Exclamation(Particle):
                 pass
             self.countdown -= 1
 
+    def draw(self, screen, window):
+        screen.blit(self.image, (self.rect.x - window.x, self.rect.y - window.y))
+
 
 class Fade(Particle):
     def __init__(self, duration, to_black):
@@ -74,6 +73,7 @@ class Fade(Particle):
         self.rect = pygame.Rect(0, 0, 1920, 1080)
         self.to_black = to_black
         self.duration = duration
+        self.image = None
 
     def update(self):
         # TIMER HANDLING
@@ -85,3 +85,6 @@ class Fade(Particle):
             self.image.fill((0, 0, 0, 255 * ((self.duration - self.countdown - 1) / self.duration)))  # not used
         else:
             self.image.fill((0, 0, 0, int(255 * ((self.countdown + 1) / self.duration))))
+
+    def draw(self, screen, window):
+        screen.blit(self.image, (self.rect.x - window.x, self.rect.y - window.y))

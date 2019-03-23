@@ -6,6 +6,10 @@ import enemy
 import player
 import particle
 import random
+import base
+import HUD
+import pickupable
+import sword
 
 
 class Game:
@@ -25,50 +29,54 @@ class Game:
         self.window = self.screen.get_rect()
 
         # SPRITES INITIALIZATION
-        # TODO move to separate namespace
-        # TODO makeup proper naming system
-        self.PLAYER_SPRITE = pygame.image.load("images/player.png").convert_alpha()
-        self.PLAYER_STUNNED_SPRITE = pygame.image.load("images/player_stunned.png").convert_alpha()
-        self.PLAYER_SURPRIZED_SPRITE = pygame.image.load("images/player_surprised.png").convert_alpha()
-        self.ENEMY_STUNNED_SPRITE = pygame.image.load("images/enemy_stunned.png").convert_alpha()
-        self.ENEMY_SURPRISED_SPRITE = pygame.image.load("images/enemy_surprised.png").convert_alpha()
-        self.ENEMY_SPRITE = pygame.image.load("images/enemy.png").convert_alpha()
-        self.HEART_SPRITE = pygame.image.load("images/heart.png").convert_alpha()
-        self.HEART_EMPTY_SPRITE = pygame.image.load("images/heart_empty.png").convert_alpha()
-        self.HEART_WEAK_SPRITE = pygame.image.load("images/weak_heart.png").convert_alpha()
-        self.LITTLE_HEART_SPRITE = pygame.image.load("images/little_heart.png").convert_alpha()
-        self.LITTLE_HEART_WEAK_SPRITE = pygame.image.load("images/little_weak_heart.png").convert_alpha()
-        self.SWORD_SPRITE = pygame.image.load("images/sword.png").convert_alpha()
-        self.SWORD_SWANG_SPRITE = pygame.image.load("images/sword_swang.png").convert_alpha()
-        self.BOX_SPRITE = pygame.image.load("images/box.png").convert_alpha()
-        pygame.display.set_icon(self.ENEMY_SPRITE)
+        player.SPRITE = pygame.image.load("images/player.png").convert_alpha()
+        player.STUNNED_SPRITE = pygame.image.load("images/player_stunned.png").convert_alpha()
+        player.SURPRISED_SPRITE = pygame.image.load("images/player_surprised.png").convert_alpha()
+        enemy.STUNNED_SPRITE = pygame.image.load("images/enemy_stunned.png").convert_alpha()
+        enemy.SURPRISED_SPRITE = pygame.image.load("images/enemy_surprised.png").convert_alpha()
+        enemy.SPRITE = pygame.image.load("images/enemy.png").convert_alpha()
+        HUD.HEART_SPRITE = pygame.image.load("images/heart.png").convert_alpha()
+        HUD.HEART_EMPTY_SPRITE = pygame.image.load("images/heart_empty.png").convert_alpha()
+        HUD.HEART_WEAK_SPRITE = pygame.image.load("images/weak_heart.png").convert_alpha()
+        pickupable.LITTLE_HEART_SPRITE = pygame.image.load("images/little_heart.png").convert_alpha()
+        pickupable.LITTLE_HEART_WEAK_SPRITE = pygame.image.load("images/little_weak_heart.png").convert_alpha()
+        sword.SPRITE = pygame.image.load("images/sword.png").convert_alpha()
+        sword.SWANG_SPRITE = pygame.image.load("images/sword_swang.png").convert_alpha()
+        obstacle.BOX_SPRITE = pygame.image.load("images/box.png").convert_alpha()
+        pygame.display.set_icon(enemy.SPRITE)
 
         # SOUND INITIALIZATION
         # TODO move to separate namespace
         # TODO makeup proper naming system
-        self.SWORD_SOUNDS = [pygame.mixer.Sound('sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
-        self.SWORD_WALL_SOUND = pygame.mixer.Sound('sounds/sword_hit_reject.wav')
-        self.DASH_SOUND = pygame.mixer.Sound('sounds/hero_dash.wav')
-        self.STAB_SOUND = pygame.mixer.Sound('sounds/enemy_damage.wav')
-        self.HERO_DAMAGE_SOUND = pygame.mixer.Sound('sounds/hero_damage.wav')
-        self.HERO_DEATH_SOUND = pygame.mixer.Sound('sounds/hero_death_extra_details.wav')
+        sword.SWING_SOUNDS = [pygame.mixer.Sound('sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
+        sword.CLING_SOUND = pygame.mixer.Sound('sounds/sword_hit_reject.wav')
+
+        player.DASH_SOUND = pygame.mixer.Sound('sounds/hero_dash.wav')
+        player.HIT_SOUND = pygame.mixer.Sound('sounds/hero_damage.wav')
+        player.DEATH_SOUND = pygame.mixer.Sound('sounds/hero_death_extra_details.wav')
+        player.HEAL_SOUND = pygame.mixer.Sound('sounds/focus_health_heal.wav')
+        player.HEARTBEAT_SOUND = pygame.mixer.Sound('sounds/heartbeat_B_01.wav')
+        player.STEPS_SOUND = pygame.mixer.Sound('sounds/hero_run_footsteps_stone.wav')
+
+        enemy.DASH_SOUND = pygame.mixer.Sound('sounds/ruin_fat_sentry_sword.wav')
+        enemy.DASH_SOUND.set_volume(0.5)
+        enemy.STARTLE_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_Fat_startle_0{}.wav'.format(i + 1)) for i in
+                                range(2)]
+        enemy.ATTACK_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_Fat_attack_0{}.wav'.format(i + 1)) for i in
+                               range(3)]
+        enemy.DEATH_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_death_0{}.wav'.format(i + 1)) for i in range(3)]
+        enemy.HEAL_SOUND = pygame.mixer.Sound('sounds/focus_health_heal.wav')  # TODO find another sound
+
+        enemy.HIT_SOUND = pygame.mixer.Sound('sounds/enemy_damage.wav')
+
+        obstacle.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('sounds/breakable_wall_hit_{}.wav'.format(i + 1)) for i in
+                                     range(2)]
+
         self.WIN_SOUND = pygame.mixer.Sound('sounds/secret_discovered_temp.wav')
         self.WIN_SOUND.set_volume(2)
-        self.ENEMY_DASH_SOUND = pygame.mixer.Sound('sounds/ruin_fat_sentry_sword.wav')
-        self.ENEMY_DASH_SOUND.set_volume(0.5)
-        self.GASP_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_Fat_startle_0{}.wav'.format(i + 1)) for i in
-                            range(2)]
-        self.ATTACK_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_Fat_attack_0{}.wav'.format(i + 1)) for i in
-                              range(3)]
-        self.DEATH_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_death_0{}.wav'.format(i + 1)) for i in
-                             range(3)]
-        self.STEPS_SOUND = pygame.mixer.Sound('sounds/hero_run_footsteps_stone.wav')
-        self.HEAL_SOUND = pygame.mixer.Sound('sounds/focus_health_heal.wav')
-
-        self.HEARTBEAT_SOUND = pygame.mixer.Sound('sounds/heartbeat_B_01.wav')
-        self.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('sounds/breakable_wall_hit_{}.wav'.format(i + 1)) for i in range(2)]
 
         # MUSIC INITIALIZATION
+        # TODO proper music controller
         if painful:
             pygame.mixer.music.load('sounds/Furious_Gods.wav')
         else:
@@ -203,8 +211,8 @@ class Game:
             enemy.Enemy(self, (2500, 1550)),
 
         )
-        self.hitter_group = pygame.sprite.Group()
-        self.hud_group = pygame.sprite.Group()
+        self.hitter_group = base.AdvancedRenderPlain()
+        self.hud_group = base.AdvancedRenderPlain()
         self.pickupable_group = pygame.sprite.Group()
 
         self.hittable_group = pygame.sprite.Group(*self.enemy_group, *self.box_group)
@@ -220,11 +228,11 @@ class Game:
         # GROUPS INITIALIZING
         # TODO reorganize groups (make new group types or start using advanced groups)
         self.player_group = pygame.sprite.GroupSingle(self.player)
-        self.particle_group = pygame.sprite.Group()
-        self.common_group = pygame.sprite.RenderPlain(*self.obstacle_group,
-                                                      *self.enemy_group,
-                                                      *self.player_group,
-                                                      *self.pickupable_group)
+        self.particle_group = base.AdvancedRenderPlain()
+        self.common_group = base.AdvancedRenderPlain(*self.obstacle_group,
+                                                     *self.enemy_group,
+                                                     *self.player_group,
+                                                     *self.pickupable_group)
         self.fade = None
 
     def win(self):
@@ -288,14 +296,12 @@ class Game:
             # DRAWING
             # TODO optimize drawing (naaah...)
             self.screen.fill(constants.C_BACKGROUND)
+
             # TODO rewrite drawing (add draw to sprites and advanced draw in groups)
-            for sprite in self.common_group:
-                self.screen.blit(sprite.image, (sprite.rect.x - self.window.x, sprite.rect.y - self.window.y))
-            for sprite in self.hitter_group:
-                self.screen.blit(sprite.image, (sprite.rect.x - self.window.x, sprite.rect.y - self.window.y))
-            self.hud_group.draw(self.screen)
-            for sprite in self.particle_group:
-                self.screen.blit(sprite.image, (sprite.rect.x - self.window.x, sprite.rect.y - self.window.y))
+            self.common_group.draw_all(self.screen, self.window)
+            self.hitter_group.draw_all(self.screen, self.window)
+            self.hud_group.draw_all(self.screen, self.window)
+            self.particle_group.draw_all(self.screen, self.window)
             self.screen.blit(self.fade.image, self.fade.rect)
 
             pygame.display.flip()
