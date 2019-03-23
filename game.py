@@ -15,7 +15,7 @@ import sword
 class Game:
     def __init__(self, painful=False):
         # GAME INITIALIZING
-        pygame.mixer.pre_init(22050, -16, 4, 64)
+        pygame.mixer.pre_init(22050, -16, 6, 64)
         pygame.init()
         pygame.mouse.set_visible(False)
         self.clock = pygame.time.Clock()
@@ -52,6 +52,8 @@ class Game:
         sword.CLING_SOUND = pygame.mixer.Sound('sounds/sword_hit_reject.wav')
 
         player.DASH_SOUND = pygame.mixer.Sound('sounds/hero_dash.wav')
+        player.DASH_STATS["sound"] = player.DASH_SOUND
+        player.BACK_DASH_STATS["sound"] = player.DASH_SOUND
         player.HIT_SOUND = pygame.mixer.Sound('sounds/hero_damage.wav')
         player.DEATH_SOUND = pygame.mixer.Sound('sounds/hero_death_extra_details.wav')
         player.HEAL_SOUND = pygame.mixer.Sound('sounds/focus_health_heal.wav')
@@ -60,6 +62,7 @@ class Game:
 
         enemy.DASH_SOUND = pygame.mixer.Sound('sounds/ruin_fat_sentry_sword.wav')
         enemy.DASH_SOUND.set_volume(0.5)
+        enemy.DASH_STATS["sound"] = enemy.DASH_SOUND
         enemy.STARTLE_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_Fat_startle_0{}.wav'.format(i + 1)) for i in
                                 range(2)]
         enemy.ATTACK_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_Fat_attack_0{}.wav'.format(i + 1)) for i in
@@ -88,6 +91,8 @@ class Game:
         # TODO move to separate class and make several levels (haha)
         self.enemies_count = 0  # TODO remove this counter and move enemies in boxes in enemy_group and take len()
         self.level_rect = pygame.Rect(0, 0, 3000, 2000)
+        self.particle_group = base.AdvancedRenderPlain()
+
         self.box_group = pygame.sprite.Group(
             # upper room
 
@@ -228,7 +233,6 @@ class Game:
         # GROUPS INITIALIZING
         # TODO reorganize groups (make new group types or start using advanced groups)
         self.player_group = pygame.sprite.GroupSingle(self.player)
-        self.particle_group = base.AdvancedRenderPlain()
         self.common_group = base.AdvancedRenderPlain(*self.obstacle_group,
                                                      *self.enemy_group,
                                                      *self.player_group,
@@ -314,7 +318,6 @@ class Game:
 
 
 def main():
-    # TODO main menu or something
     restart = True
     painful = False
     while restart:

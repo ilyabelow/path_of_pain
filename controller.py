@@ -9,6 +9,7 @@ class Controller:
         self.swing_pressed = False
 
     def check(self, obj):
+        obj.look_away = self.check_look() * 300
         face_vector = self.check_movement()
         if face_vector:
             obj.face = face_vector.normalize()
@@ -51,8 +52,11 @@ class Controller:
     def check_swing(self):
         pass
 
-    # TODO move game reseting (and then calling menu) to controller
+    # TODO move game reseting (and then calling menu) to controller?
     def check_reset(self):
+        pass
+
+    def check_look(self):
         pass
 
 
@@ -64,8 +68,13 @@ class Joystick(Controller):
         self.joystick.init()
 
     def check_movement(self):
-        offset = Joystick.dead_zone(self.joystick.get_axis(0)), \
-                 Joystick.dead_zone(self.joystick.get_axis(1))
+        offset = Joystick.dead_zone(self.joystick.get_axis(constants.A_LS_H)), \
+                 Joystick.dead_zone(self.joystick.get_axis(constants.A_LS_V))
+        return pygame.Vector2(offset)
+
+    def check_look(self):
+        offset = Joystick.dead_zone(self.joystick.get_axis(constants.A_RS_H)), \
+                 Joystick.dead_zone(self.joystick.get_axis(constants.A_RS_V))
         return pygame.Vector2(offset)
 
     def check_dash(self):
@@ -91,6 +100,9 @@ class Keyboard(Controller):
         pressed = pygame.key.get_pressed()
         return pygame.Vector2(pressed[pygame.K_RIGHT] - pressed[pygame.K_LEFT],
                               pressed[pygame.K_DOWN] - pressed[pygame.K_UP])
+
+    def check_look(self):
+        return 0  # TODO support
 
     def check_dash(self):
         return pygame.key.get_pressed()[pygame.K_d]

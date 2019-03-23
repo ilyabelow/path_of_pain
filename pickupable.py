@@ -1,20 +1,12 @@
 import pygame
 import base
+import interface
 
 LITTLE_HEART_SPRITE = None
 LITTLE_HEART_WEAK_SPRITE = None
 
 
-# TODO make interface for pickupable
-class Pickupable(base.AdvancedSprite):
-    def __init__(self):
-        super(Pickupable, self).__init__()
-
-    def pickup(self, who):
-        pass
-
-
-class Heart(Pickupable):
+class Heart(base.AdvancedSprite, interface.Pickupable):
     def __init__(self, coords, weak=False):
         super(Heart, self).__init__()
         self.weak = weak

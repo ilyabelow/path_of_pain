@@ -45,38 +45,28 @@ BOX_EMPTY = 0
 BOX_HEALTH = 1
 BOX_WEAK_HEALTH = 2
 BOX_ENEMY = 3
-# TODO move more constants here?
 
-# TODO remove this to classes themselves
+# TODO remove this to classes themselves <-- !
 
 # TODO BALANCE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # ENEMY AND PLAYER STATS
+enemy_health = 3
 enemy_idle_move_speed = 2
 enemy_move_speed = 4
 enemy_resting_move_speed = 2
-enemy_dash_speed = 20
-enemy_dash_duration = 5
-enemy_next_dash_wait = 30
 enemy_chase_radius = 300
 enemy_unchase_radius = 700
 enemy_dash_radius = 120
 enemy_spot_time = 10
-enemy_dash_time = 5
-enemy_throwback_duration = 5
+enemy_attack_time = 5
+enemy_throwback_length = 15
 enemy_throwback_speed = 3
 enemy_stun_duration = 7
-enemy_health = 3
 
 player_health = 6
 player_move_speed = 12
-player_dash_speed = 36
-player_dash_duration = 5
-player_dash_wait = 15
-player_back_dash_speed = 24
-player_back_dash_duration = 4
-player_back_dash_wait = 10
 player_invulnerability_duration = 25
-player_throwback_duration = 4
+player_throwback_length = 144
 player_throwback_speed = 36
 player_stun_duration = 8
 

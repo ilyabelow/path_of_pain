@@ -16,13 +16,13 @@ class Particle(base.AdvancedSprite):
 
 # TODO rename and make more general?
 class Blood(Particle):
-    def __init__(self, position, speed, lifetime, fadeout, color, round_shape=True):
+    def __init__(self, position, speed, lifetime, fadeout, color):
         super(Blood, self).__init__(lifetime)
+        # TODO more customisable blood
         self.color = color
         self.speed = speed
         self.fadeout = fadeout
         self.pos = position
-        self.round_shape = round_shape  # TODO make permanent solution and allow different shaped oficially
 
     def update(self, *args):
         # MOVING
@@ -38,10 +38,7 @@ class Blood(Particle):
 
     def draw(self, screen, window):
         image = pygame.Surface((int(self.countdown * 2), int(self.countdown * 2)), pygame.SRCALPHA, 32)
-        if self.round_shape:
-            pygame.draw.circle(image, self.color, [i // 2 for i in image.get_size()], int(self.countdown))
-        else:
-            image.fill(constants.C_BOX)
+        pygame.draw.circle(image, self.color, [i // 2 for i in image.get_size()], int(self.countdown))
         screen.blit(image, (self.pos.x - window.x, self.pos.y - window.y))
 
 

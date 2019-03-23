@@ -5,9 +5,9 @@ HEART_SPRITE = None
 HEART_EMPTY_SPRITE = None
 HEART_WEAK_SPRITE = None
 
+
 # TODO base class for hud?
 class HealthHUD(base.AdvancedSprite):
-
     def __init__(self, obj):
         super(HealthHUD, self).__init__()
         self.obj = obj
