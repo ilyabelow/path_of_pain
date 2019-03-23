@@ -6,7 +6,16 @@ import particle
 import clock
 import interface
 
+SPRITE = None
+STUNNED_SPRITE = None
+SURPRISED_SPRITE = None
 
+DASH_SOUND = None
+ATTACK_SOUNDS = None
+HIT_SOUND = None
+DEATH_SOUNDS = None
+STARTLE_SOUNDS = None
+HEAL_SOUND = None
 # TODO make this class more abstract to make building more types of enemies
 # TODO MORE ENEMIES MORE CONTENT
 class Enemy(alive.Alive, interface.Healthy):
@@ -16,25 +25,24 @@ class Enemy(alive.Alive, interface.Healthy):
         interface.Healthy.__init__(
             self,
             constants.enemy_health,
-            [game.HEAL_SOUND],
-            [game.STAB_SOUND],
-            game.DEATH_SOUNDS
+            [HEAL_SOUND],
+            [HIT_SOUND],
+            DEATH_SOUNDS
         )
         game.enemies_count += 1
-        # TODO remove because this are dull versions
-        self.image = self.game.ENEMY_SPRITE
-        self.rect = self.image.get_rect(centerx=coords[0], centery=coords[1])
-
+        self.rect = pygame.Rect(0, 0, 50, 50)
+        self.rect.centerx, self.rect.centery = coords[0], coords[1]
         # CLOCKS
         self.spot_clock = clock.Clock(self.unblock_movement, constants.enemy_spot_time)
         self.prepare_to_dash_clock = clock.Clock(self.dash, constants.enemy_dash_time)
         self.idle_clock = clock.Clock(self.move_in_idle)
-        self.clock_ticker.add_clock(self.spot_clock, self.prepare_to_dash_clock, self.idle_clock)
 
         # INITIAL IDLE
         self.idle_clock.wind_up(random.randint(30, 90))
         self.idle = True
         self.moving = random.randint(0, 2)
+
+        self.clock_ticker.add_clock(*[getattr(self, attr) for attr in dir(self) if '_clock' in attr])
 
     def move(self):
         # TODO remove reference to main player to add compatibility of several players
@@ -49,7 +57,7 @@ class Enemy(alive.Alive, interface.Healthy):
                     self.speed = constants.V_ZERO
                     self.game.particle_group.add(
                         particle.Exclamation(self.pos + constants.V_RIGHT.rotate(-45) * 40, 10))
-                    random.choice(self.game.GASP_SOUNDS).play()
+                    random.choice(STARTLE_SOUNDS).play()
                     self.face = -dist.normalize()
                     self.can_be_moved = False
                     self.moving = True
@@ -66,7 +74,7 @@ class Enemy(alive.Alive, interface.Healthy):
                 # ATTACK???
                 elif dist.length() < constants.enemy_dash_radius and self.next_dash_clock.is_not_running():
                     self.prepare_to_dash_clock.wind_up()
-                    random.choice(self.game.ATTACK_SOUNDS).play()
+                    random.choice(ATTACK_SOUNDS).play()
                     self.speed = constants.V_ZERO
                     self.can_be_moved = False
 
@@ -93,16 +101,17 @@ class Enemy(alive.Alive, interface.Healthy):
             self.face.rotate_ip(random.randint(-180, 180))
             self.idle_clock.wind_up(random.randint(20, 40))
 
-    # TODO turn into draw function or something
-    def compose_image(self):
+    def draw(self, screen, window):
         if self.stun_clock.is_running():
-            image = self.game.ENEMY_STUNNED_SPRITE
+            image = STUNNED_SPRITE
         elif self.spot_clock.is_running():
-            image = self.game.ENEMY_SURPRISED_SPRITE
+            image = SURPRISED_SPRITE
         else:
-            image = self.game.ENEMY_SPRITE
-        # TODO FIX IMAGE PADDING ON ROTATION
-        self.image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
+            image = SPRITE
+        rotated_image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
+        center_rect = rotated_image.get_rect(centerx=25, centery=25)
+        screen.blit(rotated_image,
+                    (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
 
     def on_any_health(self, who):
         self.bleed_one_dir((self.pos - who.pos).normalize())
@@ -124,9 +133,8 @@ class Enemy(alive.Alive, interface.Healthy):
         self.next_dash_clock.wind_up(constants.enemy_next_dash_wait)
         self.speed = self.face * constants.enemy_dash_speed
         self.can_be_moved = False
-        self.game.ENEMY_DASH_SOUND.play()
+        DASH_SOUND.play()
 
-    # TODO make beautiful
     # TODO MOVE up to base class or to interface
     def bleed_one_dir(self, main_direction):
         for i in range(7):

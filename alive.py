@@ -2,15 +2,15 @@ import pygame
 import random
 import constants
 import clock
+import base
 
 
 # TODO all common properties of Player and Anemy is bunched up here, needs disassembling to interfaces
-class Alive(pygame.sprite.Sprite):
+class Alive(base.AdvancedSprite):
     def __init__(self, game, pos, face=None):  # TODO think about values sent to this __init__
         super(Alive, self).__init__()
         self.game = game
         # TODO remove dull inits??? (we have to init fields in init}
-        self.image = None
         self.rect = None
         if face is not None:
             self.face = face
@@ -22,8 +22,6 @@ class Alive(pygame.sprite.Sprite):
         # TODO make up better way to state if the object is moving. This field is used in SOME cases
         self.moving = False
         self.can_be_moved = True  # object's ability to make decision about its movement!!!
-        # HEALTH
-        # TODO move to interface?
 
         # BASE CLOCKS
         # TODO move to interfaces as well
@@ -31,10 +29,7 @@ class Alive(pygame.sprite.Sprite):
         self.next_dash_clock = clock.Clock(None)
         self.stun_clock = clock.Clock(self.unblock_movement)
         self.throw_back_clock = clock.Clock(self.stop)
-        self.clock_ticker = clock.ClockTicker(self.dash_clock,
-                                              self.next_dash_clock,
-                                              self.stun_clock,
-                                              self.throw_back_clock)
+        self.clock_ticker = clock.ClockTicker()
 
     def move_and_collide_with_walls(self):
         # collision logic mostly copypasted from some example, so it works fine
@@ -73,7 +68,6 @@ class Alive(pygame.sprite.Sprite):
         self.clock_ticker.tick_all()
         self.move()
         self.pickup()
-        self.compose_image()
 
     # TODO merge throw back and stun because of conflict of can_be_moved????
     def throw_back(self, direction, speed, duration, stun_duration):
@@ -92,9 +86,6 @@ class Alive(pygame.sprite.Sprite):
         pass
 
     def move(self):
-        pass
-
-    def compose_image(self):
         pass
 
     def unblock_movement(self):

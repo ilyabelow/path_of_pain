@@ -3,11 +3,21 @@ import pygame
 import random
 import constants
 import particle
-import hitter
+import sword
 import HUD
 import clock
 import interface
 
+SPRITE = None
+STUNNED_SPRITE = None
+SURPRISED_SPRITE = None
+
+DASH_SOUND = None
+HIT_SOUND = None
+DEATH_SOUND = None
+HEAL_SOUND = None
+HEARTBEAT_SOUND = None
+STEPS_SOUND = None  # TODO integrate!
 
 class Player(alive.Alive, interface.Healthy):
 
@@ -16,23 +26,21 @@ class Player(alive.Alive, interface.Healthy):
         interface.Healthy.__init__(
             self,
             constants.player_health if not game.painful else 1,
-            [game.HEAL_SOUND],
-            [game.HERO_DAMAGE_SOUND],
-            [game.HERO_DEATH_SOUND],
+            [HEAL_SOUND],
+            [HIT_SOUND],
+            [DEATH_SOUND],
             20
         )
-        # TODO remove because this are dull versions
-        self.image = self.game.PLAYER_SPRITE
-        self.rect = self.image.get_rect(centerx=coords[0], centery=coords[1])
-
-        self.weak_health = 0
+        self.rect = pygame.Rect(0, 0, 50, 50)
+        self.rect.centerx, self.rect.centery = coords[0], coords[1]
         if not game.painful:
             self.health_hud = HUD.HealthHUD(self)
         self.controller = controller
-        self.sword = hitter.Sword(self)
+        self.sword = sword.Sword(self)
 
         self.surprised_clock = clock.Clock(None, 30)
-        self.clock_ticker.add_clock(self.invulnerability_clock, self.surprised_clock)
+
+        self.clock_ticker.add_clock(*[getattr(self, attr) for attr in dir(self) if '_clock' in attr])
 
     def move(self):
         if self.can_be_moved:
@@ -45,17 +53,17 @@ class Player(alive.Alive, interface.Healthy):
             self.move_and_collide_with_walls()
             self.fetch_screen()
 
-    # TODO move to draw()
-    def compose_image(self):
+    def draw(self, screen, window):
         if self.stun_clock.is_running():
-            image = self.game.PLAYER_STUNNED_SPRITE
+            image = STUNNED_SPRITE
         elif self.surprised_clock.is_running():
-            image = self.game.PLAYER_SURPRIZED_SPRITE
+            image = SURPRISED_SPRITE
         else:
-            image = self.game.PLAYER_SPRITE
-
-        # TODO FIX IMAGE PADDING ON ROTATION
-        self.image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
+            image = SPRITE
+        rotated_image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
+        center_rect = rotated_image.get_rect()
+        screen.blit(rotated_image,
+                    (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
 
     # TODO union them and probably move to base class/interface
     def dash(self):
@@ -64,7 +72,7 @@ class Player(alive.Alive, interface.Healthy):
         self.next_dash_clock.wind_up(constants.player_dash_wait)
         self.speed = self.face * constants.player_dash_speed
         self.can_be_moved = False
-        self.game.DASH_SOUND.play()
+        DASH_SOUND.play()
 
     def back_dash(self):
         # TODO same
@@ -72,7 +80,7 @@ class Player(alive.Alive, interface.Healthy):
         self.next_dash_clock.wind_up(constants.player_back_dash_wait)
         self.speed = -self.face * constants.player_back_dash_speed
         self.can_be_moved = False
-        self.game.DASH_SOUND.play()
+        DASH_SOUND.play()
 
     def on_any_health(self, who):
         self.bleed_one_dir((self.pos - who.pos).normalize())
@@ -80,12 +88,12 @@ class Player(alive.Alive, interface.Healthy):
             self.health_hud.makeup()
 
     def on_low_health(self, who):
-        self.game.HEARTBEAT_SOUND.play(-1)
-
+        HEARTBEAT_SOUND.play(-1)
         pygame.mixer.music.set_volume(0.2)
 
     def on_zero_health(self, who):
-        self.game.HEARTBEAT_SOUND.stop()
+        HEARTBEAT_SOUND.stop()
+        DEATH_SOUND.play()
         self.sword.kill()
         self.kill()
         self.bleed_all_dir()
@@ -100,7 +108,7 @@ class Player(alive.Alive, interface.Healthy):
 
     def after_healing(self):
         self.health_hud.makeup()
-        self.game.HEARTBEAT_SOUND.stop()
+        HEARTBEAT_SOUND.stop()
         pygame.mixer.music.set_volume(0.5)
 
     def fetch_screen(self):
