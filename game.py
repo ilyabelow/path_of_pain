@@ -46,8 +46,6 @@ class Game:
         pygame.display.set_icon(enemy.SPRITE)
 
         # SOUND INITIALIZATION
-        # TODO move to separate namespace
-        # TODO makeup proper naming system
         sword.SWING_SOUNDS = [pygame.mixer.Sound('sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
         sword.CLING_SOUND = pygame.mixer.Sound('sounds/sword_hit_reject.wav')
 
@@ -88,139 +86,138 @@ class Game:
         pygame.mixer.music.play(loops=-1)
 
         # LEVEL INITIALIZATION
+        self.common_group = base.AdvancedLayeredUpdates()
         # TODO move to separate class and make several levels (haha)
         self.enemies_count = 0  # TODO remove this counter and move enemies in boxes in enemy_group and take len()
         self.level_rect = pygame.Rect(0, 0, 3000, 2000)
-        self.particle_group = base.AdvancedRenderPlain()
 
-        self.box_group = pygame.sprite.Group(
-            # upper room
+        self.particle_group = base.AdvancedGroup(self.common_group)
+        self.box_group = base.AdvancedGroup(self.common_group,
+                                            # upper room
 
-            obstacle.Box(self, (200, 200)),
-            obstacle.Box(self, (250, 200)),
-            obstacle.Box(self, (250, 250)),
-            obstacle.Box(self, (200, 350)),
+                                            obstacle.Box(self, (200, 200)),
+                                            obstacle.Box(self, (250, 200)),
+                                            obstacle.Box(self, (250, 250)),
+                                            obstacle.Box(self, (200, 350)),
 
-            obstacle.Box(self, (1300, 700)),
-            obstacle.Box(self, (1350, 750)),
-            obstacle.Box(self, (1450, 750)),
+                                            obstacle.Box(self, (1300, 700)),
+                                            obstacle.Box(self, (1350, 750)),
+                                            obstacle.Box(self, (1450, 750)),
 
-            obstacle.Box(self, (2400, 200)),
-            obstacle.Box(self, (2400, 400)),
-            obstacle.Box(self, (2450, 400)),
-            obstacle.Box(self, (2650, 350)),
-            obstacle.Box(self, (2400, 500)),
-            obstacle.Box(self, (2400, 700)),
-            obstacle.Box(self, (2500, 400)),
-            obstacle.Box(self, (2600, 300)),
-            obstacle.Box(self, (2600, 600)),
-            obstacle.Box(self, (2700, 400)),
-            obstacle.Box(self, (2500, 550)),
-            obstacle.Box(self, (2550, 500)),
+                                            obstacle.Box(self, (2400, 200)),
+                                            obstacle.Box(self, (2400, 400)),
+                                            obstacle.Box(self, (2450, 400)),
+                                            obstacle.Box(self, (2650, 350)),
+                                            obstacle.Box(self, (2400, 500)),
+                                            obstacle.Box(self, (2400, 700)),
+                                            obstacle.Box(self, (2500, 400)),
+                                            obstacle.Box(self, (2600, 300)),
+                                            obstacle.Box(self, (2600, 600)),
+                                            obstacle.Box(self, (2700, 400)),
+                                            obstacle.Box(self, (2500, 550)),
+                                            obstacle.Box(self, (2550, 500)),
 
-            obstacle.Box(self, (200, 650)),
-            obstacle.Box(self, (200, 700)),
-            obstacle.Box(self, (250, 700)),
-            obstacle.Box(self, (200, 750)),
-            obstacle.Box(self, (250, 750)),
-            obstacle.Box(self, (300, 750)),
+                                            obstacle.Box(self, (200, 650)),
+                                            obstacle.Box(self, (200, 700)),
+                                            obstacle.Box(self, (250, 700)),
+                                            obstacle.Box(self, (200, 750)),
+                                            obstacle.Box(self, (250, 750)),
+                                            obstacle.Box(self, (300, 750)),
 
-            obstacle.Box(self, (650, 150)),
-            obstacle.Box(self, (650, 200)),
+                                            obstacle.Box(self, (650, 150)),
+                                            obstacle.Box(self, (650, 200)),
 
-            # bottom-left room
+                                            # bottom-left room
 
-            obstacle.Box(self, (1100, 1700)),
-            obstacle.Box(self, (1150, 1700)),
-            obstacle.Box(self, (1200, 1700)),
+                                            obstacle.Box(self, (1100, 1700)),
+                                            obstacle.Box(self, (1150, 1700)),
+                                            obstacle.Box(self, (1200, 1700)),
 
-            obstacle.Box(self, (300, 1450)),
-            obstacle.Box(self, (250, 1500)),
+                                            obstacle.Box(self, (300, 1450)),
+                                            obstacle.Box(self, (250, 1500)),
 
-            # bottom-right room
+                                            # bottom-right room
 
-            obstacle.Box(self, (2400, 1450)),
-            obstacle.Box(self, (2450, 1450)),
-            obstacle.Box(self, (2500, 1450)),
-            obstacle.Box(self, (2550, 1450)),
-            obstacle.Box(self, (2600, 1450)),
+                                            obstacle.Box(self, (2400, 1450)),
+                                            obstacle.Box(self, (2450, 1450)),
+                                            obstacle.Box(self, (2500, 1450)),
+                                            obstacle.Box(self, (2550, 1450)),
+                                            obstacle.Box(self, (2600, 1450)),
 
-            obstacle.Box(self, (2400, 1700)),
-            obstacle.Box(self, (2450, 1700)),
-            obstacle.Box(self, (2500, 1700)),
-            obstacle.Box(self, (2550, 1700)),
-            obstacle.Box(self, (2600, 1700)),
+                                            obstacle.Box(self, (2400, 1700)),
+                                            obstacle.Box(self, (2450, 1700)),
+                                            obstacle.Box(self, (2500, 1700)),
+                                            obstacle.Box(self, (2550, 1700)),
+                                            obstacle.Box(self, (2600, 1700)),
 
-            obstacle.Box(self, (2350, 1500)),
-            obstacle.Box(self, (2350, 1450)),
-            obstacle.Box(self, (2350, 1550)),
-            obstacle.Box(self, (2350, 1600)),
-            obstacle.Box(self, (2350, 1650)),
-            obstacle.Box(self, (2350, 1700)),
+                                            obstacle.Box(self, (2350, 1500)),
+                                            obstacle.Box(self, (2350, 1450)),
+                                            obstacle.Box(self, (2350, 1550)),
+                                            obstacle.Box(self, (2350, 1600)),
+                                            obstacle.Box(self, (2350, 1650)),
+                                            obstacle.Box(self, (2350, 1700)),
 
-            obstacle.Box(self, (2600, 1500)),
-            obstacle.Box(self, (2600, 1550)),
-            obstacle.Box(self, (2600, 1600)),
-            obstacle.Box(self, (2600, 1650)),
+                                            obstacle.Box(self, (2600, 1500)),
+                                            obstacle.Box(self, (2600, 1550)),
+                                            obstacle.Box(self, (2600, 1600)),
+                                            obstacle.Box(self, (2600, 1650)),
 
-            obstacle.Box(self, (1800, 1750)),
-            obstacle.Box(self, (2050, 1700)),
+                                            obstacle.Box(self, (1800, 1750)),
+                                            obstacle.Box(self, (2050, 1700)),
 
-        )
-        self.wall_group = pygame.sprite.Group(
-            # vertical center walls
-            obstacle.Wall(pygame.Rect(1400, 900, 200, 500), True),
-            obstacle.Wall(pygame.Rect(1400, 1600, 200, 300)),
+                                            )
+        self.wall_group = base.AdvancedGroup(self.common_group,
+                                             # vertical center walls
+                                             obstacle.Wall(pygame.Rect(1400, 900, 200, 500)),
+                                             obstacle.Wall(pygame.Rect(1400, 1600, 200, 300)),
 
-            # horizontal center walls
-            obstacle.Wall(pygame.Rect(100, 900, 500, 200), True),
-            obstacle.Wall(pygame.Rect(900, 900, 500, 200), True),
-            obstacle.Wall(pygame.Rect(1600, 900, 500, 200), True),
-            obstacle.Wall(pygame.Rect(2400, 900, 500, 200), True),
-            # pillars
-            obstacle.Wall(pygame.Rect(900, 400, 200, 200), True),
-            obstacle.Wall(pygame.Rect(1400, 400, 200, 200), True),
-            obstacle.Wall(pygame.Rect(1900, 400, 200, 200), True),
-            obstacle.Wall(pygame.Rect(1800, 1300, 200, 200), True),
+                                             # horizontal center walls
+                                             obstacle.Wall(pygame.Rect(100, 900, 500, 200)),
+                                             obstacle.Wall(pygame.Rect(900, 900, 500, 200)),
+                                             obstacle.Wall(pygame.Rect(1600, 900, 500, 200)),
+                                             obstacle.Wall(pygame.Rect(2400, 900, 500, 200)),
+                                             # pillars
+                                             obstacle.Wall(pygame.Rect(900, 400, 200, 200)),
+                                             obstacle.Wall(pygame.Rect(1400, 400, 200, 200)),
+                                             obstacle.Wall(pygame.Rect(1900, 400, 200, 200)),
+                                             obstacle.Wall(pygame.Rect(1800, 1300, 200, 200)),
 
-            # border walls
-            obstacle.Wall(pygame.Rect(100, 0, 3000, 100), True),
-            obstacle.Wall(pygame.Rect(0, 0, 100, 2000)),
-            obstacle.Wall(pygame.Rect(0, 1900, 3000, 100)),
-            obstacle.Wall(pygame.Rect(2900, 0, 100, 2000)),
-        )
+                                             # border walls
+                                             obstacle.Wall(pygame.Rect(100, 0, 3000, 100)),
+                                             obstacle.Wall(pygame.Rect(0, 0, 100, 2000)),
+                                             obstacle.Wall(pygame.Rect(0, 1900, 3000, 100)),
+                                             obstacle.Wall(pygame.Rect(2900, 0, 100, 2000)),
+                                             )
 
-        self.obstacle_group = pygame.sprite.Group(*self.wall_group, *self.box_group)
-        self.enemy_group = pygame.sprite.Group(
-            # bottom-left room
-            enemy.Enemy(self, (500, 1300)),
-            enemy.Enemy(self, (900, 1300)),
-            enemy.Enemy(self, (500, 1600)),
-            enemy.Enemy(self, (900, 1600)),
-            enemy.Enemy(self, (700, 1450)),
+        self.obstacle_group = base.AdvancedGroup(self.common_group, *self.wall_group, *self.box_group)
+        self.enemy_group = base.AdvancedGroup(self.common_group,
+                                              # bottom-left room
+                                              enemy.Enemy(self, (500, 1300)),
+                                              enemy.Enemy(self, (900, 1300)),
+                                              enemy.Enemy(self, (500, 1600)),
+                                              enemy.Enemy(self, (900, 1600)),
+                                              enemy.Enemy(self, (700, 1450)),
 
-            # upper room
-            enemy.Enemy(self, (1700, 450)),
-            enemy.Enemy(self, (2200, 450)),
-            enemy.Enemy(self, (2850, 150)),
-            enemy.Enemy(self, (2850, 750)),
+                                              # upper room
+                                              enemy.Enemy(self, (1700, 450)),
+                                              enemy.Enemy(self, (2200, 450)),
+                                              enemy.Enemy(self, (2850, 150)),
+                                              enemy.Enemy(self, (2850, 750)),
 
-            # bottom-right
-            enemy.Enemy(self, (2100, 1200)),
-            enemy.Enemy(self, (2100, 1500)),
-            enemy.Enemy(self, (1800, 1500)),
+                                              # bottom-right
+                                              enemy.Enemy(self, (2100, 1200)),
+                                              enemy.Enemy(self, (2100, 1500)),
+                                              enemy.Enemy(self, (1800, 1500)),
 
-            enemy.Enemy(self, (2450, 1600)),
-            enemy.Enemy(self, (2500, 1600)),
-            enemy.Enemy(self, (2450, 1550)),
-            enemy.Enemy(self, (2500, 1550)),
+                                              enemy.Enemy(self, (2450, 1600)),
+                                              enemy.Enemy(self, (2500, 1600)),
+                                              enemy.Enemy(self, (2450, 1550)),
+                                              enemy.Enemy(self, (2500, 1550)),
 
-        )
-        self.hitter_group = base.AdvancedRenderPlain()
-        self.hud_group = base.AdvancedRenderPlain()
-        self.pickupable_group = pygame.sprite.Group()
-
-        self.hittable_group = pygame.sprite.Group(*self.enemy_group, *self.box_group)
+                                              )
+        self.hitter_group = base.AdvancedGroup(self.common_group)
+        self.pickupable_group = base.AdvancedGroup(self.common_group)
+        self.hittable_group = base.AdvancedGroup(self.common_group, *self.enemy_group, *self.box_group)
 
         # PLAYER INITIALIZING
         if pygame.joystick.get_count() == 0:
@@ -229,15 +226,11 @@ class Game:
             ctrlr = controller.Joystick()
         self.player = player.Player(self, (400, 300), ctrlr)
         self.player.fetch_screen()
-
         # GROUPS INITIALIZING
         # TODO reorganize groups (make new group types or start using advanced groups)
-        self.player_group = pygame.sprite.GroupSingle(self.player)
-        self.common_group = base.AdvancedRenderPlain(*self.obstacle_group,
-                                                     *self.enemy_group,
-                                                     *self.player_group,
-                                                     *self.pickupable_group)
+        self.player_group = base.AdvancedGroup(self.common_group, self.player)
         self.fade = None
+        self.prev_rect = [self.window]
 
     def win(self):
         self.player.surprised_clock.wind_up()
@@ -251,13 +244,18 @@ class Game:
         self.WIN_SOUND.play()
         self.enemies_count = -1
 
+    def fade_out(self):
+        self.fade = particle.Fade(constants.fade_out, True)
+        self.common_group.add(self.fade)
+
     def loop(self):
+        # TODO remove this temp solution
         self.fade = particle.Fade(constants.fade_in, False)
+        self.common_group.add(self.fade)
         running = True
         reset = False  # will the game be reseted or not
         while running:
             # TODO remove this temp solution
-            # TODO better win effect
             if self.enemies_count == 0:
                 self.win()
             # TODO remove this temp solution
@@ -269,22 +267,22 @@ class Game:
                 # TODO move to controller?
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.fade = particle.Fade(constants.fade_out, True)
+                        self.fade_out()
                     if event.key == pygame.K_TAB:
-                        self.fade = particle.Fade(constants.fade_out, True)
+                        self.fade_out()
                         reset = True
                     if event.key == pygame.K_p:
-                        self.fade = particle.Fade(constants.fade_out, True)
+                        self.fade_out()
                         reset = True
                         self.painful = not self.painful
                 if event.type == pygame.JOYBUTTONDOWN:
                     if event.button == constants.B_BACK:
-                        self.fade = particle.Fade(constants.fade_out, True)
+                        self.fade_out()
                     if event.button == constants.B_START:
-                        self.fade = particle.Fade(constants.fade_out, True)
+                        self.fade_out()
                         reset = True
                     if event.button == constants.B_HOME:
-                        self.fade = particle.Fade(constants.fade_out, True)
+                        self.fade_out()
                         reset = True
                         self.painful = not self.painful
                 if event.type == pygame.QUIT:
@@ -298,17 +296,12 @@ class Game:
             self.fade.update()
 
             # DRAWING
-            # TODO optimize drawing (naaah...)
-            self.screen.fill(constants.C_BACKGROUND)
-
-            # TODO rewrite drawing (add draw to sprites and advanced draw in groups)
-            self.common_group.draw_all(self.screen, self.window)
-            self.hitter_group.draw_all(self.screen, self.window)
-            self.hud_group.draw_all(self.screen, self.window)
-            self.particle_group.draw_all(self.screen, self.window)
-            self.screen.blit(self.fade.image, self.fade.rect)
-
-            pygame.display.flip()
+            # TODO move to DirtyUpdates?
+            for r in self.prev_rect:
+                self.screen.fill(constants.C_BACKGROUND, r)
+            rect = self.common_group.draw_all(self.screen, self.window)
+            pygame.display.update([*rect, *self.prev_rect])
+            self.prev_rect = rect
 
             # WAITING
             self.clock.tick_busy_loop(constants.FRAME_RATE)
