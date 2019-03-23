@@ -29,6 +29,7 @@ class Game:
         # TODO makeup proper naming system
         self.PLAYER_SPRITE = pygame.image.load("images/player.png").convert_alpha()
         self.PLAYER_STUNNED_SPRITE = pygame.image.load("images/player_stunned.png").convert_alpha()
+        self.PLAYER_SURPRIZED_SPRITE = pygame.image.load("images/player_surprised.png").convert_alpha()
         self.ENEMY_STUNNED_SPRITE = pygame.image.load("images/enemy_stunned.png").convert_alpha()
         self.ENEMY_SURPRISED_SPRITE = pygame.image.load("images/enemy_surprised.png").convert_alpha()
         self.ENEMY_SPRITE = pygame.image.load("images/enemy.png").convert_alpha()
@@ -65,7 +66,7 @@ class Game:
         self.HEAL_SOUND = pygame.mixer.Sound('sounds/focus_health_heal.wav')
 
         self.HEARTBEAT_SOUND = pygame.mixer.Sound('sounds/heartbeat_B_01.wav')
-        self.BOX_BREAK_SOUND = [pygame.mixer.Sound('sounds/breakable_wall_hit_{}.wav'.format(i + 1)) for i in range(2)]
+        self.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('sounds/breakable_wall_hit_{}.wav'.format(i + 1)) for i in range(2)]
 
         # MUSIC INITIALIZATION
         if painful:
@@ -174,10 +175,9 @@ class Game:
             obstacle.Wall(pygame.Rect(0, 0, 100, 2000)),
             obstacle.Wall(pygame.Rect(0, 1900, 3000, 100)),
             obstacle.Wall(pygame.Rect(2900, 0, 100, 2000)),
-            # TODO move
-            *self.box_group
         )
 
+        self.obstacle_group = pygame.sprite.Group(*self.wall_group, *self.box_group)
         self.enemy_group = pygame.sprite.Group(
             # bottom-left room
             enemy.Enemy(self, (500, 1300)),
@@ -221,13 +221,14 @@ class Game:
         # TODO reorganize groups (make new group types or start using advanced groups)
         self.player_group = pygame.sprite.GroupSingle(self.player)
         self.particle_group = pygame.sprite.Group()
-        self.common_group = pygame.sprite.RenderPlain(*self.wall_group,
+        self.common_group = pygame.sprite.RenderPlain(*self.obstacle_group,
                                                       *self.enemy_group,
                                                       *self.player_group,
                                                       *self.pickupable_group)
         self.fade = None
 
     def win(self):
+        self.player.surprised_clock.wind_up()
         for i in range(15):
             direction = constants.V_RIGHT.rotate(random.randint(-180, 180))
             self.particle_group.add(particle.Blood(self.player.pos + constants.V_ZERO,

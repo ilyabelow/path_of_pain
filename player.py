@@ -6,12 +6,21 @@ import particle
 import hitter
 import HUD
 import clock
+import interface
 
 
-class Player(alive.Alive):
+class Player(alive.Alive, interface.Healthy):
 
     def __init__(self, game, coords, controller):
-        super(Player, self).__init__(game, coords, constants.player_health if not game.painful else 1)
+        alive.Alive.__init__(self, game, coords)
+        interface.Healthy.__init__(
+            self,
+            constants.player_health if not game.painful else 1,
+            [game.HEAL_SOUND],
+            [game.HERO_DAMAGE_SOUND],
+            [game.HERO_DEATH_SOUND],
+            20
+        )
         # TODO remove because this are dull versions
         self.image = self.game.PLAYER_SPRITE
         self.rect = self.image.get_rect(centerx=coords[0], centery=coords[1])
@@ -22,8 +31,8 @@ class Player(alive.Alive):
         self.controller = controller
         self.sword = hitter.Sword(self)
 
-        self.invulnerability_clock = clock.Clock(None, constants.player_invulnerability_duration)
-        self.clock_ticker.add_clock(self.invulnerability_clock)
+        self.surprised_clock = clock.Clock(None, 30)
+        self.clock_ticker.add_clock(self.invulnerability_clock, self.surprised_clock)
 
     def move(self):
         if self.can_be_moved:
@@ -40,8 +49,11 @@ class Player(alive.Alive):
     def compose_image(self):
         if self.stun_clock.is_running():
             image = self.game.PLAYER_STUNNED_SPRITE
+        elif self.surprised_clock.is_running():
+            image = self.game.PLAYER_SURPRIZED_SPRITE
         else:
             image = self.game.PLAYER_SPRITE
+
         # TODO FIX IMAGE PADDING ON ROTATION
         self.image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
 
@@ -62,48 +74,32 @@ class Player(alive.Alive):
         self.can_be_moved = False
         self.game.DASH_SOUND.play()
 
-    # TODO move to base/interface
-    def hit(self, who):
-        if self.invulnerability_clock.is_not_running():
+    def on_any_health(self, who):
+        self.bleed_one_dir((self.pos - who.pos).normalize())
+        if not self.game.painful:
+            self.health_hud.makeup()
 
-            self.invulnerability_clock.wind_up()
+    def on_low_health(self, who):
+        self.game.HEARTBEAT_SOUND.play(-1)
 
-            if self.weak_health != 0:
-                self.weak_health -= 1
-            else:
-                self.health -= 1
+        pygame.mixer.music.set_volume(0.2)
 
-            if not self.game.painful:
-                self.health_hud.makeup()
-            direction = (self.pos - who.pos).normalize()
-            self.bleed_one_dir(direction)
+    def on_zero_health(self, who):
+        self.game.HEARTBEAT_SOUND.stop()
+        self.sword.kill()
+        self.kill()
+        self.bleed_all_dir()
+        pygame.mixer.music.fadeout(2500)
 
-            if self.health == 1 and self.health != self.max_health and self.weak_health == 0:
-                self.game.HEARTBEAT_SOUND.play(-1)
-                pygame.mixer.music.set_volume(0.2)
-            if self.health == 0:
-                self.game.HEARTBEAT_SOUND.stop()
-                self.sword.kill()
-                self.kill()
-                self.bleed_all_dir()
-                self.game.HERO_DEATH_SOUND.play()
-                pygame.mixer.music.fadeout(2500)
-            else:
-                self.throw_back(direction,
-                                constants.player_throwback_speed,
-                                constants.player_throwback_duration,
-                                constants.player_stun_duration)
-                self.can_be_moved = False
-                self.game.HERO_DAMAGE_SOUND.play()
+    def on_ok_health(self, who):
+        self.throw_back((self.pos - who.pos).normalize(),
+                        constants.player_throwback_speed,
+                        constants.player_throwback_duration,
+                        constants.player_stun_duration)
+        self.can_be_moved = False
 
-    def heal(self, amount, weak_mode=False):
-        self.game.HEAL_SOUND.play()
-        if not weak_mode:
-            self.health = min(self.max_health, self.health + amount)
-        else:
-            self.weak_health += 1
+    def after_healing(self):
         self.health_hud.makeup()
-        # TODO move somewhere?
         self.game.HEARTBEAT_SOUND.stop()
         pygame.mixer.music.set_volume(0.5)
 

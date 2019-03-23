@@ -4,14 +4,22 @@ import random
 import constants
 import particle
 import clock
+import interface
 
 
 # TODO make this class more abstract to make building more types of enemies
 # TODO MORE ENEMIES MORE CONTENT
-class Enemy(alive.Alive):
+class Enemy(alive.Alive, interface.Healthy):
 
     def __init__(self, game, coords):
-        super(Enemy, self).__init__(game, coords, constants.enemy_health)
+        alive.Alive.__init__(self, game, coords)
+        interface.Healthy.__init__(
+            self,
+            constants.enemy_health,
+            [game.HEAL_SOUND],
+            [game.STAB_SOUND],
+            game.DEATH_SOUNDS
+        )
         game.enemies_count += 1
         # TODO remove because this are dull versions
         self.image = self.game.ENEMY_SPRITE
@@ -74,7 +82,7 @@ class Enemy(alive.Alive):
 
         self.move_and_collide_with_walls()
         if self.game.player.rect.colliderect(self.rect):
-            self.game.player.hit(self)
+            self.game.player.hit(1, self)
 
     def move_in_idle(self):
         if self.moving:
@@ -84,11 +92,6 @@ class Enemy(alive.Alive):
             self.moving = True
             self.face.rotate_ip(random.randint(-180, 180))
             self.idle_clock.wind_up(random.randint(20, 40))
-
-    # TODO move to interface already!
-    def heal(self, amount, weak_mode=False):
-        if not weak_mode:
-            self.health = min(self.max_health, self.health + amount)
 
     # TODO turn into draw function or something
     def compose_image(self):
@@ -101,22 +104,19 @@ class Enemy(alive.Alive):
         # TODO FIX IMAGE PADDING ON ROTATION
         self.image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
 
-    def hit(self, who):
-        # TODO can be hit a lot of times at once? add invulnerability countdown?
-        self.game.STAB_SOUND.play()
-        self.health -= 1
-        direction = (self.pos - who.pos).normalize()
-        self.bleed_one_dir(direction)
-        if self.health == 0:
-            random.choice(self.game.DEATH_SOUNDS).play()
-            self.bleed_all_dir()
-            self.game.enemies_count -= 1
-            self.kill()
-        else:
-            self.throw_back(direction,
-                            constants.enemy_throwback_speed,
-                            constants.enemy_throwback_duration,
-                            constants.enemy_stun_duration)
+    def on_any_health(self, who):
+        self.bleed_one_dir((self.pos - who.pos).normalize())
+
+    def on_zero_health(self, who):
+        self.bleed_all_dir()
+        self.game.enemies_count -= 1
+        self.kill()
+
+    def on_ok_health(self, who):
+        self.throw_back((self.pos - who.pos).normalize(),
+                        constants.enemy_throwback_speed,
+                        constants.enemy_throwback_duration,
+                        constants.enemy_stun_duration)
 
     # TODO this is so similar to player's dash! merge???
     def dash(self):
