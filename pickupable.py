@@ -2,7 +2,7 @@ import pygame
 import base
 import interface
 import random
-import constants
+import const
 
 LITTLE_HEART_SPRITE = None
 LITTLE_HEART_WEAK_SPRITE = None
@@ -35,10 +35,10 @@ class Key(base.AdvancedSprite, interface.Pickupable):
         self.rect.centerx, self.rect.centery = coords.x, coords.y
         self.y = coords.y - 100  # TODO improve because it is really flat and should me under everything
         if face is None:
-            self.face = constants.V_LEFT.rotate(random.randint(-180, 180))
+            self.face = const.V_LEFT.rotate(random.randint(-180, 180))
         else:
             self.face = face
-        self.image = pygame.transform.rotate(KEY_SPRITE, self.face.angle_to(constants.V_UP))
+        self.image = pygame.transform.rotate(KEY_SPRITE, self.face.angle_to(const.V_UP))
         # TODO rethink
         self.im_rect = self.image.get_rect(centerx=self.rect.centerx, centery=self.rect.centery)
 

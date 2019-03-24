@@ -1,5 +1,6 @@
 import pygame
 import base
+import const
 
 HEART_SPRITE = None
 HEART_EMPTY_SPRITE = None
@@ -13,7 +14,7 @@ class HealthHUD(base.AdvancedSprite):
         base.AdvancedSprite.__init__(self)
         self.obj = obj
         # TODO move adding to group?
-        self.y = 3000  # +inf
+        self.y = const.HUD_Y
         self.obj.game.common_group.add(self)
         self.image = None
         self.makeup()
@@ -41,14 +42,14 @@ class KeyHUD(base.AdvancedSprite):
         base.AdvancedSprite.__init__(self)
         self.obj = obj
         # TODO move adding to group?
-        self.y = 3000  # +inf
+        self.y = const.HUD_Y
         self.obj.game.common_group.add(self)
         self.image = None
         self.makeup()
 
     def makeup(self):
         # IMAGE COMPOSING
-        self.image = pygame.Surface((100 * (self.obj.max_health + self.obj.weak_health), 100), pygame.SRCALPHA, 32)
+        self.image = pygame.Surface((100 * (self.obj.max_health + self.obj.weak_health), 30), pygame.SRCALPHA, 32)
         # normal hearts
         for i in range(self.obj.keys):
             self.image.blit(KEY_SPRITE, (i * 100, 0))

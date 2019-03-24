@@ -1,6 +1,6 @@
 import pygame
 import clock
-import constants
+import const
 import particle
 import random
 
@@ -88,7 +88,7 @@ class Bleeding:
 
     def bleed_all_dir(self, pos):
         for i in range(self.all_dir_stats['amount']):
-            direction = constants.V_LEFT.rotate(random.randint(-180, 180))
+            direction = const.V_LEFT.rotate(random.randint(-180, 180))
             self.group.add(particle.Blood(pos + direction * self.all_dir_stats['offset'],
                                           direction * self.all_dir_stats['speed'],
                                           random.randint(self.all_dir_stats['sizes'][0],
@@ -131,10 +131,10 @@ class Moving:
         self.dash_stats = dash_stats
         self.rect = None
         self.collide_with = collide_with
-        self.face = constants.V_LEFT.rotate(random.randint(-180, 180))
+        self.face = const.V_LEFT.rotate(random.randint(-180, 180))
 
         self.pos = pygame.Vector2(pos)
-        self.speed = constants.V_ZERO
+        self.speed = const.V_ZERO
 
         # TODO make up better way to state if the object is moving. This field is used in SOME cases
         self.moving = False
@@ -203,7 +203,7 @@ class Moving:
         self.can_be_moved = False
 
     def stop(self):
-        self.speed = constants.V_ZERO
+        self.speed = const.V_ZERO
 
     def move(self):
         pass

@@ -1,90 +1,75 @@
 import pygame
-import constants
+import const
 import base
+import clock
 
 
-# TODO CLEAR UP THIS FILE
-
-class Particle(base.AdvancedSprite):
-    def __init__(self, countdown):
-        base.AdvancedSprite.__init__(self)
-        # TODO move to clocks?
-        self.countdown = countdown
-
-    # TODO move shared functionality here (countdown of death for example)
+# TODO make base class for particles
 
 
 # TODO rename and make more general?
-class Blood(Particle):
-    def __init__(self, position, speed, lifetime, fadeout, color):
-        Particle.__init__(self, lifetime)
+class Blood(base.AdvancedSprite):
+    def __init__(self, position, speed, size, fadeout, color):
+        base.AdvancedSprite.__init__(self)
         # TODO more customisable blood
         self.color = color
         self.speed = speed
         self.fadeout = fadeout
         self.pos = position
+        self.size = size
 
     def update(self, *args):
-        # MOVING
-        # TODO optimize positioning
         self.pos.x += self.speed.x
         self.pos.y += self.speed.y
-        # TIMER HANDLING
-        # TODO make countdown class?
-        self.countdown -= self.fadeout
-        if self.countdown < 0:
+        self.size -= self.fadeout
+        if self.size < 0:
             self.kill()
             return
         self.fetch_layer(self.pos.y)
 
     def draw(self, screen, window):
-        image = pygame.Surface((int(self.countdown * 2), int(self.countdown * 2)), pygame.SRCALPHA, 32)
-        pygame.draw.circle(image, self.color, [i // 2 for i in image.get_size()], int(self.countdown))
+        image = pygame.Surface((int(self.size * 2), int(self.size * 2)), pygame.SRCALPHA, 32)
+        pygame.draw.circle(image, self.color, [i // 2 for i in image.get_size()], int(self.size))
         return screen.blit(image, (self.pos.x - window.x, self.pos.y - window.y))
 
 
-class Exclamation(Particle):
-    def __init__(self, position, lifetime):
-        Particle.__init__(self, lifetime)
-        # TODO move font to game obj?
+class Exclamation(base.AdvancedSprite):
+    def __init__(self, pos, lifetime):
+        base.AdvancedSprite.__init__(self)
+        # TODO move font somewhere in shared place?
         font = pygame.font.Font(None, 80)
 
-        self.image = font.render("!", 3, constants.C_BLACK)
-        self.rect = self.image.get_rect(centerx=position.x, centery=position.y)
+        self.image = font.render("!", 3, const.C_BLACK)
+        self.rect = self.image.get_rect(centerx=pos.x, centery=pos.y)
         self.y = 3000  # +inf
+        self.clock = clock.Clock(self.kill, lifetime)
+        self.clock.wind_up()
 
-    def update(self, *args):
-        # TODO this clearly can move to Clock!
-        if self.countdown >= 0:
-            if self.countdown == 0:
-                self.kill()
-            else:
-                pass
-            self.countdown -= 1
+    def update(self):
+        self.clock.tick()
 
     def draw(self, screen, window):
         return screen.blit(self.image, (self.rect.x - window.x, self.rect.y - window.y))
 
 
-class Fade(Particle):
-    def __init__(self, duration, to_black):
-        Particle.__init__(self, duration)
-        self.rect = pygame.Rect(0, 0, 1920, 1080)
+class Fade(base.AdvancedSprite):
+    def __init__(self, duration, to_black, when_stops=None):
+        base.AdvancedSprite.__init__(self)
+        if when_stops is None:
+            when_stops = self.kill
         self.to_black = to_black
         self.duration = duration
-        self.image = None
-        self.y = 5000  # +inf
+        self.y = const.FADE_Y
+        self.clock = clock.Clock(when_stops, duration)
+        self.clock.wind_up()
 
     def update(self):
-        # TIMER HANDLING
-        if self.countdown >= 0:
-            self.countdown -= 1
-        # IMAGE COMPOSING
-        self.image = pygame.Surface(self.rect[2:4]).convert_alpha()
-        if self.to_black:
-            self.image.fill((0, 0, 0, 255 * ((self.duration - self.countdown - 1) / self.duration)))
-        else:
-            self.image.fill((0, 0, 0, int(255 * ((self.countdown + 1) / self.duration))))
+        self.clock.tick()
 
     def draw(self, screen, window):
-        return screen.blit(self.image, self.rect)
+        image = pygame.Surface(const.RESOLUTION).convert_alpha()
+        if self.to_black:
+            image.fill((0, 0, 0, 255 * ((self.duration - self.clock.how_much_is_left() - 1) / self.duration)))
+        else:
+            image.fill((0, 0, 0, int(255 * ((self.clock.how_much_is_left() + 1) / self.duration))))
+        return screen.blit(image, (0, 0))
