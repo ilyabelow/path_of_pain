@@ -193,7 +193,7 @@ class Game:
                                              # border walls
                                              obstacle.Wall(pygame.Rect(100, 0, 2800, 100)),
                                              obstacle.Wall(pygame.Rect(0, 0, 100, 2000)),
-                                             obstacle.Wall(pygame.Rect(0, 1900, 3000, 100)),
+                                             obstacle.Wall(pygame.Rect(0, 1900, 3000, 150)),
                                              obstacle.Wall(pygame.Rect(2900, 0, 100, 2000)),
                                              )
 
