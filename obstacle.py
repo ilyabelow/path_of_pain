@@ -62,12 +62,6 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
     def on_ok_health(self, who):
         pos = pygame.Vector2((self.rect.centerx, self.rect.centery - (self.health - 1) * 15))
         self.bleed_one_dir(pos, (pos - who.pos).normalize())
-        # TODO does not work really good?
-        self.rect.x += self.offsets[self.health][0]
-        self.rect.y += self.offsets[self.health][1]
-        for i in self.offsets:
-            i[0] -= self.offsets[self.health][0]
-            i[1] -= self.offsets[self.health][1]
         self.offsets.pop(0)
 
     def on_zero_health(self, who):
