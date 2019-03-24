@@ -97,15 +97,12 @@ class Bleeding:
                                           self.color))
 
 
+# TODO move some functionality here?
 class Pickupable:
     def __init__(self):
         pass
 
-    def pickup(self, who):
-        pass
 
-
-# TODO make pickuping for several groups
 class Pickuping:
     def __init__(self, what_to_pickup):
         self.what_to_pickup = what_to_pickup
@@ -113,7 +110,17 @@ class Pickuping:
     def pickup(self):
         pick = pygame.sprite.spritecollide(self, self.what_to_pickup, False)
         for p in pick:
-            p.pickup(self)
+            if self.can_pickup(p):
+                # TODO Pickupable.pickup() was dissolved here, mb restore?
+                p.kill()
+                self.do_pickup(p)
+
+    # TODO BAD INTERFACE???
+    def do_pickup(self, what):
+        pass
+
+    def can_pickup(self, what):
+        pass
 
 
 # TODO all common properties of Player and Anemy is bunched up here, needs disassembling to DIFFERENT interfaces

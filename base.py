@@ -15,7 +15,6 @@ class AdvancedSprite(pygame.sprite.Sprite):
         if self.drawing_group is None:
             for g in self.groups():
                 if isinstance(g, AdvancedLayeredUpdates):
-                    print(type(self))
                     self.drawing_group = g
                     break
         if y is not None:
