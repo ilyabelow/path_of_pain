@@ -1,4 +1,4 @@
-import constants
+import const
 import pygame
 import random
 import clock
@@ -30,16 +30,16 @@ class Sword(base.AdvancedSprite):
         self.current_swing_clock = clock.Clock(None)
         self.next_combo_clock = clock.Clock(self.swinging_stopped)
         self.next_swing_clock = clock.Clock(None)
-        self.clock_ticker = clock.ClockTicker(self.current_swing_clock, self.next_swing_clock, self.next_combo_clock)
+        self.clock_ticker = clock.ClockTicker(self)
 
     def swing(self):
         # continue combo
         if 0 < self.swing_count <= 2 and self.next_swing_clock.is_not_running() \
                 or self.swing_count == 0 and self.next_combo_clock.is_not_running():  # start new combo
             # TODO nerf this because triple attack is too OP
-            self.next_swing_clock.wind_up(constants.sword_swing_wait[self.swing_count])
-            self.next_combo_clock.wind_up(constants.sword_combo_wait[self.swing_count])
-            self.current_swing_clock.wind_up(constants.sword_swing_duration[self.swing_count])
+            self.next_swing_clock.wind_up(const.sword_swing_wait[self.swing_count])
+            self.next_combo_clock.wind_up(const.sword_combo_wait[self.swing_count])
+            self.current_swing_clock.wind_up(const.sword_swing_duration[self.swing_count])
             self.swing_count += 1
             self.right_hand = not self.right_hand  # switch hand, just for aesthetics
 
@@ -72,12 +72,12 @@ class Sword(base.AdvancedSprite):
 
     def draw(self, screen, window):
         if self.current_swing_clock.is_not_running():
-            image = pygame.transform.rotate(SPRITE, self.owner.face.angle_to(constants.V_UP))
+            image = pygame.transform.rotate(SPRITE, self.owner.face.angle_to(const.V_UP))
         else:
             if self.right_hand:
                 image = pygame.transform.rotate(pygame.transform.flip(SWANG_SPRITE, True, False),
-                                                self.owner.face.angle_to(constants.V_UP) - 45)
+                                                self.owner.face.angle_to(const.V_UP) - 45)
             else:
-                image = pygame.transform.rotate(SWANG_SPRITE, self.owner.face.angle_to(constants.V_UP) + 45)
+                image = pygame.transform.rotate(SWANG_SPRITE, self.owner.face.angle_to(const.V_UP) + 45)
         rect = image.get_rect(centerx=self.pos.x, centery=self.pos.y)
         return screen.blit(image, (rect.x - window.x, rect.y - window.y))

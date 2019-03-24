@@ -1,4 +1,4 @@
-import constants
+import const
 import controller
 import obstacle
 import pygame
@@ -15,7 +15,7 @@ import sword
 class Game:
     def __init__(self, painful=False):
         # GAME INITIALIZING
-        pygame.mixer.pre_init(22050, -16, 6, 64)
+        pygame.mixer.pre_init(22050, -16, 8, 64)
         pygame.init()
         pygame.mouse.set_visible(False)
         self.clock = pygame.time.Clock()
@@ -23,7 +23,7 @@ class Game:
         # TODO separate level initialization and application initialization to allow menu and stuff
 
         # SCREEN INITIALIZATION
-        self.screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode(const.RESOLUTION, pygame.FULLSCREEN)
         pygame.display.set_caption("Path of Pain")
         # TODO support window resizing and windowed mode
         self.window = self.screen.get_rect()
@@ -60,10 +60,11 @@ class Game:
         player.HEAL_SOUND = pygame.mixer.Sound('sounds/focus_health_heal.wav')
         player.HEARTBEAT_SOUND = pygame.mixer.Sound('sounds/heartbeat_B_01.wav')
         player.STEPS_SOUND = pygame.mixer.Sound('sounds/hero_run_footsteps_stone.wav')
+        player.STEPS_SOUND.set_volume(1.5)  # TODO tune
         player.PICKUP_SOUND = pygame.mixer.Sound('sounds/shiny_item_pickup.wav')
 
         enemy.DASH_SOUND = pygame.mixer.Sound('sounds/ruin_fat_sentry_sword.wav')
-        enemy.DASH_SOUND.set_volume(0.5)
+        enemy.DASH_SOUND.set_volume(0.5)  # TODO tune
         enemy.DASH_STATS["sound"] = enemy.DASH_SOUND
         enemy.STARTLE_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_Fat_startle_0{}.wav'.format(i + 1)) for i in
                                 range(2)]
@@ -78,7 +79,7 @@ class Game:
                                      range(2)]
 
         self.WIN_SOUND = pygame.mixer.Sound('sounds/secret_discovered_temp.wav')
-        self.WIN_SOUND.set_volume(2)
+        self.WIN_SOUND.set_volume(2)  # TODO tune
 
         # MUSIC INITIALIZATION
         # TODO proper music controller
@@ -86,15 +87,18 @@ class Game:
             pygame.mixer.music.load('sounds/Furious_Gods.wav')
         else:
             pygame.mixer.music.load('sounds/Gods_and_Glory.wav')
-        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.set_volume(const.MUSIC_NORMAL_VOLUME)
         pygame.mixer.music.play(loops=-1)
 
-        # LEVEL INITIALIZATION
+        # GROUPS INITIALIZATION
         self.common_group = base.AdvancedLayeredUpdates()
         # TODO move to separate class and make several levels (haha)
-        self.enemies_count = 0  # TODO remove this counter and move enemies in boxes in enemy_group and take len()
-        self.level_rect = pygame.Rect(0, 0, 3000, 2000)
+        self.enemies_count = 0
+        self.max_keys = 5
 
+        self.hitter_group = base.AdvancedGroup(self.common_group)
+        self.level_rect = pygame.Rect(0, 0, 3000, 2000)
+        self.pickupable_group = base.AdvancedGroup(self.common_group)
         self.particle_group = base.AdvancedGroup(self.common_group)
         self.box_group = base.AdvancedGroup(self.common_group,
                                             # upper room
@@ -181,20 +185,20 @@ class Game:
                                              obstacle.Wall(pygame.Rect(1600, 900, 500, 200)),
                                              obstacle.Wall(pygame.Rect(2400, 900, 500, 200)),
                                              # pillars
-                                             obstacle.Wall(pygame.Rect(900, 400, 200, 200)),
-                                             obstacle.Wall(pygame.Rect(1400, 400, 200, 200)),
-                                             obstacle.Wall(pygame.Rect(1900, 400, 200, 200)),
-                                             obstacle.Wall(pygame.Rect(1800, 1300, 200, 200)),
+                                             obstacle.Wall(pygame.Rect(900, 400, 200, 200), 90),
+                                             obstacle.Wall(pygame.Rect(1400, 400, 200, 200), 120),
+                                             obstacle.Wall(pygame.Rect(1900, 400, 200, 200), 150),
+                                             obstacle.Wall(pygame.Rect(1800, 1300, 200, 200), 30),
 
                                              # border walls
-                                             obstacle.Wall(pygame.Rect(100, 0, 3000, 100)),
+                                             obstacle.Wall(pygame.Rect(100, 0, 2800, 100)),
                                              obstacle.Wall(pygame.Rect(0, 0, 100, 2000)),
                                              obstacle.Wall(pygame.Rect(0, 1900, 3000, 100)),
                                              obstacle.Wall(pygame.Rect(2900, 0, 100, 2000)),
                                              )
 
         self.obstacle_group = base.AdvancedGroup(self.common_group, *self.wall_group, *self.box_group)
-        self.pickupable_group = base.AdvancedGroup(self.common_group)
+
         self.enemy_group = base.AdvancedGroup(self.common_group,
                                               # bottom-left room
                                               enemy.Enemy(self, (500, 1300)),
@@ -220,17 +224,9 @@ class Game:
                                               enemy.Enemy(self, (2500, 1550)),
 
                                               )
-        # KEY DISTRIBUTION
-        self.max_keys = 5
-        key_amount = self.max_keys
-        while key_amount > 0:
-            en = random.choice(self.enemy_group.sprites())
-            if not en.has_key:
-                key_amount -= 1
-                en.has_key = True
-
-        self.hitter_group = base.AdvancedGroup(self.common_group)
+        self.distribute_keys()
         self.hittable_group = base.AdvancedGroup(self.common_group, *self.enemy_group, *self.box_group)
+
         # PLAYER INITIALIZING
         if pygame.joystick.get_count() == 0:
             ctrlr = controller.Keyboard()
@@ -238,48 +234,60 @@ class Game:
             ctrlr = controller.Joystick()
         self.player = player.Player(self, (400, 300), ctrlr)
         self.player.fetch_screen()
-        # GROUPS INITIALIZING
-        # TODO reorganize groups (make new group types or start using advanced groups)
         self.player_group = base.AdvancedGroup(self.common_group, self.player)
+
         self.fade = None
-        self.prev_rect = [self.window]
+        self.running = True
+
+    def distribute_keys(self):
+        if len(self.enemy_group) < self.max_keys:
+            raise BaseException("um there is not enough enemies to distribute so much keys")
+        key_amount = self.max_keys
+        while key_amount > 0:
+            en = random.choice(self.enemy_group.sprites())
+            if not en.has_key:
+                key_amount -= 1
+                en.has_key = True
 
     def win(self):
         self.player.surprised_clock.wind_up()
         for i in range(15):
-            direction = constants.V_RIGHT.rotate(random.randint(-180, 180))
-            self.particle_group.add(particle.Blood(self.player.pos + constants.V_ZERO,
+            direction = const.V_RIGHT.rotate(random.randint(-180, 180))
+            self.particle_group.add(particle.Blood(self.player.pos + const.V_ZERO,
                                                    direction * 5,
                                                    random.randint(10, 20),
                                                    0.5,
-                                                   constants.C_GOLDEN))
+                                                   const.C_GOLDEN))
         self.WIN_SOUND.play()
         self.enemies_count = -1
 
+    def quit(self):
+        self.running = False
+
     def fade_out(self):
-        self.fade = particle.Fade(constants.fade_out, True)
+        self.fade = particle.Fade(const.fade_out, True, self.quit)
         self.common_group.add(self.fade)
 
     def loop(self):
-        # TODO remove this temp solution
-        self.fade = particle.Fade(constants.fade_in, False)
+        prev_rect = [self.window]
+        # TODO remove this temp solution?
+        self.fade = particle.Fade(const.fade_in, False)
         self.common_group.add(self.fade)
-        running = True
+
+        self.running = True
         reset = False  # will the game be reseted or not
-        while running:
-            # TODO remove this temp solution
+        while self.running:
+            # TODO remove this temp solution?
             if self.enemies_count == 0:
                 self.win()
-            # TODO remove this temp solution
-            if self.fade.to_black and self.fade.countdown == -1:
-                running = False
-
-            # EVENT HANDLING
+            # EVENT HANDLING (Now it is just exiting, hmm)
             for event in pygame.event.get():
                 # TODO move to controller?
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.fade_out()
+                    if event.key == pygame.K_0:
+                        self.running = False  # just in case fading out fails
                     if event.key == pygame.K_TAB:
                         self.fade_out()
                         reset = True
@@ -288,17 +296,17 @@ class Game:
                         reset = True
                         self.painful = not self.painful
                 if event.type == pygame.JOYBUTTONDOWN:
-                    if event.button == constants.B_BACK:
+                    if event.button == const.B_BACK:
                         self.fade_out()
-                    if event.button == constants.B_START:
+                    if event.button == const.B_START:
                         self.fade_out()
                         reset = True
-                    if event.button == constants.B_HOME:
+                    if event.button == const.B_HOME:
                         self.fade_out()
                         reset = True
                         self.painful = not self.painful
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
 
             # UPDATING
             self.player_group.update()
@@ -308,15 +316,19 @@ class Game:
             self.fade.update()
 
             # DRAWING
-            # TODO move to DirtyUpdates?
-            for r in self.prev_rect:
-                self.screen.fill(constants.C_BACKGROUND, r)
+            # see what areas are updating
+            # self.screen.fill(const.C_BLACK, (0, 0, *const.RESOLUTION))
+            for r in prev_rect:
+                self.screen.fill(const.C_BACKGROUND, r)
             rect = self.common_group.draw_all(self.screen, self.window)
-            pygame.display.update([*rect, *self.prev_rect])
-            self.prev_rect = rect
+            pygame.display.update()
+            prev_rect.clear()
+            prev_rect = rect
 
             # WAITING
-            self.clock.tick_busy_loop(constants.FRAME_RATE)
+            self.clock.tick_busy_loop(const.FRAME_RATE)
+            # see fps
+            #  print(self.clock.get_fps())
 
         pygame.quit()
         return reset, self.painful

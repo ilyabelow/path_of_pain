@@ -1,5 +1,5 @@
 import pygame
-import constants
+import const
 
 
 class Controller:
@@ -68,23 +68,23 @@ class Joystick(Controller):
         self.joystick.init()
 
     def check_movement(self):
-        offset = Joystick.dead_zone(self.joystick.get_axis(constants.A_LS_H)), \
-                 Joystick.dead_zone(self.joystick.get_axis(constants.A_LS_V))
+        offset = Joystick.dead_zone(self.joystick.get_axis(const.A_LS_H)), \
+                 Joystick.dead_zone(self.joystick.get_axis(const.A_LS_V))
         return pygame.Vector2(offset)
 
     def check_look(self):
-        offset = Joystick.dead_zone(self.joystick.get_axis(constants.A_RS_H)), \
-                 Joystick.dead_zone(self.joystick.get_axis(constants.A_RS_V))
+        offset = Joystick.dead_zone(self.joystick.get_axis(const.A_RS_H)), \
+                 Joystick.dead_zone(self.joystick.get_axis(const.A_RS_V))
         return pygame.Vector2(offset)
 
     def check_dash(self):
-        return self.joystick.get_button(constants.B_A)
+        return self.joystick.get_button(const.B_A)
 
     def check_swing(self):
-        return self.joystick.get_button(constants.B_X)
+        return self.joystick.get_button(const.B_X)
 
     def check_back_dash(self):
-        return self.joystick.get_button(constants.B_B)
+        return self.joystick.get_button(const.B_B)
 
     def dead_zone(x):
         if abs(x) < 0.1:

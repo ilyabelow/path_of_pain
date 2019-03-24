@@ -34,11 +34,9 @@ class Clock:
         return self.time
 
 
-# shortcut for ticking everything
-# TODO make automatick extractor of all *_clock from object!!!
 class ClockTicker:
-    def __init__(self, *clocks):
-        self.clocks = [*clocks]
+    def __init__(self, o):
+        self.clocks = [getattr(o, attr) for attr in dir(o) if '_clock' in attr]
 
     def tick_all(self):
         for clock in self.clocks:

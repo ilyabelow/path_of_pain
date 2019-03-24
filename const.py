@@ -2,7 +2,7 @@ import pygame
 
 # TODO separate framerate and game ticks
 FRAME_RATE = 30
-
+RESOLUTION = (1920, 1080)
 # GAMEPAD INPUT
 B_A = 0
 B_B = 1
@@ -76,3 +76,11 @@ sword_combo_wait = 10, 20, 30
 
 fade_in = 10
 fade_out = 10
+
+HUD_Y = 4000
+FADE_Y = 5000
+
+# TODO tune
+MUSIC_NORMAL_VOLUME = 0.3
+MUSIC_MUTED_VOLUME = 0.15
+MUSIC_FADE_OUT = 2500

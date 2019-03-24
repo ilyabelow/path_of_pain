@@ -1,5 +1,5 @@
 import pygame
-import constants
+import const
 import sword
 import HUD
 import clock
@@ -16,7 +16,7 @@ HIT_SOUND = None
 DEATH_SOUND = None
 HEAL_SOUND = None
 HEARTBEAT_SOUND = None
-STEPS_SOUND = None  # TODO integrate!
+STEPS_SOUND = None
 PICKUP_SOUND = None
 
 DASH_STATS = {"speed": 36, "length": 180, "rest": 15, "sound": DASH_SOUND}
@@ -32,7 +32,7 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
         interface.Moving.__init__(self, coords, game.obstacle_group, DASH_STATS, BACK_DASH_STATS)
         interface.Healthy.__init__(
             self,
-            constants.player_health if not game.painful else 1,
+            const.player_health if not game.painful else 1,
             [HEAL_SOUND],
             [HIT_SOUND],
             [DEATH_SOUND],
@@ -44,23 +44,23 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
             game.particle_group,
             BLEED_ONE_DIR_STATS,
             BLEED_ALL_DIR_STATS,
-            constants.C_BLACK
+            const.C_BLACK
         )
+        self.steps_are_stepping = False
         self.keys = 0
-        self.look_away = constants.V_ZERO
+        self.look_away = const.V_ZERO
         self.game = game
         self.rect = pygame.Rect(0, 0, 50, 50)
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
         if not game.painful:
             self.health_hud = HUD.HealthHUD(self)
         self.key_hud = HUD.KeyHUD(self)
-
         self.controller = controller
         self.sword = sword.Sword(self)
 
         self.surprised_clock = clock.Clock(None, 30)
 
-        self.clock_ticker = clock.ClockTicker(*[getattr(self, attr) for attr in dir(self) if '_clock' in attr])
+        self.clock_ticker = clock.ClockTicker(self)
 
     def update(self):
         self.clock_ticker.tick_all()
@@ -83,8 +83,11 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
             self.controller.check(self)
         # separate ifs because controller can stop
         if self.can_be_moved:
-            # TODO rethink this legacy formula
-            self.speed = self.face * self.moving * constants.player_move_speed
+            if self.moving:
+                self.start_stepping()
+            else:
+                self.stop_stepping()
+            self.speed = self.face * self.moving * const.player_move_speed
         if self.speed:
             self.move_and_collide()
         self.fetch_screen()
@@ -97,7 +100,7 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
             image = SURPRISED_SPRITE
         else:
             image = SPRITE
-        rotated_image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
+        rotated_image = pygame.transform.rotate(image, self.face.angle_to(const.V_UP))
         center_rect = rotated_image.get_rect()
         return screen.blit(rotated_image,
                            (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
@@ -109,27 +112,28 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
 
     def on_low_health(self, who):
         HEARTBEAT_SOUND.play(-1)
-        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.set_volume(const.MUSIC_MUTED_VOLUME)
 
     def on_zero_health(self, who):
+        self.stop_stepping()
         HEARTBEAT_SOUND.stop()
         DEATH_SOUND.play()
         self.sword.kill()
         self.kill()
         self.bleed_all_dir(self.pos)
-        pygame.mixer.music.fadeout(2500)
+        pygame.mixer.music.fadeout(const.MUSIC_FADE_OUT)
 
     def on_ok_health(self, who):
         self.throw_back((self.pos - who.pos).normalize(),
-                        constants.player_throwback_speed,
-                        constants.player_throwback_length,
-                        constants.player_stun_duration)
+                        const.player_throwback_speed,
+                        const.player_throwback_length,
+                        const.player_stun_duration)
         self.can_be_moved = False
 
     def after_healing(self):
         self.health_hud.makeup()
         HEARTBEAT_SOUND.stop()
-        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.set_volume(const.MUSIC_NORMAL_VOLUME)
 
     def fetch_screen(self):
         self.game.window.centerx = self.rect.centerx + int(self.look_away.x)
@@ -142,3 +146,13 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
             self.game.window.right = self.game.level_rect.right
         if self.game.window.left < self.game.level_rect.left:
             self.game.window.left = self.game.level_rect.left
+
+    def start_stepping(self):
+        if not self.steps_are_stepping:
+            STEPS_SOUND.play(-1)
+            self.steps_are_stepping = True
+
+    def stop_stepping(self):
+        if self.steps_are_stepping:
+            STEPS_SOUND.stop()
+            self.steps_are_stepping = False

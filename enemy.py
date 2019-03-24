@@ -1,6 +1,6 @@
 import pygame
 import random
-import constants
+import const
 import particle
 import clock
 import interface
@@ -34,7 +34,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         interface.Moving.__init__(self, coords, game.obstacle_group, DASH_STATS, None)
         interface.Healthy.__init__(
             self,
-            constants.enemy_health,
+            const.enemy_health,
             [HEAL_SOUND],
             [HIT_SOUND],
             DEATH_SOUNDS
@@ -44,7 +44,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             game.particle_group,
             BLEED_ONE_DIR_STATS,
             BLEED_ALL_DIR_STATS,
-            constants.C_RED
+            const.C_RED
         )
         interface.Pickuping.__init__(
             self,
@@ -55,8 +55,8 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         self.rect = pygame.Rect(0, 0, 50, 50)
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
         # CLOCKS
-        self.spot_clock = clock.Clock(self.unblock_movement, constants.enemy_spot_time)
-        self.prepare_to_dash_clock = clock.Clock(self.dash, constants.enemy_attack_time)
+        self.spot_clock = clock.Clock(self.unblock_movement, const.enemy_spot_time)
+        self.prepare_to_dash_clock = clock.Clock(self.dash, const.enemy_attack_time)
         self.idle_clock = clock.Clock(self.move_in_idle)
 
         # INITIAL IDLE
@@ -66,7 +66,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
         self.has_key = False
 
-        self.clock_ticker = clock.ClockTicker(*[getattr(self, attr) for attr in dir(self) if '_clock' in attr])
+        self.clock_ticker = clock.ClockTicker(self)
 
     def update(self):
         self.clock_ticker.tick_all()
@@ -75,62 +75,59 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         self.move()
 
     def drop_key(self):
-        # TODO mae it so it drops out existing key and not new
         if self.has_key:
             # TODO make better key positioning
             self.game.pickupable_group.add(pickupable.Key(self.pos, self.face))
             self.has_key = False
 
     def move(self):
-        # TODO remove reference to main player to add compatibility of several players
-        # TODO refactor this a bit
-        if self.can_be_moved:  # can decide how to move
-            # TODO fix problem with normalizing
-            dist = self.pos - self.game.player.pos
-            if self.idle:
-                # start chasing?
-                if dist and dist.length() < constants.enemy_chase_radius and self.game.player.alive():
-                    self.spot_clock.wind_up()
-                    self.speed = constants.V_ZERO
-                    self.game.particle_group.add(
-                        particle.Exclamation(self.pos + constants.V_RIGHT.rotate(-45) * 40, 10))
-                    random.choice(STARTLE_SOUNDS).play()
-                    self.drop_key()
-                    self.face = -dist.normalize()
-                    self.can_be_moved = False
-                    self.moving = True
-                    self.idle = False
-                    self.idle_clock.stop()
-
-            else:  # already chasing
-                self.face = -dist.normalize()
-                # stop chasing?
-                if dist.length() > constants.enemy_unchase_radius or not self.game.player.alive():
-                    self.idle = True
-                    self.moving = False
-                    self.can_be_moved = True
-                    self.idle_clock.wind_up(random.randint(30, 90))
-                # ATTACK???
-                elif dist.length() < constants.enemy_dash_radius and self.next_dash_clock.is_not_running():
-                    self.prepare_to_dash_clock.wind_up()
-                    random.choice(ATTACK_SOUNDS).play()
-                    self.speed = constants.V_ZERO
-                    self.can_be_moved = False
-
         if self.can_be_moved:
-            # SMART SPEED CALC
             if self.idle:
-                speed_abs = constants.enemy_idle_move_speed
-            elif self.next_dash_clock.is_running():
-                speed_abs = constants.enemy_resting_move_speed
+                self.move_when_idle()
             else:
-                speed_abs = constants.enemy_move_speed
+                self.move_when_chasing()
+        if self.can_be_moved:
+            if self.idle:
+                speed_abs = const.enemy_idle_move_speed
+            elif self.next_dash_clock.is_running():
+                speed_abs = const.enemy_resting_move_speed
+            else:
+                speed_abs = const.enemy_move_speed
             self.speed = self.moving * self.face * speed_abs
 
         self.move_and_collide()
         self.fetch_layer(self.pos.y)
         if self.game.player.rect.colliderect(self.rect):
             self.game.player.hit(1, self)
+
+    def move_when_idle(self):
+        dist = self.pos - self.game.player.pos
+        if dist and dist.length() < const.enemy_chase_radius and self.game.player.alive():
+            self.spot_clock.wind_up()
+            self.speed = const.V_ZERO
+            self.game.particle_group.add(
+                particle.Exclamation(self.pos + const.V_RIGHT.rotate(-45) * 40, 10))
+            random.choice(STARTLE_SOUNDS).play()
+            self.drop_key()
+            self.face = -dist.normalize()
+            self.can_be_moved = False
+            self.moving = True
+            self.idle = False
+            self.idle_clock.stop()
+
+    def move_when_chasing(self):
+        dist = self.pos - self.game.player.pos
+        self.face = -dist.normalize()  # TODO fix problem with normalizing
+        if dist.length() > const.enemy_unchase_radius or not self.game.player.alive():
+            self.idle = True
+            self.moving = False
+            self.can_be_moved = True
+            self.idle_clock.wind_up(random.randint(30, 90))
+        elif dist.length() < const.enemy_dash_radius and self.next_dash_clock.is_not_running():
+            self.prepare_to_dash_clock.wind_up()
+            random.choice(ATTACK_SOUNDS).play()
+            self.speed = const.V_ZERO
+            self.can_be_moved = False
 
     def move_in_idle(self):
         if self.moving:
@@ -163,7 +160,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             ext_image.blit(image, (25, 25))
             ext_image.blit(KEY_TAKEN_SPRITE, (0, 25))
             image = ext_image
-        rotated_image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
+        rotated_image = pygame.transform.rotate(image, self.face.angle_to(const.V_UP))
         if self.has_key:
             center_rect = rotated_image.get_rect(centerx=50, centery=50)
         else:
@@ -183,6 +180,6 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
     def on_ok_health(self, who):
         self.throw_back((self.pos - who.pos).normalize(),
-                        constants.enemy_throwback_speed,
-                        constants.enemy_throwback_length,
-                        constants.enemy_stun_duration)
+                        const.enemy_throwback_speed,
+                        const.enemy_throwback_length,
+                        const.enemy_stun_duration)
