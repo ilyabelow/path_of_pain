@@ -5,10 +5,12 @@ import particle
 import clock
 import interface
 import base
+import pickupable
 
 SPRITE = None
 STUNNED_SPRITE = None
 SURPRISED_SPRITE = None
+KEY_TAKEN_SPRITE = None
 
 DASH_SOUND = None
 ATTACK_SOUNDS = None
@@ -25,7 +27,7 @@ BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1, '
 
 # TODO make this class more abstract to make building more types of enemies
 # TODO MORE ENEMIES MORE CONTENT
-class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.Bleeding):
+class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.Bleeding, interface.Pickuping):
 
     def __init__(self, game, coords):
         base.AdvancedSprite.__init__(self)
@@ -44,6 +46,10 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             BLEED_ALL_DIR_STATS,
             constants.C_RED
         )
+        interface.Pickuping.__init__(
+            self,
+            game.pickupable_group
+        )
         self.game = game
         game.enemies_count += 1
         self.rect = pygame.Rect(0, 0, 50, 50)
@@ -58,11 +64,22 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         self.idle = True
         self.moving = random.randint(0, 2)
 
+        self.has_key = False
+
         self.clock_ticker = clock.ClockTicker(*[getattr(self, attr) for attr in dir(self) if '_clock' in attr])
 
     def update(self):
         self.clock_ticker.tick_all()
+        if self.spot_clock.is_not_running():
+            self.pickup()
         self.move()
+
+    def drop_key(self):
+        # TODO mae it so it drops out existing key and not new
+        if self.has_key:
+            # TODO make better key positioning
+            self.game.pickupable_group.add(pickupable.Key(self.pos, self.face))
+            self.has_key = False
 
     def move(self):
         # TODO remove reference to main player to add compatibility of several players
@@ -78,11 +95,13 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
                     self.game.particle_group.add(
                         particle.Exclamation(self.pos + constants.V_RIGHT.rotate(-45) * 40, 10))
                     random.choice(STARTLE_SOUNDS).play()
+                    self.drop_key()
                     self.face = -dist.normalize()
                     self.can_be_moved = False
                     self.moving = True
                     self.idle = False
                     self.idle_clock.stop()
+
             else:  # already chasing
                 self.face = -dist.normalize()
                 # stop chasing?
@@ -122,6 +141,15 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             self.face.rotate_ip(random.randint(-180, 180))
             self.idle_clock.wind_up(random.randint(20, 40))
 
+    def do_pickup(self, what):
+        if isinstance(what, pickupable.Key):
+            self.has_key = True
+
+    def can_pickup(self, what):
+        if isinstance(what, pickupable.Key) and not self.has_key:
+            return True
+        return False
+
     def draw(self, screen, window):
         if self.stun_clock.is_running():
             image = STUNNED_SPRITE
@@ -129,8 +157,18 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             image = SURPRISED_SPRITE
         else:
             image = SPRITE
+        # TODO REMOVE THIS DUMB DRAWING
+        if self.has_key:
+            ext_image = pygame.Surface((100, 100), pygame.SRCALPHA, 32)
+            ext_image.blit(image, (25, 25))
+            ext_image.blit(KEY_TAKEN_SPRITE, (0, 25))
+            image = ext_image
         rotated_image = pygame.transform.rotate(image, self.face.angle_to(constants.V_UP))
-        center_rect = rotated_image.get_rect(centerx=25, centery=25)
+        if self.has_key:
+            center_rect = rotated_image.get_rect(centerx=50, centery=50)
+        else:
+            center_rect = rotated_image.get_rect(centerx=25, centery=25)
+
         return screen.blit(rotated_image,
                            (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
 
@@ -140,6 +178,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
     def on_zero_health(self, who):
         self.bleed_all_dir(self.pos)
         self.game.enemies_count -= 1
+        self.drop_key()
         self.kill()
 
     def on_ok_health(self, who):

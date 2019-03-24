@@ -35,11 +35,14 @@ class Game:
         enemy.STUNNED_SPRITE = pygame.image.load("images/enemy_stunned.png").convert_alpha()
         enemy.SURPRISED_SPRITE = pygame.image.load("images/enemy_surprised.png").convert_alpha()
         enemy.SPRITE = pygame.image.load("images/enemy.png").convert_alpha()
+        enemy.KEY_TAKEN_SPRITE = pygame.image.load("images/key_taken.png").convert_alpha()
         HUD.HEART_SPRITE = pygame.image.load("images/heart.png").convert_alpha()
         HUD.HEART_EMPTY_SPRITE = pygame.image.load("images/heart_empty.png").convert_alpha()
         HUD.HEART_WEAK_SPRITE = pygame.image.load("images/weak_heart.png").convert_alpha()
+        HUD.KEY_SPRITE = pygame.image.load("images/key.png").convert_alpha()  # TODO another image
         pickupable.LITTLE_HEART_SPRITE = pygame.image.load("images/little_heart.png").convert_alpha()
         pickupable.LITTLE_HEART_WEAK_SPRITE = pygame.image.load("images/little_weak_heart.png").convert_alpha()
+        pickupable.KEY_SPRITE = pygame.image.load("images/key.png").convert_alpha()
         sword.SPRITE = pygame.image.load("images/sword.png").convert_alpha()
         sword.SWANG_SPRITE = pygame.image.load("images/sword_swang.png").convert_alpha()
         obstacle.BOX_SPRITE = pygame.image.load("images/box.png").convert_alpha()
@@ -57,6 +60,7 @@ class Game:
         player.HEAL_SOUND = pygame.mixer.Sound('sounds/focus_health_heal.wav')
         player.HEARTBEAT_SOUND = pygame.mixer.Sound('sounds/heartbeat_B_01.wav')
         player.STEPS_SOUND = pygame.mixer.Sound('sounds/hero_run_footsteps_stone.wav')
+        player.PICKUP_SOUND = pygame.mixer.Sound('sounds/shiny_item_pickup.wav')
 
         enemy.DASH_SOUND = pygame.mixer.Sound('sounds/ruin_fat_sentry_sword.wav')
         enemy.DASH_SOUND.set_volume(0.5)
@@ -190,6 +194,7 @@ class Game:
                                              )
 
         self.obstacle_group = base.AdvancedGroup(self.common_group, *self.wall_group, *self.box_group)
+        self.pickupable_group = base.AdvancedGroup(self.common_group)
         self.enemy_group = base.AdvancedGroup(self.common_group,
                                               # bottom-left room
                                               enemy.Enemy(self, (500, 1300)),
@@ -215,10 +220,17 @@ class Game:
                                               enemy.Enemy(self, (2500, 1550)),
 
                                               )
-        self.hitter_group = base.AdvancedGroup(self.common_group)
-        self.pickupable_group = base.AdvancedGroup(self.common_group)
-        self.hittable_group = base.AdvancedGroup(self.common_group, *self.enemy_group, *self.box_group)
+        # KEY DISTRIBUTION
+        self.max_keys = 5
+        key_amount = self.max_keys
+        while key_amount > 0:
+            en = random.choice(self.enemy_group.sprites())
+            if not en.has_key:
+                key_amount -= 1
+                en.has_key = True
 
+        self.hitter_group = base.AdvancedGroup(self.common_group)
+        self.hittable_group = base.AdvancedGroup(self.common_group, *self.enemy_group, *self.box_group)
         # PLAYER INITIALIZING
         if pygame.joystick.get_count() == 0:
             ctrlr = controller.Keyboard()

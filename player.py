@@ -5,6 +5,7 @@ import HUD
 import clock
 import interface
 import base
+import pickupable
 
 SPRITE = None
 STUNNED_SPRITE = None
@@ -16,6 +17,7 @@ DEATH_SOUND = None
 HEAL_SOUND = None
 HEARTBEAT_SOUND = None
 STEPS_SOUND = None  # TODO integrate!
+PICKUP_SOUND = None
 
 DASH_STATS = {"speed": 36, "length": 180, "rest": 15, "sound": DASH_SOUND}
 BACK_DASH_STATS = {"speed": 25, "length": 100, "rest": 10, "sound": DASH_SOUND}
@@ -44,12 +46,15 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
             BLEED_ALL_DIR_STATS,
             constants.C_BLACK
         )
+        self.keys = 0
         self.look_away = constants.V_ZERO
         self.game = game
         self.rect = pygame.Rect(0, 0, 50, 50)
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
         if not game.painful:
             self.health_hud = HUD.HealthHUD(self)
+        self.key_hud = HUD.KeyHUD(self)
+
         self.controller = controller
         self.sword = sword.Sword(self)
 
@@ -61,6 +66,17 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
         self.clock_ticker.tick_all()
         self.pickup()
         self.move()
+
+    def do_pickup(self, what):
+        if isinstance(what, pickupable.Key):
+            self.keys += 1
+            PICKUP_SOUND.play()
+            self.key_hud.makeup()
+        if isinstance(what, pickupable.Heart):
+            self.heal(1, what.weak)
+
+    def can_pickup(self, what):
+        return True
 
     def move(self):
         if self.can_be_moved:
