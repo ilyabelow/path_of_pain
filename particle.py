@@ -107,4 +107,5 @@ class Title(base.AdvancedSprite):
         self.stage += 1
         if self.stage > 3:
             self.kill()
-        self.clock.wind_up(self.times[self.stage])
+        else:
+            self.clock.wind_up(self.times[self.stage])
