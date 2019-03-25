@@ -268,8 +268,12 @@ class Game:
         self.fade = particle.Fade(const.fade_out, True, self.quit)
         self.common_group.add(self.fade)
 
+    def deploy_logo(self, level):
+        self.particle_group.add(
+            particle.Title(pygame.image.load('images/{}_level{}.png'.format(level, self.painful * '_painful'))))
+
     def loop(self):
-        self.particle_group.add(particle.Title(pygame.image.load('images/1_level.png')))
+        self.deploy_logo(1)
         prev_rect = [self.window]
         # TODO remove this temp solution?
         self.fade = particle.Fade(const.fade_in, False)
