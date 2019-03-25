@@ -73,3 +73,38 @@ class Fade(base.AdvancedSprite):
         else:
             image.fill((0, 0, 0, int(255 * ((self.clock.how_much_is_left() + 1) / self.duration))))
         return screen.blit(image, (0, 0))
+
+
+# 0 - wait, 1 - fade in, 2 - stay, 3 - fade out
+class Title(base.AdvancedSprite):
+    def __init__(self, image):
+        base.AdvancedSprite.__init__(self)
+        self.image = image
+        self.stage = 0
+        self.times = const.fade_in + 5, 20, 30, 20
+        self.clock = clock.Clock(self.next_stage)
+        self.clock.wind_up(self.times[self.stage])
+        self.y = const.HUD_Y
+
+    def update(self, *args):
+        print(self.stage)
+        self.clock.tick()
+
+    def draw(self, screen, offset):
+        if 0 < self.stage:
+            temp = self.image.copy()
+            alpha = 255
+            if self.stage == 1:
+                alpha = 255 * (self.times[1] - self.clock.how_much_is_left()) / self.times[1]
+            if self.stage == 3:
+                alpha = 255 * self.clock.how_much_is_left() / self.times[3]
+            temp.fill((255, 255, 255, alpha), None, pygame.BLEND_RGBA_MULT)
+            return screen.blit(temp,
+                               self.image.get_rect(centerx=const.RESOLUTION[0] / 2, bottom=const.RESOLUTION[1] - 25))
+        return pygame.Rect(0, 0, 0, 0)
+
+    def next_stage(self):
+        self.stage += 1
+        if self.stage > 3:
+            self.kill()
+        self.clock.wind_up(self.times[self.stage])
