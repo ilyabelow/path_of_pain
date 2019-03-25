@@ -86,8 +86,7 @@ class Title(base.AdvancedSprite):
         self.clock.wind_up(self.times[self.stage])
         self.y = const.HUD_Y
 
-    def update(self, *args):
-        print(self.stage)
+    def update(self):
         self.clock.tick()
 
     def draw(self, screen, offset):
