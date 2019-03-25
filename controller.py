@@ -102,7 +102,7 @@ class Keyboard(Controller):
                               pressed[pygame.K_DOWN] - pressed[pygame.K_UP])
 
     def check_look(self):
-        return 0  # TODO support
+        return pygame.Vector2(0, 0)
 
     def check_dash(self):
         return pygame.key.get_pressed()[pygame.K_d]
