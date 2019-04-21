@@ -54,7 +54,6 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
                 self.mode = const.BOX_HEALTH
         elif random.randint(0, 15) == 0:
             self.mode = const.BOX_ENEMY
-            self.game.enemies_count += 1
         else:
             self.mode = const.BOX_EMPTY
         self.y = self.rect.y
@@ -75,7 +74,6 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         if self.mode == const.BOX_ENEMY:
             # TODO temp solution, should sort out groups
             # TODO factory here
-            self.game.enemies_count -= 1  # otherwise it will be incremented twice in box constructor and enemy one
             en = enemy.Enemy(self.game, self.rect[:2])
             self.game.enemy_group.add(en)
             self.game.hittable_group.add(en)

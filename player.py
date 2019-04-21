@@ -72,6 +72,8 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
             self.keys += 1
             PICKUP_SOUND.play()
             self.key_hud.makeup()
+            if self.keys == self.game.max_keys:
+                self.game.win()
         if isinstance(what, pickupable.Heart):
             self.heal(1, what.weak)
 

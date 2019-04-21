@@ -12,22 +12,21 @@ import pickupable
 import sword
 
 
-class Game:
+class State:
+    def update(self):
+        pass
+
+    def draw(self):
+        pass
+
+    def switch_state(self):
+        pass
+
+
+class Game(State):
     def __init__(self, painful=False):
-        # GAME INITIALIZING
-        pygame.mixer.pre_init(22050, -16, 8, 64)
-        pygame.init()
-        pygame.mouse.set_visible(False)
-        self.clock = pygame.time.Clock()
         self.painful = painful
-        # TODO separate level initialization and application initialization to allow menu and stuff
-
-        # SCREEN INITIALIZATION
-        self.screen = pygame.display.set_mode(const.RESOLUTION, pygame.FULLSCREEN)
-        pygame.display.set_caption("Path of Pain")
-        # TODO support window resizing and windowed mode
-        self.window = self.screen.get_rect()
-
+        self.window = pygame.display.get_surface().get_rect()
         # SPRITES INITIALIZATION
         player.SPRITE = pygame.image.load("images/player.png").convert_alpha()
         player.STUNNED_SPRITE = pygame.image.load("images/player_stunned.png").convert_alpha()
@@ -46,7 +45,6 @@ class Game:
         sword.SPRITE = pygame.image.load("images/sword.png").convert_alpha()
         sword.SWANG_SPRITE = pygame.image.load("images/sword_swang.png").convert_alpha()
         obstacle.BOX_SPRITE = pygame.image.load("images/box.png").convert_alpha()
-        pygame.display.set_icon(enemy.SPRITE)
 
         # SOUND INITIALIZATION
         sword.SWING_SOUNDS = [pygame.mixer.Sound('sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
@@ -93,7 +91,6 @@ class Game:
         # GROUPS INITIALIZATION
         self.common_group = base.AdvancedLayeredUpdates()
         # TODO move to separate class and make several levels (haha)
-        self.enemies_count = 0
         self.max_keys = 5
 
         self.hitter_group = base.AdvancedGroup(self.common_group)
@@ -236,8 +233,12 @@ class Game:
         self.player.fetch_screen()
         self.player_group = base.AdvancedGroup(self.common_group, self.player)
 
-        self.fade = None
         self.running = True
+        self.reset = False
+        self.deploy_logo(1)
+        self.prev_rect = [self.window]
+        self.fade = particle.Fade(const.GAME_FADE_IN, False)
+        self.common_group.add(self.fade)
 
     def distribute_keys(self):
         if len(self.enemy_group) < self.max_keys:
@@ -259,93 +260,150 @@ class Game:
                                                    0.5,
                                                    const.C_GOLDEN))
         self.WIN_SOUND.play()
-        self.enemies_count = -1
 
     def quit(self):
         self.running = False
 
     def fade_out(self):
-        self.fade = particle.Fade(const.fade_out, True, self.quit)
+        self.fade = particle.Fade(const.GAME_FADE_OUT, True, self.quit)
         self.common_group.add(self.fade)
+        pygame.mixer.fadeout(const.GAME_FADE_OUT)
+        pygame.mixer.music.fadeout(const.GAME_FADE_OUT * const.FRAME_RATE)
 
     def deploy_logo(self, level):
         self.particle_group.add(
             particle.Title(pygame.image.load('images/{}_level{}.png'.format(level, self.painful * '_painful'))))
 
-    def loop(self):
-        self.deploy_logo(1)
-        prev_rect = [self.window]
-        # TODO remove this temp solution?
-        self.fade = particle.Fade(const.fade_in, False)
-        self.common_group.add(self.fade)
+    def update(self):
+        # EVENT HANDLING (Now it is just exiting, hmm)
+        for event in pygame.event.get():
+            # TODO move to controller?
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.fade_out()
+                if event.key == pygame.K_0:
+                    self.running = False  # just in case fading out fails
+                if event.key == pygame.K_TAB:
+                    self.fade_out()
+                    self.reset = True
+            if event.type == pygame.JOYBUTTONDOWN:
+                if event.button == const.B_BACK:
+                    self.fade_out()
+                if event.button == const.B_START:
+                    self.fade_out()
+                    self.reset = True
+            if event.type == pygame.QUIT:
+                self.running = False
 
-        self.running = True
-        reset = False  # will the game be reseted or not
-        while self.running:
-            # TODO remove this temp solution?
-            if self.enemies_count == 0:
-                self.win()
-            # EVENT HANDLING (Now it is just exiting, hmm)
-            for event in pygame.event.get():
-                # TODO move to controller?
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.fade_out()
-                    if event.key == pygame.K_0:
-                        self.running = False  # just in case fading out fails
-                    if event.key == pygame.K_TAB:
-                        self.fade_out()
-                        reset = True
-                    if event.key == pygame.K_p:
-                        self.fade_out()
-                        reset = True
-                        self.painful = not self.painful
-                if event.type == pygame.JOYBUTTONDOWN:
-                    if event.button == const.B_BACK:
-                        self.fade_out()
-                    if event.button == const.B_START:
-                        self.fade_out()
-                        reset = True
-                    if event.button == const.B_HOME:
-                        self.fade_out()
-                        reset = True
-                        self.painful = not self.painful
-                if event.type == pygame.QUIT:
-                    self.running = False
+        # UPDATING
+        self.player_group.update()
+        self.hitter_group.update()
+        self.enemy_group.update()
+        self.particle_group.update()
+        self.fade.update()
 
-            # UPDATING
-            self.player_group.update()
-            self.hitter_group.update()
-            self.enemy_group.update()
-            self.particle_group.update()
-            self.fade.update()
+    def draw(self):
+        # DRAWING
+        # see what areas are updating
+        # self.screen.fill(const.C_BLACK, (0, 0, *const.RESOLUTION))
+        screen = pygame.display.get_surface()
+        for r in self.prev_rect:
+            screen.fill(const.C_BACKGROUND, r)
+        rect = self.common_group.draw_all(screen, self.window)
+        pygame.display.update()
+        self.prev_rect.clear()
+        self.prev_rect = rect
 
-            # DRAWING
-            # see what areas are updating
-            # self.screen.fill(const.C_BLACK, (0, 0, *const.RESOLUTION))
-            for r in prev_rect:
-                self.screen.fill(const.C_BACKGROUND, r)
-            rect = self.common_group.draw_all(self.screen, self.window)
-            pygame.display.update()
-            prev_rect.clear()
-            prev_rect = rect
-
-            # WAITING
-            self.clock.tick_busy_loop(const.FRAME_RATE)
-            # see fps
-            #  print(self.clock.get_fps())
-
-        pygame.quit()
-        return reset, self.painful
+    def switch_state(self):
+        if not self.running:
+            if self.reset:
+                return const.RESTART
+            return const.TO_MAIN_MENU
+        return const.NO
 
 
-def main():
-    restart = True
-    painful = False
-    while restart:
-        the_game = Game(painful)
-        restart, painful = the_game.loop()
+class Menu(State):
+    class Title(pygame.sprite.Sprite):
+        def __init__(self):
+            pygame.sprite.Sprite.__init__(self)
+            title_font = pygame.font.Font("images/AUGUSTUS.TTF", 128)
+            self.image = title_font.render("Path of Pain", 10, const.C_RED)
+            self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2, centery=200)
 
+    class Option(pygame.sprite.Sprite):
+        def __init__(self, ):
+            pygame.sprite.Sprite.__init__(self)
 
-if __name__ == '__main__':
-    main()
+    def __init__(self):
+        self.option_font = pygame.font.Font("images/AUGUSTUS.TTF", 36)
+        self.options = ["Play", "play painful", "exit"]
+        self.option_sprite = []
+        for i in self.options:
+            self.option_sprite.append(self.option_font.render(i, 10, const.C_RED))
+
+        pygame.mixer.music.load('sounds/S59-55 Final Stage 3.wav')
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(1)
+        self.CHANGE_SOUND = pygame.mixer.Sound('sounds/ui_change_selection.wav')
+        self.OK_SOUND = pygame.mixer.Sound('sounds/ui_button_confirm.wav')
+
+        self.result = const.NO
+        self.option = const.OPTION_PLAY
+        self.option_sprite[self.option] = self.option_font.render(self.options[self.option], 10, const.C_GOLDEN)
+        self.fade = particle.Fade(const.MENU_FADE_IN, False)
+
+        self.title_group = pygame.sprite.GroupSingle(self.Title())
+        self.option_group = pygame.sprite.OrderedUpdates()
+
+    def draw(self):
+        screen = pygame.display.get_surface()
+        screen.fill(const.C_BLACK)
+        self.title_group.draw(screen)
+        screen.blit(self.option_sprite[const.OPTION_PLAY],
+                    self.option_sprite[const.OPTION_PLAY].get_rect(centerx=const.RESOLUTION[0] / 2,
+                                                                   centery=const.RESOLUTION[1] / 2 - 100))
+        screen.blit(self.option_sprite[const.OPTION_PLAY_PAINFUL],
+                    self.option_sprite[const.OPTION_PLAY_PAINFUL].get_rect(centerx=const.RESOLUTION[0] / 2,
+                                                                           centery=const.RESOLUTION[1] / 2))
+        screen.blit(self.option_sprite[const.OPTION_EXIT],
+                    self.option_sprite[const.OPTION_EXIT].get_rect(centerx=const.RESOLUTION[0] / 2,
+                                                                   centery=const.RESOLUTION[1] / 2 + 100))
+        self.fade.draw(screen, None)
+
+        pygame.display.update()
+
+    def update(self):
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    self.change_option((self.option + 1) % const.OPTIONS)
+                if event.key == pygame.K_UP:
+                    self.change_option((self.option - 1) % const.OPTIONS)
+                if event.key == pygame.K_SPACE:
+                    self.select_option()
+            if event.type == pygame.JOYBUTTONDOWN:
+                if event.button == const.B_A:
+                    self.select_option()
+            if event.type == pygame.JOYHATMOTION:
+                if event.value[1] == -1:
+                    self.change_option((self.option + 1) % const.OPTIONS)
+                if event.value[1] == 1:
+                    self.change_option((self.option - 1) % const.OPTIONS)
+        self.fade.update()
+
+    def select_option(self):
+        self.OK_SOUND.play()
+        pygame.mixer.music.fadeout(const.MENU_FADE_OUT * const.FRAME_RATE)
+        self.fade = particle.Fade(const.MENU_FADE_OUT, True, self.confirm_selection)
+
+    def confirm_selection(self):
+        self.result = self.option
+
+    def change_option(self, option):
+        self.option_sprite[self.option] = self.option_font.render(self.options[self.option], 10, const.C_RED)
+        self.option_sprite[option] = self.option_font.render(self.options[option], 10, const.C_GOLDEN)
+        self.option = option
+        self.CHANGE_SOUND.play()
+
+    def switch_state(self):
+        return self.result

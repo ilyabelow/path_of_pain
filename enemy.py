@@ -51,7 +51,6 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             game.pickupable_group
         )
         self.game = game
-        game.enemies_count += 1
         self.rect = pygame.Rect(0, 0, 50, 50)
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
         # CLOCKS
@@ -174,7 +173,6 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
     def on_zero_health(self, who):
         self.bleed_all_dir(self.pos)
-        self.game.enemies_count -= 1
         self.drop_key()
         self.kill()
 
