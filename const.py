@@ -74,8 +74,10 @@ sword_swing_duration = 8, 10, 12
 sword_swing_wait = 3, 4, 5  # To avoid spam?????????/
 sword_combo_wait = 10, 20, 30
 
-fade_in = 10
-fade_out = 10
+GAME_FADE_IN = 10
+GAME_FADE_OUT = 10
+MENU_FADE_IN = 30
+MENU_FADE_OUT = 30
 
 HUD_Y = 4000
 FADE_Y = 5000
@@ -84,3 +86,13 @@ FADE_Y = 5000
 MUSIC_NORMAL_VOLUME = 0.3
 MUSIC_MUTED_VOLUME = 0.15
 MUSIC_FADE_OUT = 2500
+
+NO = -1
+TO_MAIN_MENU = 1
+RESTART = 2
+
+OPTION_PLAY = 0
+OPTION_PLAY_PAINFUL = 1
+OPTION_EXIT = 2
+
+OPTIONS = 3

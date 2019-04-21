@@ -65,7 +65,6 @@ class Joystick(Controller):
     def __init__(self):
         super().__init__()
         self.joystick = pygame.joystick.Joystick(0)
-        self.joystick.init()
 
     def check_movement(self):
         offset = Joystick.dead_zone(self.joystick.get_axis(const.A_LS_H)), \

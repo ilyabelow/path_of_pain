@@ -81,7 +81,7 @@ class Title(base.AdvancedSprite):
         base.AdvancedSprite.__init__(self)
         self.image = image
         self.stage = 0
-        self.times = const.fade_in + 5, 20, 30, 20
+        self.times = const.GAME_FADE_IN + 5, 20, 30, 20
         self.clock = clock.Clock(self.next_stage)
         self.clock.wind_up(self.times[self.stage])
         self.y = const.HUD_Y
