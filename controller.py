@@ -11,11 +11,9 @@ class Controller:
     def check(self, obj):
         obj.look_away = self.check_look() * 300
         face_vector = self.check_movement()
+        obj.moving = bool(face_vector)
         if face_vector:
-            obj.face = face_vector.normalize()
-            obj.moving = True
-        else:
-            obj.moving = False
+            obj.face = face_vector.normalize()  # normalize 0 => error
 
         # TODO make simple common interface for a button
         if self.check_swing():
