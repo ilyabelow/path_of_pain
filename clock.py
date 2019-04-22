@@ -1,11 +1,10 @@
 # love this class
 class Clock:
-    def __init__(self, when_end, start_time=0):
+    def __init__(self, when_end=lambda: True, start_time=0):
         self.time = -1
         if when_end is None:
-            self.when_end = lambda: True  # plug
-        else:
-            self.when_end = when_end
+            when_end = lambda: True
+        self.when_end = when_end
         self.start_time = start_time
 
     # TODO add support for when_end() with args
