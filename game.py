@@ -330,7 +330,7 @@ class Menu(State):
     class Title(pygame.sprite.Sprite):
         def __init__(self):
             pygame.sprite.Sprite.__init__(self)
-            title_font = pygame.font.Font("assets/fonts/AUGUSTUS.TTF", 128)
+            title_font = pygame.font.Font("assets/fonts/augustus.ttf", 128)
             self.image = title_font.render("Path of Pain", 10, const.C_RED)
             self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2, centery=200)
 
@@ -339,7 +339,7 @@ class Menu(State):
             pygame.sprite.Sprite.__init__(self)
 
     def __init__(self):
-        self.option_font = pygame.font.Font("assets/fonts/AUGUSTUS.TTF", 36)
+        self.option_font = pygame.font.Font("assets/fonts/augustus.ttf", 36)
         self.options = ["Play", "play painful", "exit"]
         self.option_sprite = []
         for i in self.options:
