@@ -27,9 +27,9 @@ class Sword(base.AdvancedSprite):
         self.right_hand = True
 
         # CLOCKS
-        self.current_swing_clock = clock.Clock(None)
+        self.current_swing_clock = clock.Clock()
         self.next_combo_clock = clock.Clock(self.swinging_stopped)
-        self.next_swing_clock = clock.Clock(None)
+        self.next_swing_clock = clock.Clock()
         self.clock_ticker = clock.ClockTicker(self)
 
     def swing(self):

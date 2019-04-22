@@ -28,63 +28,67 @@ class Game(State):
         self.painful = painful
         self.window = pygame.display.get_surface().get_rect()
         # SPRITES INITIALIZATION
-        player.SPRITE = pygame.image.load("images/player.png").convert_alpha()
-        player.STUNNED_SPRITE = pygame.image.load("images/player_stunned.png").convert_alpha()
-        player.SURPRISED_SPRITE = pygame.image.load("images/player_surprised.png").convert_alpha()
-        enemy.STUNNED_SPRITE = pygame.image.load("images/enemy_stunned.png").convert_alpha()
-        enemy.SURPRISED_SPRITE = pygame.image.load("images/enemy_surprised.png").convert_alpha()
-        enemy.SPRITE = pygame.image.load("images/enemy.png").convert_alpha()
-        enemy.KEY_TAKEN_SPRITE = pygame.image.load("images/key_taken.png").convert_alpha()
-        HUD.HEART_SPRITE = pygame.image.load("images/heart.png").convert_alpha()
-        HUD.HEART_EMPTY_SPRITE = pygame.image.load("images/heart_empty.png").convert_alpha()
-        HUD.HEART_WEAK_SPRITE = pygame.image.load("images/weak_heart.png").convert_alpha()
-        HUD.KEY_SPRITE = pygame.image.load("images/key.png").convert_alpha()  # TODO another image
-        pickupable.LITTLE_HEART_SPRITE = pygame.image.load("images/little_heart.png").convert_alpha()
-        pickupable.LITTLE_HEART_WEAK_SPRITE = pygame.image.load("images/little_weak_heart.png").convert_alpha()
-        pickupable.KEY_SPRITE = pygame.image.load("images/key.png").convert_alpha()
-        sword.SPRITE = pygame.image.load("images/sword.png").convert_alpha()
-        sword.SWANG_SPRITE = pygame.image.load("images/sword_swang.png").convert_alpha()
-        obstacle.BOX_SPRITE = pygame.image.load("images/box.png").convert_alpha()
+        player.SPRITE = pygame.image.load("assets/images/player.png").convert_alpha()
+        player.STUNNED_SPRITE = pygame.image.load("assets/images/player_stunned.png").convert_alpha()
+        player.SURPRISED_SPRITE = pygame.image.load("assets/images/player_surprised.png").convert_alpha()
+        enemy.STUNNED_SPRITE = pygame.image.load("assets/images/enemy_stunned.png").convert_alpha()
+        enemy.SURPRISED_SPRITE = pygame.image.load("assets/images/enemy_surprised.png").convert_alpha()
+        enemy.SPRITE = pygame.image.load("assets/images/enemy.png").convert_alpha()
+        enemy.KEY_TAKEN_SPRITE = pygame.image.load("assets/images/key_taken.png").convert_alpha()
+        HUD.HEART_SPRITE = pygame.image.load("assets/images/heart.png").convert_alpha()
+        HUD.HEART_EMPTY_SPRITE = pygame.image.load("assets/images/heart_empty.png").convert_alpha()
+        HUD.HEART_WEAK_SPRITE = pygame.image.load("assets/images/weak_heart.png").convert_alpha()
+        HUD.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()  # TODO another image
+        pickupable.LITTLE_HEART_SPRITE = pygame.image.load("assets/images/little_heart.png").convert_alpha()
+        pickupable.LITTLE_HEART_WEAK_SPRITE = pygame.image.load("assets/images/little_weak_heart.png").convert_alpha()
+        pickupable.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()
+        sword.SPRITE = pygame.image.load("assets/images/sword.png").convert_alpha()
+        sword.SWANG_SPRITE = pygame.image.load("assets/images/sword_swang.png").convert_alpha()
+        obstacle.BOX_SPRITE = pygame.image.load("assets/images/box.png").convert_alpha()
 
         # SOUND INITIALIZATION
-        sword.SWING_SOUNDS = [pygame.mixer.Sound('sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
-        sword.CLING_SOUND = pygame.mixer.Sound('sounds/sword_hit_reject.wav')
+        sword.SWING_SOUNDS = [pygame.mixer.Sound('assets/sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
+        sword.CLING_SOUND = pygame.mixer.Sound('assets/sounds/sword_hit_reject.wav')
 
-        player.DASH_SOUND = pygame.mixer.Sound('sounds/hero_dash.wav')
+        player.DASH_SOUND = pygame.mixer.Sound('assets/sounds/hero_dash.wav')
         player.DASH_STATS["sound"] = player.DASH_SOUND
         player.BACK_DASH_STATS["sound"] = player.DASH_SOUND
-        player.HIT_SOUND = pygame.mixer.Sound('sounds/hero_damage.wav')
-        player.DEATH_SOUND = pygame.mixer.Sound('sounds/hero_death_extra_details.wav')
-        player.HEAL_SOUND = pygame.mixer.Sound('sounds/focus_health_heal.wav')
-        player.HEARTBEAT_SOUND = pygame.mixer.Sound('sounds/heartbeat_B_01.wav')
-        player.STEPS_SOUND = pygame.mixer.Sound('sounds/hero_run_footsteps_stone.wav')
+        player.HIT_SOUND = pygame.mixer.Sound('assets/sounds/hero_damage.wav')
+        player.DEATH_SOUND = pygame.mixer.Sound('assets/sounds/hero_death_extra_details.wav')
+        player.HEAL_SOUND = pygame.mixer.Sound('assets/sounds/focus_health_heal.wav')
+        player.HEARTBEAT_SOUND = pygame.mixer.Sound('assets/sounds/heartbeat_B_01.wav')
+        player.STEPS_SOUND = pygame.mixer.Sound('assets/sounds/hero_run_footsteps_stone.wav')
         player.STEPS_SOUND.set_volume(1.5)  # TODO tune
-        player.PICKUP_SOUND = pygame.mixer.Sound('sounds/shiny_item_pickup.wav')
+        player.PICKUP_SOUND = pygame.mixer.Sound('assets/sounds/shiny_item_pickup.wav')
 
-        enemy.DASH_SOUND = pygame.mixer.Sound('sounds/ruin_fat_sentry_sword.wav')
+        enemy.DASH_SOUND = pygame.mixer.Sound('assets/sounds/ruin_fat_sentry_sword.wav')
         enemy.DASH_SOUND.set_volume(0.5)  # TODO tune
         enemy.DASH_STATS["sound"] = enemy.DASH_SOUND
-        enemy.STARTLE_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_Fat_startle_0{}.wav'.format(i + 1)) for i in
+        enemy.STARTLE_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_Fat_startle_0{}.wav'.format(i + 1)) for i
+                                in
                                 range(2)]
-        enemy.ATTACK_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_Fat_attack_0{}.wav'.format(i + 1)) for i in
+        enemy.ATTACK_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_Fat_attack_0{}.wav'.format(i + 1)) for i
+                               in
                                range(3)]
-        enemy.DEATH_SOUNDS = [pygame.mixer.Sound('sounds/Ruins_Sentry_death_0{}.wav'.format(i + 1)) for i in range(3)]
-        enemy.HEAL_SOUND = pygame.mixer.Sound('sounds/focus_health_heal.wav')  # TODO find another sound
+        enemy.DEATH_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_death_0{}.wav'.format(i + 1)) for i in
+                              range(3)]
+        enemy.HEAL_SOUND = pygame.mixer.Sound('assets/sounds/focus_health_heal.wav')  # TODO find another sound
 
-        enemy.HIT_SOUND = pygame.mixer.Sound('sounds/enemy_damage.wav')
+        enemy.HIT_SOUND = pygame.mixer.Sound('assets/sounds/enemy_damage.wav')
 
-        obstacle.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('sounds/breakable_wall_hit_{}.wav'.format(i + 1)) for i in
+        obstacle.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('assets/sounds/breakable_wall_hit_{}.wav'.format(i + 1)) for i
+                                     in
                                      range(2)]
 
-        self.WIN_SOUND = pygame.mixer.Sound('sounds/secret_discovered_temp.wav')
+        self.WIN_SOUND = pygame.mixer.Sound('assets/sounds/secret_discovered_temp.wav')
         self.WIN_SOUND.set_volume(2)  # TODO tune
 
         # MUSIC INITIALIZATION
         # TODO proper music controller
         if painful:
-            pygame.mixer.music.load('sounds/Furious_Gods.wav')
+            pygame.mixer.music.load('assets/sounds/Furious_Gods.wav')
         else:
-            pygame.mixer.music.load('sounds/Gods_and_Glory.wav')
+            pygame.mixer.music.load('assets/sounds/Gods_and_Glory.wav')
         pygame.mixer.music.set_volume(const.MUSIC_NORMAL_VOLUME)
         pygame.mixer.music.play(loops=-1)
 
@@ -272,7 +276,7 @@ class Game(State):
 
     def deploy_logo(self, level):
         self.particle_group.add(
-            particle.Title(pygame.image.load('images/{}_level{}.png'.format(level, self.painful * '_painful'))))
+            particle.Title(pygame.image.load('assets/images/{}_level{}.png'.format(level, self.painful * '_painful'))))
 
     def update(self):
         # EVENT HANDLING (Now it is just exiting, hmm)
@@ -326,7 +330,7 @@ class Menu(State):
     class Title(pygame.sprite.Sprite):
         def __init__(self):
             pygame.sprite.Sprite.__init__(self)
-            title_font = pygame.font.Font("images/AUGUSTUS.TTF", 128)
+            title_font = pygame.font.Font("assets/fonts/AUGUSTUS.TTF", 128)
             self.image = title_font.render("Path of Pain", 10, const.C_RED)
             self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2, centery=200)
 
@@ -335,17 +339,17 @@ class Menu(State):
             pygame.sprite.Sprite.__init__(self)
 
     def __init__(self):
-        self.option_font = pygame.font.Font("images/AUGUSTUS.TTF", 36)
+        self.option_font = pygame.font.Font("assets/fonts/AUGUSTUS.TTF", 36)
         self.options = ["Play", "play painful", "exit"]
         self.option_sprite = []
         for i in self.options:
             self.option_sprite.append(self.option_font.render(i, 10, const.C_RED))
 
-        pygame.mixer.music.load('sounds/S59-55 Final Stage 3.wav')
+        pygame.mixer.music.load('assets/sounds/S59-55 Final Stage 3.wav')
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(1)
-        self.CHANGE_SOUND = pygame.mixer.Sound('sounds/ui_change_selection.wav')
-        self.OK_SOUND = pygame.mixer.Sound('sounds/ui_button_confirm.wav')
+        self.CHANGE_SOUND = pygame.mixer.Sound('assets/sounds/ui_change_selection.wav')
+        self.OK_SOUND = pygame.mixer.Sound('assets/sounds/ui_button_confirm.wav')
 
         self.result = const.NO
         self.option = const.OPTION_PLAY

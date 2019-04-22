@@ -143,7 +143,7 @@ class Moving:
         # BASE CLOCKS
         # TODO move to interfaces as well
         self.dash_clock = clock.Clock(self.unblock_movement)
-        self.next_dash_clock = clock.Clock(None)
+        self.next_dash_clock = clock.Clock()
         self.stun_clock = clock.Clock(self.unblock_movement)
         self.throw_back_clock = clock.Clock(self.stop)
 

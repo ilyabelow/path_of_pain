@@ -1,0 +1,6 @@
+# File manager files
+.directory
+# Python and Pycharm files
+__pycache__/
+venv/
+.idea/
