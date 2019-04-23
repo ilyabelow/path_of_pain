@@ -2,11 +2,11 @@
 
 the best game ever
 
-## Controls (outdated)
+## Controls
 
-|   | move  |  attack |  dash | backdash  | exit  |  restart | switch mode  |
-| :------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: |
-| keyboard  | arrows  | s  |  d |  a |  Esc | Tab  | p  |
-|  gamepad | LS  | X  | A  | B  | Back  | Start  |  Home |
+|   | move  |  attack |  dash | backdash  | exit  |  restart | option select  | change option |
+| :------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: |
+| keyboard  | arrows  | s  |  d |  a |  Esc | Tab  | Space  |  arrows |
+|  gamepad | LS  | X  | A  | B  | Back  | Start  |  A | Hat |
 
 > TODO: better README.md
