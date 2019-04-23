@@ -7,6 +7,7 @@ import interface
 import base
 import pickupable
 
+# TODO move all of these somewhere...
 SPRITE = None
 STUNNED_SPRITE = None
 SURPRISED_SPRITE = None
@@ -20,7 +21,7 @@ STARTLE_SOUNDS = None
 HEAL_SOUND = None
 
 DASH_STATS = {"speed": 20, "length": 100, "rest": 30, "sound": DASH_SOUND}
-BACK_DASH_STATS = None
+BACK_DASH_STATS = None  # Yet
 BLEED_ONE_DIR_STATS = {'amount': 7, 'splash': 15, 'fade': 0.5, 'sizes': [6, 8], 'speed': 10, 'offset': 50}
 BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1, 'offset': 0}
 
@@ -28,6 +29,9 @@ BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1, '
 # TODO make this class more abstract to make building more types of enemies
 # TODO MORE ENEMIES MORE CONTENT
 class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.Bleeding, interface.Pickuping):
+    STAY_TIME = (50, 90)
+    WANDER_TIME = (20, 40)
+    UNITED_TIME = (30, 90)
 
     def __init__(self, game, coords):
         base.AdvancedSprite.__init__(self)
@@ -51,7 +55,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             game.pickupable_group
         )
         self.game = game
-        self.rect = pygame.Rect(0, 0, 50, 50)
+        self.rect = pygame.Rect(0, 0, 50, 50)  # hitbox
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
         # CLOCKS
         self.spot_clock = clock.Clock(self.unblock_movement, const.enemy_spot_time)
@@ -59,9 +63,9 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         self.idle_clock = clock.Clock(self.move_in_idle)
 
         # INITIAL IDLE
-        self.idle_clock.wind_up(random.randint(30, 90))
+        self.idle_clock.wind_up(random.randint(*self.UNITED_TIME))
         self.idle = True
-        self.moving = random.randint(0, 2)
+        self.moving = bool(random.randint(0, 2))
 
         self.has_key = False
 
@@ -105,7 +109,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             self.spot_clock.wind_up()
             self.speed = const.V_ZERO
             self.game.particle_group.add(
-                particle.Exclamation(self.pos + const.V_RIGHT.rotate(-45) * 40, 10))
+                particle.Exclamation(self.pos + const.V_RIGHT.rotate(-45) * 40, 10))  # ! will be place to upper-right
             random.choice(STARTLE_SOUNDS).play()
             self.drop_key()
             self.face = -dist.normalize()
@@ -121,7 +125,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             self.idle = True
             self.moving = False
             self.can_be_moved = True
-            self.idle_clock.wind_up(random.randint(30, 90))
+            self.idle_clock.wind_up(random.randint(*self.UNITED_TIME))
         elif dist.length() < const.enemy_dash_radius and self.next_dash_clock.is_not_running():
             self.prepare_to_dash_clock.wind_up()
             random.choice(ATTACK_SOUNDS).play()
@@ -131,11 +135,11 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
     def move_in_idle(self):
         if self.moving:
             self.moving = False
-            self.idle_clock.wind_up(random.randint(50, 90))
+            self.idle_clock.wind_up(random.randint(*self.STAY_TIME))
         else:
             self.moving = True
-            self.face.rotate_ip(random.randint(-180, 180))
-            self.idle_clock.wind_up(random.randint(20, 40))
+            self.face.rotate_ip(random.randint(-180, 180))  # 360 degrees
+            self.idle_clock.wind_up(random.randint(*self.WANDER_TIME))
 
     def do_pickup(self, what):
         if isinstance(what, pickupable.Key):
@@ -153,18 +157,15 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             image = SURPRISED_SPRITE
         else:
             image = SPRITE
-        # TODO REMOVE THIS DUMB DRAWING
         if self.has_key:
+            # Drawing enemy + key on a bigger surface
             ext_image = pygame.Surface((100, 100), pygame.SRCALPHA, 32)
             ext_image.blit(image, (25, 25))
             ext_image.blit(KEY_TAKEN_SPRITE, (0, 25))
             image = ext_image
         rotated_image = pygame.transform.rotate(image, self.face.angle_to(const.V_UP))
-        if self.has_key:
-            center_rect = rotated_image.get_rect(centerx=50, centery=50)
-        else:
-            center_rect = rotated_image.get_rect(centerx=25, centery=25)
-
+        # tl;dr image is padded when rotated, this method allows to center image back
+        center_rect = rotated_image.get_rect(centerx=image.get_width() / 2, centery=image.get_width() / 2)
         return screen.blit(rotated_image,
                            (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
 
