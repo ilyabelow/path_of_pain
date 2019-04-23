@@ -24,8 +24,12 @@ BACK_DASH_STATS = {"speed": 25, "length": 100, "rest": 10, "sound": DASH_SOUND}
 BLEED_ONE_DIR_STATS = {'amount': 10, 'splash': 15, 'fade': 0.5, 'sizes': [6, 10], 'speed': 10, 'offset': 100}
 BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1, 'offset': 0}
 
-
-class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.Pickuping, interface.Bleeding):
+class Player(base.AdvancedSprite,
+             interface.Moving,
+             interface.Healthy,
+             interface.Pickuping,
+             interface.Bleeding,
+             interface.Tired):
 
     def __init__(self, game, coords, controller):
         base.AdvancedSprite.__init__(self)
@@ -46,6 +50,7 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
             BLEED_ALL_DIR_STATS,
             const.C_BLACK
         )
+        interface.Tired.__init__(self, 10, 10)
         self.steps_are_stepping = False
         self.keys = 0
         self.look_away = const.V_ZERO
@@ -55,17 +60,18 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
         if not game.painful:
             self.health_hud = hud.HealthHUD(self)
         self.key_hud = hud.KeyHUD(self)
+        self.stamina_hud = hud.StaminaHUD(self)
+
         self.controller = controller
         self.sword = sword.Sword(self)
-
         self.surprised_clock = clock.Clock(None, 30)
-
         self.clock_ticker = clock.ClockTicker(self)
 
     def update(self):
         self.clock_ticker.tick_all()
         self.pickup()
         self.move()
+        self.stamina_hud.makeup()
 
     def do_pickup(self, what):
         if isinstance(what, pickupable.Key):

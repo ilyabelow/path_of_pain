@@ -68,6 +68,30 @@ class Healthy:
         pass
 
 
+class Tired:
+    def __init__(self, max_stamina, rest_speed):
+        self.rest_speed = rest_speed
+        self.max_stamina = max_stamina
+        self.stamina = max_stamina
+        self.rest_clock = clock.Clock(self.rest, rest_speed)
+
+    # TODO fool proofing?
+    def rest(self):
+        self.stamina += 1
+        if self.stamina >= self.max_stamina:
+            self.rest_clock.hard_stop()
+        else:
+            self.rest_clock.wind_up()
+
+    # TODO fool proofing?
+    def work(self, cost):
+        self.stamina -= cost
+        self.rest_clock.wind_up()
+
+    def available(self, desired):
+        return self.stamina >= desired
+
+
 class Bleeding:
     def __init__(self, group, one_dir_stats, all_dir_stats, color):
         self.all_dir_stats = all_dir_stats
