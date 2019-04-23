@@ -10,6 +10,11 @@ SWANG_SPRITE = None
 SWING_SOUNDS = None
 CLING_SOUND = None
 
+SWING_WAIT = 3
+SWING_DURATION = 9
+
+STAMINA_COST = 2
+
 
 # TODO projectiles!
 # TODO base class with better name then "hitter"
@@ -23,26 +28,20 @@ class Sword(base.AdvancedSprite):
         self.rect = None
 
         # SWING STATS
-        self.swing_count = 0
         self.right_hand = True
 
         # CLOCKS
         self.current_swing_clock = clock.Clock()
-        self.next_combo_clock = clock.Clock(self.swinging_stopped)
         self.next_swing_clock = clock.Clock()
         self.clock_ticker = clock.ClockTicker(self)
 
     def swing(self):
-        # continue combo
-        if 0 < self.swing_count <= 2 and self.next_swing_clock.is_not_running() \
-                or self.swing_count == 0 and self.next_combo_clock.is_not_running():  # start new combo
-            # TODO nerf this because triple attack is too OP
-            self.next_swing_clock.wind_up(const.sword_swing_wait[self.swing_count])
-            self.next_combo_clock.wind_up(const.sword_combo_wait[self.swing_count])
-            self.current_swing_clock.wind_up(const.sword_swing_duration[self.swing_count])
-            self.swing_count += 1
+        if self.next_swing_clock.is_not_running and self.owner.available(3):
+            self.next_swing_clock.wind_up(SWING_WAIT)
+            self.current_swing_clock.wind_up(SWING_DURATION)
             self.right_hand = not self.right_hand  # switch hand, just for aesthetics
 
+            self.owner.work(STAMINA_COST)
             # HITTING
             self.pos = self.owner.pos + self.owner.face * 70
             # TODO good hitbox for sword
@@ -66,9 +65,6 @@ class Sword(base.AdvancedSprite):
         else:
             self.pos = self.owner.pos + self.owner.face * 70
         self.fetch_layer(self.owner.pos.y)  # TODO make better layer calculation
-
-    def swinging_stopped(self):
-        self.swing_count = 0
 
     def draw(self, screen, window):
         if self.current_swing_clock.is_not_running():

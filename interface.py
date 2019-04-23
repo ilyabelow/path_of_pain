@@ -151,6 +151,7 @@ class Pickuping:
 class Moving:
     def __init__(self, pos, collide_with, dash_stats, back_dash_stats):
         # TODO remove dull inits??? (we have to init fields in init}
+        # TODO unpack dash stats
         self.back_dash_stats = back_dash_stats
         self.dash_stats = dash_stats
         self.rect = None
@@ -217,7 +218,6 @@ class Moving:
         self.do_dash(self.dash_stats)
 
     def back_dash(self):
-        print()
         self.do_dash(self.back_dash_stats, True)
 
     def unblock_movement(self):

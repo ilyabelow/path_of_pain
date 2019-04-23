@@ -82,10 +82,13 @@ class Menu(State):
                     self.shift_option(-1)
                 if event.key == pygame.K_SPACE:
                     self.select_option()
-
+                if event.key == pygame.K_ESCAPE:
+                    self.app.stop()
             if event.type == pygame.JOYBUTTONDOWN:
                 if event.button == Button.A.value:
                     self.select_option()
+                if event.button == Button.BACK.value:
+                    self.app.stop()
             if event.type == pygame.JOYHATMOTION:
                 if event.value[1] == -1:
                     self.shift_option(1)

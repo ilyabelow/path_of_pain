@@ -72,10 +72,6 @@ player_throwback_length = 144
 player_throwback_speed = 36
 player_stun_duration = 8
 
-sword_swing_duration = 8, 10, 12
-sword_swing_wait = 3, 4, 5  # To avoid spam?????????/
-sword_combo_wait = 10, 20, 30
-
 GAME_FADE_IN = 10
 GAME_FADE_OUT = 10
 MENU_FADE_IN = 30
