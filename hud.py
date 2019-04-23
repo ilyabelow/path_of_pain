@@ -1,11 +1,18 @@
 import pygame
 import base
 import const
+from enum import Enum
 
 HEART_SPRITE = None
 HEART_EMPTY_SPRITE = None
 HEART_WEAK_SPRITE = None
 KEY_SPRITE = None
+
+
+class HUDPos(Enum):
+    KEYS = (30, 150)
+    HEARTS = (30, 30)
+    STAMINA = (0, 0)
 
 
 class HUD(base.AdvancedSprite):
@@ -27,7 +34,7 @@ class HUD(base.AdvancedSprite):
 
 class HealthHUD(HUD):
     def __init__(self, owner):
-        HUD.__init__(self, owner, (30, 30))  # this const will be here because it's easier to find it here I GUESS
+        HUD.__init__(self, owner, HUDPos.HEARTS.value)
 
     def makeup(self):
         # IMAGE COMPOSING
@@ -47,7 +54,7 @@ class HealthHUD(HUD):
 
 class KeyHUD(HUD):
     def __init__(self, owner):
-        HUD.__init__(self, owner, (30, 150 - 120 * owner.game.painful))  # keys HUD will be placed in place of hearts
+        HUD.__init__(self, owner, HUDPos.KEYS.value)
 
     def makeup(self):
         # IMAGE COMPOSING
@@ -56,5 +63,6 @@ class KeyHUD(HUD):
         # normal hearts
         for i in range(self.owner.keys):
             self.image.blit(KEY_SPRITE, (i * KEY_SPRITE.get_width(), 0))
+
 
 # TODO add stamina!!! heheheheh

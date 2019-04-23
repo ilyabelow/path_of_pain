@@ -2,10 +2,10 @@ import pygame
 import const
 import base
 import clock
+from enum import Enum
 
 
 # TODO make base class for particles
-
 
 # TODO rename and make more general?
 class Blood(base.AdvancedSprite):
@@ -38,10 +38,9 @@ class Exclamation(base.AdvancedSprite):
         base.AdvancedSprite.__init__(self)
         # TODO move font somewhere in shared place?
         font = pygame.font.Font(None, 80)
-
         self.image = font.render("!", 3, const.C_BLACK)
         self.rect = self.image.get_rect(centerx=pos.x, centery=pos.y)
-        self.y = 3000  # +inf
+        self.y = const.IMP_PARTICLE_Y
         self.clock = clock.Clock(self.kill, lifetime)
         self.clock.wind_up()
 
@@ -75,36 +74,44 @@ class Fade(base.AdvancedSprite):
         return screen.blit(image, (0, 0))
 
 
-# 0 - wait, 1 - fade in, 2 - stay, 3 - fade out
+class TitleState(Enum):
+    WAIT = 0
+    FADE_IN = 1
+    STAY = 2
+    FADE_OUT = 3
+
+
+# TODO make customizable position
 class Title(base.AdvancedSprite):
-    def __init__(self, image):
+    def __init__(self, image, state_durations):
         base.AdvancedSprite.__init__(self)
         self.image = image
-        self.stage = 0
-        self.times = const.GAME_FADE_IN + 5, 20, 30, 20
+        self.stage = TitleState.WAIT
+        self.state_durations = state_durations
         self.clock = clock.Clock(self.next_stage)
-        self.clock.wind_up(self.times[self.stage])
+        self.clock.wind_up(self.state_durations[self.stage.value])
         self.y = const.HUD_Y
 
     def update(self):
         self.clock.tick()
 
     def draw(self, screen, offset):
-        if 0 < self.stage:
+        if self.stage != TitleState.WAIT:
             temp = self.image.copy()
             alpha = 255
-            if self.stage == 1:
-                alpha = 255 * (self.times[1] - self.clock.how_much_is_left()) / self.times[1]
-            if self.stage == 3:
-                alpha = 255 * self.clock.how_much_is_left() / self.times[3]
+            if self.stage == TitleState.FADE_IN:
+                alpha = 255 * (self.state_durations[1] - self.clock.how_much_is_left()) / self.state_durations[1]
+            if self.stage == TitleState.FADE_OUT:
+                alpha = 255 * self.clock.how_much_is_left() / self.state_durations[3]
+
             temp.fill((255, 255, 255, alpha), None, pygame.BLEND_RGBA_MULT)
             return screen.blit(temp,
                                self.image.get_rect(centerx=const.RESOLUTION[0] / 2, bottom=const.RESOLUTION[1] - 25))
-        return pygame.Rect(0, 0, 0, 0)
+        return pygame.Rect(0, 0, 0, 0)  # Nothing is drawn
 
     def next_stage(self):
-        self.stage += 1
-        if self.stage > 3:
+        if self.stage == TitleState.FADE_OUT:
             self.kill()
         else:
-            self.clock.wind_up(self.times[self.stage])
+            self.stage = TitleState(self.stage.value + 1)
+            self.clock.wind_up(self.state_durations[self.stage.value])
