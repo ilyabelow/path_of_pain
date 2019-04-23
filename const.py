@@ -1,26 +1,34 @@
 import pygame
+from enum import Enum
+
 
 # TODO separate framerate and game ticks
 FRAME_RATE = 30
 RESOLUTION = (1920, 1080)
+
+
 # GAMEPAD INPUT
-B_A = 0
-B_B = 1
-B_X = 2
-B_Y = 3
-B_LB = 4
-B_RB = 5
-B_BACK = 6
-B_START = 7
-B_HOME = 8
-B_LS = 9
-B_RS = 10
-A_LS_H = 0
-A_LS_V = 1
-A_LT = 2
-A_RS_H = 3
-A_RS_V = 4
-A_RT = 5
+class Button(Enum):
+    A = 0
+    B = 1
+    X = 2
+    Y = 3
+    LB = 4
+    RB = 5
+    BACK = 6
+    START = 7
+    HOME = 8
+    LS = 9
+    RS = 10
+
+
+class Axis(Enum):
+    LS_H = 0
+    LS_V = 1
+    LT = 2
+    RS_H = 3
+    RS_V = 4
+    RT = 5
 
 # VECTORS
 # TODO make functions that return copy of a vector?
@@ -38,13 +46,6 @@ C_BLACK = (0, 0, 0)
 C_WHITE = (255, 255, 255)
 C_GOLDEN = (255, 215, 0)
 
-# TODO type specific constants to corresponding classes. HOW?
-
-# BOX TYPES
-BOX_EMPTY = 0
-BOX_HEALTH = 1
-BOX_WEAK_HEALTH = 2
-BOX_ENEMY = 3
 
 # TODO remove this to classes themselves <-- !
 
@@ -87,12 +88,6 @@ MUSIC_NORMAL_VOLUME = 0.3
 MUSIC_MUTED_VOLUME = 0.15
 MUSIC_FADE_OUT = 2500
 
-NO = -1
 TO_MAIN_MENU = 1
 RESTART = 2
 
-OPTION_PLAY = 0
-OPTION_PLAY_PAINFUL = 1
-OPTION_EXIT = 2
-
-OPTIONS = 3

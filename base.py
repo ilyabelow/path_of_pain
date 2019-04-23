@@ -100,3 +100,16 @@ class AdvancedGroup(pygame.sprite.Group):
                     elif not self.has_internal(sprite):
                         self.add_internal(sprite)
                         sprite.add_internal(self)
+
+
+class State:
+    def __def__(self):
+        self.app = None
+
+    def update(self):
+        pass
+
+    def draw(self):
+        pass
+
+    # TODO shared method to fade out
