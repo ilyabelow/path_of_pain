@@ -26,8 +26,12 @@ class Clock:
     def is_running(self):
         return self.time >= 0
 
-    def stop(self):
+    def hard_stop(self):
         self.time = -1
+
+    def soft_stop(self):
+        self.time = -1
+        self.when_end()
 
     def how_much_is_left(self):
         return self.time

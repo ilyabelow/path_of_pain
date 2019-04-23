@@ -1,18 +1,17 @@
 import pygame
 import base
 import const
-from enum import Enum
 
 HEART_SPRITE = None
 HEART_EMPTY_SPRITE = None
 HEART_WEAK_SPRITE = None
 KEY_SPRITE = None
+STAMINA_SPRITE = None
+STAMINA_EMPTY_SPRITE = None
 
-
-class HUDPos(Enum):
-    KEYS = (30, 150)
-    HEARTS = (30, 30)
-    STAMINA = (0, 0)
+KEYS_POS = (30, 180)
+HEARTS_POS = (30, 30)
+STAMINA_POS = (30, 120)
 
 
 class HUD(base.AdvancedSprite):
@@ -34,7 +33,7 @@ class HUD(base.AdvancedSprite):
 
 class HealthHUD(HUD):
     def __init__(self, owner):
-        HUD.__init__(self, owner, HUDPos.HEARTS.value)
+        HUD.__init__(self, owner, HEARTS_POS)
 
     def makeup(self):
         # IMAGE COMPOSING
@@ -54,7 +53,7 @@ class HealthHUD(HUD):
 
 class KeyHUD(HUD):
     def __init__(self, owner):
-        HUD.__init__(self, owner, HUDPos.KEYS.value)
+        HUD.__init__(self, owner, KEYS_POS)
 
     def makeup(self):
         # IMAGE COMPOSING
@@ -65,4 +64,15 @@ class KeyHUD(HUD):
             self.image.blit(KEY_SPRITE, (i * KEY_SPRITE.get_width(), 0))
 
 
-# TODO add stamina!!! heheheheh
+class StaminaHUD(HUD):
+    def __init__(self, owner):
+        HUD.__init__(self, owner, STAMINA_POS)
+
+    def makeup(self):
+        self.image = pygame.Surface((STAMINA_SPRITE.get_width() * self.owner.stamina, STAMINA_SPRITE.get_height()),
+                                    pygame.SRCALPHA, 32)
+        for i in range(self.owner.max_stamina):
+            if i < self.owner.stamina:
+                self.image.blit(STAMINA_SPRITE, (i * STAMINA_SPRITE.get_width(), 0))
+            else:
+                self.image.blit(STAMINA_EMPTY_SPRITE, (i * STAMINA_EMPTY_SPRITE.get_width(), 0))

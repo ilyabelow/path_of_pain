@@ -117,7 +117,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             self.can_be_moved = False
             self.moving = True
             self.idle = False
-            self.idle_clock.stop()
+            self.idle_clock.hard_stop()
 
     def move_when_chasing(self):
         dist = self.pos - self.game.player.pos
