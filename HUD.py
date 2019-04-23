@@ -15,7 +15,7 @@ class HealthHUD(base.AdvancedSprite):
         self.obj = obj
         # TODO move adding to group?
         self.y = const.HUD_Y
-        self.obj.game.common_group.add(self)
+        self.obj.game.render_group.add(self)
         self.image = None
         self.makeup()
 
@@ -43,7 +43,7 @@ class KeyHUD(base.AdvancedSprite):
         self.obj = obj
         # TODO move adding to group?
         self.y = const.HUD_Y
-        self.obj.game.common_group.add(self)
+        self.obj.game.render_group.add(self)
         self.image = None
         self.makeup()
 
