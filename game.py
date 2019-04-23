@@ -7,7 +7,7 @@ import player
 import particle
 import random
 import base
-import HUD
+import hud
 import pickupable
 import sword
 
@@ -38,10 +38,10 @@ class Game(State):
         enemy.SURPRISED_SPRITE = pygame.image.load("assets/images/enemy_surprised.png").convert_alpha()
         enemy.SPRITE = pygame.image.load("assets/images/enemy.png").convert_alpha()
         enemy.KEY_TAKEN_SPRITE = pygame.image.load("assets/images/key_taken.png").convert_alpha()
-        HUD.HEART_SPRITE = pygame.image.load("assets/images/heart.png").convert_alpha()
-        HUD.HEART_EMPTY_SPRITE = pygame.image.load("assets/images/heart_empty.png").convert_alpha()
-        HUD.HEART_WEAK_SPRITE = pygame.image.load("assets/images/weak_heart.png").convert_alpha()
-        HUD.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()  # TODO another image
+        hud.HEART_SPRITE = pygame.image.load("assets/images/heart.png").convert_alpha()
+        hud.HEART_EMPTY_SPRITE = pygame.image.load("assets/images/heart_empty.png").convert_alpha()
+        hud.HEART_WEAK_SPRITE = pygame.image.load("assets/images/weak_heart.png").convert_alpha()
+        hud.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()  # TODO another image
         pickupable.LITTLE_HEART_SPRITE = pygame.image.load("assets/images/little_heart.png").convert_alpha()
         pickupable.LITTLE_HEART_WEAK_SPRITE = pygame.image.load("assets/images/little_weak_heart.png").convert_alpha()
         pickupable.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()
@@ -282,6 +282,7 @@ class Game(State):
     def deploy_logo(self, level):
         self.particle_group.add(
             particle.Title(pygame.image.load('assets/images/{}_level{}.png'.format(level, self.painful * '_painful'))))
+
 
     def update(self):
         # EVENT HANDLING (Now it is just exiting, hmm)
