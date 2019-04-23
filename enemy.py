@@ -1,10 +1,12 @@
-import pygame
 import random
-import const
-import particle
-import clock
-import interface
+
+import pygame
+
 import base
+import clock
+import const
+import interface
+import particle
 import pickupable
 
 # TODO move all of these somewhere...
@@ -23,20 +25,24 @@ HEAL_SOUND = None
 # TODO enums here?
 DASH_STATS = {"speed": 20, "length": 100, "rest": 30, "sound": DASH_SOUND}
 BACK_DASH_STATS = None  # Yet
-BLEED_ONE_DIR_STATS = {'amount': 7, 'splash': 15, 'fade': 0.5, 'sizes': [6, 8], 'speed': 10, 'offset': 50}
-BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1, 'offset': 0}
+BLEED_ONE_DIR_STATS = {'amount': 7, 'splash': 15, 'fade': 0.5, 'sizes': [6, 8],
+                       'speed': 10, 'offset': 50}
+BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1,
+                       'offset': 0}
 
 
 # TODO make this class more abstract to make building more types of enemies
 # TODO MORE ENEMIES MORE CONTENT
-class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.Bleeding, interface.Pickuping):
+class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy,
+            interface.Bleeding, interface.Pickuping):
     STAY_TIME = (50, 90)
     WANDER_TIME = (20, 40)
     UNITED_TIME = (30, 90)
 
     def __init__(self, game, coords):
         base.AdvancedSprite.__init__(self)
-        interface.Moving.__init__(self, coords, game.obstacle_group, DASH_STATS, None)
+        interface.Moving.__init__(self, coords, game.obstacle_group,
+                                  DASH_STATS, None)
         interface.Healthy.__init__(
             self,
             const.enemy_health,
@@ -59,8 +65,10 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         self.rect = pygame.Rect(0, 0, 50, 50)  # hitbox
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
         # CLOCKS
-        self.spot_clock = clock.Clock(self.unblock_movement, const.enemy_spot_time)
-        self.prepare_to_dash_clock = clock.Clock(self.dash, const.enemy_attack_time)
+        self.spot_clock = clock.Clock(self.unblock_movement,
+                                      const.enemy_spot_time)
+        self.prepare_to_dash_clock = clock.Clock(self.dash,
+                                                 const.enemy_attack_time)
         self.idle_clock = clock.Clock(self.move_in_idle)
 
         # INITIAL IDLE
@@ -106,11 +114,13 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
     def move_when_idle(self):
         dist = self.pos - self.game.player.pos
-        if dist and dist.length() < const.enemy_chase_radius and self.game.player.alive():
+        if dist and dist.length() < const.enemy_chase_radius \
+                and self.game.player.alive():
             self.spot_clock.wind_up()
             self.speed = const.V_ZERO
             self.game.particle_group.add(
-                particle.Exclamation(self.pos + const.V_RIGHT.rotate(-45) * 40, 10))  # ! will be place to upper-right
+                particle.Exclamation(self.pos + const.V_RIGHT.rotate(-45) * 40,
+                                     10))  # ! will be place to upper-right
             random.choice(STARTLE_SOUNDS).play()
             self.drop_key()
             self.face = -dist.normalize()
@@ -122,12 +132,14 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
     def move_when_chasing(self):
         dist = self.pos - self.game.player.pos
         self.face = -dist.normalize()  # TODO fix problem with normalizing
-        if dist.length() > const.enemy_unchase_radius or not self.game.player.alive():
+        if dist.length() > const.enemy_unchase_radius or \
+                not self.game.player.alive():
             self.idle = True
             self.moving = False
             self.can_be_moved = True
             self.idle_clock.wind_up(random.randint(*self.UNITED_TIME))
-        elif dist.length() < const.enemy_dash_radius and self.next_dash_clock.is_not_running():
+        elif dist.length() < const.enemy_dash_radius \
+                and self.next_dash_clock.is_not_running():
             self.prepare_to_dash_clock.wind_up()
             random.choice(ATTACK_SOUNDS).play()
             self.speed = const.V_ZERO
@@ -164,11 +176,15 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             ext_image.blit(image, (25, 25))
             ext_image.blit(KEY_TAKEN_SPRITE, (0, 25))
             image = ext_image
-        rotated_image = pygame.transform.rotate(image, self.face.angle_to(const.V_UP))
-        # tl;dr image is padded when rotated, this method allows to center image back
-        center_rect = rotated_image.get_rect(centerx=image.get_width() / 2, centery=image.get_width() / 2)
+        rotated_image = pygame.transform.rotate(image,
+                                                self.face.angle_to(const.V_UP))
+        # tl;dr image is padded when rotated,
+        # this method allows to center image back
+        center_rect = rotated_image.get_rect(centerx=image.get_width() / 2,
+                                             centery=image.get_width() / 2)
         return screen.blit(rotated_image,
-                           (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
+                           (self.pos.x - window.x - center_rect.w / 2,
+                            self.pos.y - window.y - center_rect.w / 2))
 
     def on_any_health(self, who):
         self.bleed_one_dir(self.pos, (self.pos - who.pos).normalize())

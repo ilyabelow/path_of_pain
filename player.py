@@ -1,11 +1,12 @@
 import pygame
-import const
-import sword
-import hud
-import clock
-import interface
+
 import base
+import clock
+import const
+import hud
+import interface
 import pickupable
+import sword
 
 SPRITE = None
 STUNNED_SPRITE = None
@@ -19,10 +20,14 @@ HEARTBEAT_SOUND = None
 STEPS_SOUND = None
 PICKUP_SOUND = None
 
-DASH_STATS = {"speed": 36, "length": 180, "rest": 5, "cost": 1, "sound": DASH_SOUND}  # TODO balance
-BACK_DASH_STATS = {"speed": 25, "length": 100, "rest": 5, "cost": 1, "sound": DASH_SOUND}
-BLEED_ONE_DIR_STATS = {'amount': 10, 'splash': 15, 'fade': 0.5, 'sizes': [6, 10], 'speed': 10, 'offset': 100}
-BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1, 'offset': 0}
+DASH_STATS = {"speed": 36, "length": 180, "rest": 5, "cost": 1,
+              "sound": DASH_SOUND}  # TODO balance
+BACK_DASH_STATS = {"speed": 25, "length": 100, "rest": 5, "cost": 1,
+                   "sound": DASH_SOUND}
+BLEED_ONE_DIR_STATS = {'amount': 10, 'splash': 15, 'fade': 0.5,
+                       'sizes': [6, 10], 'speed': 10, 'offset': 100}
+BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30],
+                       'speed': 1, 'offset': 0}
 
 
 class Player(base.AdvancedSprite,
@@ -34,7 +39,8 @@ class Player(base.AdvancedSprite,
 
     def __init__(self, game, coords, controller):
         base.AdvancedSprite.__init__(self)
-        interface.Moving.__init__(self, coords, game.obstacle_group, DASH_STATS, BACK_DASH_STATS)
+        interface.Moving.__init__(self, coords, game.obstacle_group,
+                                  DASH_STATS, BACK_DASH_STATS)
         interface.Healthy.__init__(
             self,
             const.player_health if not game.painful else 1,
@@ -51,7 +57,8 @@ class Player(base.AdvancedSprite,
             BLEED_ALL_DIR_STATS,
             const.C_BLACK
         )
-        interface.Tired.__init__(self, 10, 10)  # TODO move to constants? TODO balance
+        interface.Tired.__init__(self, 10,
+                                 10)  # TODO move to constants? TODO balance
         self.steps_are_stepping = False
         self.keys = 0
         self.look_away = const.V_ZERO
@@ -65,7 +72,8 @@ class Player(base.AdvancedSprite,
 
         self.controller = controller
         self.sword = sword.Sword(self)
-        self.surprised_clock = clock.Clock(None, 30)  # How long player will be :0
+        self.surprised_clock = clock.Clock(None,
+                                           30)  # How long player will be :0
         self.clock_ticker = clock.ClockTicker(self)
 
     def update(self):
@@ -109,10 +117,12 @@ class Player(base.AdvancedSprite,
             image = SURPRISED_SPRITE
         else:
             image = SPRITE
-        rotated_image = pygame.transform.rotate(image, self.face.angle_to(const.V_UP))
+        rotated_image = pygame.transform.rotate(image,
+                                                self.face.angle_to(const.V_UP))
         center_rect = rotated_image.get_rect()
         return screen.blit(rotated_image,
-                           (self.pos.x - window.x - center_rect.w / 2, self.pos.y - window.y - center_rect.w / 2))
+                           (self.pos.x - window.x - center_rect.w / 2,
+                            self.pos.y - window.y - center_rect.w / 2))
 
     def on_any_health(self, who):
         self.bleed_one_dir(self.pos, (self.pos - who.pos).normalize())
@@ -167,11 +177,13 @@ class Player(base.AdvancedSprite,
             self.steps_are_stepping = False
 
     def try_to_dash(self):
-        if self.dash_clock.is_not_running() and self.available(self.dash_stats['cost']):
+        if self.dash_clock.is_not_running() and self.available(
+                self.dash_stats['cost']):
             self.dash()
             self.work(self.dash_stats['cost'])
 
     def try_to_back_dash(self):
-        if self.dash_clock.is_not_running() and self.available(self.back_dash_stats['cost']):
+        if self.dash_clock.is_not_running() and self.available(
+                self.back_dash_stats['cost']):
             self.back_dash()
             self.work(self.back_dash_stats['cost'])

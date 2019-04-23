@@ -1,8 +1,10 @@
+from enum import Enum
+
 import pygame
-import const
+
 import base
 import clock
-from enum import Enum
+import const
 
 
 # TODO make base class for particles
@@ -28,9 +30,12 @@ class Blood(base.AdvancedSprite):
         self.fetch_layer(self.pos.y)
 
     def draw(self, screen, window):
-        image = pygame.Surface((int(self.size * 2), int(self.size * 2)), pygame.SRCALPHA, 32)
-        pygame.draw.circle(image, self.color, [i // 2 for i in image.get_size()], int(self.size))
-        return screen.blit(image, (self.pos.x - window.x, self.pos.y - window.y))
+        image = pygame.Surface((int(self.size * 2), int(self.size * 2)),
+                               pygame.SRCALPHA, 32)
+        pygame.draw.circle(image, self.color,
+                           [i // 2 for i in image.get_size()], int(self.size))
+        return screen.blit(image,
+                           (self.pos.x - window.x, self.pos.y - window.y))
 
 
 class Exclamation(base.AdvancedSprite):
@@ -48,7 +53,8 @@ class Exclamation(base.AdvancedSprite):
         self.clock.tick()
 
     def draw(self, screen, window):
-        return screen.blit(self.image, (self.rect.x - window.x, self.rect.y - window.y))
+        return screen.blit(self.image,
+                           (self.rect.x - window.x, self.rect.y - window.y))
 
 
 class Fade(base.AdvancedSprite):
@@ -68,9 +74,12 @@ class Fade(base.AdvancedSprite):
     def draw(self, screen, window):
         image = pygame.Surface(const.RESOLUTION).convert_alpha()
         if self.to_black:
-            image.fill((0, 0, 0, 255 * ((self.duration - self.clock.how_much_is_left() - 1) / self.duration)))
+            image.fill((0, 0, 0, 255 * ((self.duration -
+                                         self.clock.how_much_is_left() - 1) /
+                                        self.duration)))
         else:
-            image.fill((0, 0, 0, int(255 * ((self.clock.how_much_is_left() + 1) / self.duration))))
+            image.fill((0, 0, 0, int(
+                255 * ((self.clock.how_much_is_left() + 1) / self.duration))))
         return screen.blit(image, (0, 0))
 
 
@@ -100,13 +109,18 @@ class Title(base.AdvancedSprite):
             temp = self.image.copy()
             alpha = 255
             if self.stage == TitleState.FADE_IN:
-                alpha = 255 * (self.state_durations[1] - self.clock.how_much_is_left()) / self.state_durations[1]
+                alpha = 255 * (self.state_durations[
+                                   1] - self.clock.how_much_is_left()) / \
+                        self.state_durations[1]
             if self.stage == TitleState.FADE_OUT:
-                alpha = 255 * self.clock.how_much_is_left() / self.state_durations[3]
+                alpha = 255 * self.clock.how_much_is_left() / \
+                        self.state_durations[3]
 
             temp.fill((255, 255, 255, alpha), None, pygame.BLEND_RGBA_MULT)
             return screen.blit(temp,
-                               self.image.get_rect(centerx=const.RESOLUTION[0] / 2, bottom=const.RESOLUTION[1] - 25))
+                               self.image.get_rect(
+                                   centerx=const.RESOLUTION[0] / 2,
+                                   bottom=const.RESOLUTION[1] - 25))
         return pygame.Rect(0, 0, 0, 0)  # Nothing is drawn
 
     def next_stage(self):

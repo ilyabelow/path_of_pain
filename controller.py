@@ -1,6 +1,7 @@
 import pygame
-import const
+
 from const import Button, Axis
+
 
 class Controller:
     def __init__(self):
