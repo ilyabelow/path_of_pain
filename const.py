@@ -30,6 +30,7 @@ class Axis(Enum):
     RS_V = 4
     RT = 5
 
+
 # VECTORS
 # TODO make functions that return copy of a vector?
 V_UP = pygame.Vector2(0, -1)
@@ -80,6 +81,7 @@ GAME_FADE_OUT = 10
 MENU_FADE_IN = 30
 MENU_FADE_OUT = 30
 
+IMP_PARTICLE_Y = 3000
 HUD_Y = 4000
 FADE_Y = 5000
 
@@ -87,5 +89,3 @@ FADE_Y = 5000
 MUSIC_NORMAL_VOLUME = 0.3
 MUSIC_MUTED_VOLUME = 0.15
 MUSIC_FADE_OUT = 2500
-
-

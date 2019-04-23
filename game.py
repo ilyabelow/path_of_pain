@@ -14,6 +14,7 @@ from const import Button
 from base import State
 import menu
 
+
 class Game(State):
     def __init__(self, painful=False):
         State.__init__(self)
@@ -230,9 +231,8 @@ class Game(State):
         self.player.fetch_screen()
         self.player_group = base.AdvancedGroup(self.render_group, self.player)
 
-        self.deploy_logo(1)
         self.prev_rect = [self.window]
-        self.fade = particle.Fade(const.GAME_FADE_IN, False)
+        self.fade = particle.Fade(const.GAME_FADE_IN, False, self.deploy_logo)
         self.render_group.add(self.fade)
 
     def distribute_keys(self):
@@ -269,10 +269,10 @@ class Game(State):
         pygame.mixer.fadeout(const.GAME_FADE_OUT)
         pygame.mixer.music.fadeout(const.GAME_FADE_OUT * const.FRAME_RATE)
 
-    def deploy_logo(self, level):
+    def deploy_logo(self):
         self.particle_group.add(
-            particle.Title(pygame.image.load('assets/images/{}_level{}.png'.format(level, self.painful * '_painful'))))
-
+            particle.Title(pygame.image.load('assets/images/{}_level{}.png'.format(1, self.painful * '_painful')),
+                           (5, 20, 30, 20)))  # ok stage duration
 
     def update(self):
         # EVENT HANDLING (Now it is just exiting, hmm)
@@ -309,5 +309,3 @@ class Game(State):
         pygame.display.update()
         self.prev_rect.clear()
         self.prev_rect = rect
-
-
