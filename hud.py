@@ -64,12 +64,13 @@ class KeyHUD(HUD):
             self.image.blit(KEY_SPRITE, (i * KEY_SPRITE.get_width(), 0))
 
 
+# TODO redesign those big ugly circles
 class StaminaHUD(HUD):
     def __init__(self, owner):
         HUD.__init__(self, owner, STAMINA_POS)
 
     def makeup(self):
-        self.image = pygame.Surface((STAMINA_SPRITE.get_width() * self.owner.stamina, STAMINA_SPRITE.get_height()),
+        self.image = pygame.Surface((STAMINA_SPRITE.get_width() * self.owner.max_stamina, STAMINA_SPRITE.get_height()),
                                     pygame.SRCALPHA, 32)
         for i in range(self.owner.max_stamina):
             if i < self.owner.stamina:
