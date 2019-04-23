@@ -1,7 +1,7 @@
 import pygame
 import const
 import sword
-import HUD
+import hud
 import clock
 import interface
 import base
@@ -53,8 +53,8 @@ class Player(base.AdvancedSprite, interface.Moving, interface.Healthy, interface
         self.rect = pygame.Rect(0, 0, 50, 50)
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
         if not game.painful:
-            self.health_hud = HUD.HealthHUD(self)
-        self.key_hud = HUD.KeyHUD(self)
+            self.health_hud = hud.HealthHUD(self)
+        self.key_hud = hud.KeyHUD(self)
         self.controller = controller
         self.sword = sword.Sword(self)
 
