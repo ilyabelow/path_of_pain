@@ -292,6 +292,7 @@ class Game(State):
                 pygame.quit()
 
         # UPDATING
+        self.pickupable_group.update()
         self.player_group.update()
         self.hitter_group.update()
         self.enemy_group.update()

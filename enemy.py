@@ -20,6 +20,7 @@ DEATH_SOUNDS = None
 STARTLE_SOUNDS = None
 HEAL_SOUND = None
 
+# TODO enums here?
 DASH_STATS = {"speed": 20, "length": 100, "rest": 30, "sound": DASH_SOUND}
 BACK_DASH_STATS = None  # Yet
 BLEED_ONE_DIR_STATS = {'amount': 7, 'splash': 15, 'fade': 0.5, 'sizes': [6, 8], 'speed': 10, 'offset': 50}
