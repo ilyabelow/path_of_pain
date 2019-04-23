@@ -10,19 +10,9 @@ import base
 import hud
 import pickupable
 import sword
-
-
-class State:
-    def __def__(self):
-        self.app = None
-
-    def update(self):
-        pass
-
-    def draw(self):
-        pass
-
-    # TODO shared method to fade out
+from const import Button
+from base import State
+import menu
 
 class Game(State):
     def __init__(self, painful=False):
@@ -267,7 +257,7 @@ class Game(State):
         self.WIN_SOUND.play()
 
     def to_main_menu(self):
-        self.app.switch_state(Menu())
+        self.app.switch_state(menu.Menu())
 
     def reset_level(self):
         # TODO reset level
@@ -294,9 +284,9 @@ class Game(State):
                 if event.key == pygame.K_TAB:
                     self.fade_out(self.reset_level)
             if event.type == pygame.JOYBUTTONDOWN:
-                if event.button == const.B_BACK:
+                if event.button == Button.BACK.value:
                     self.fade_out(self.to_main_menu)
-                if event.button == const.B_START:
+                if event.button == Button.START.value:
                     self.fade_out(self.reset_level)
             if event.type == pygame.QUIT:  # hard quit
                 pygame.quit()
@@ -321,137 +311,3 @@ class Game(State):
         self.prev_rect = rect
 
 
-class Menu(State):
-    class Title(pygame.sprite.Sprite):
-        def __init__(self):
-            pygame.sprite.Sprite.__init__(self)
-            title_font = pygame.font.Font("assets/fonts/augustus.ttf", 128)
-            self.image = title_font.render("Path of Pain", 10, const.C_RED)
-            self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2, centery=200)
-
-    class Option(pygame.sprite.Sprite):
-        def __init__(self, ):
-            pygame.sprite.Sprite.__init__(self)
-
-    def __init__(self):
-        State.__init__(self)
-        self.option_font = pygame.font.Font("assets/fonts/augustus.ttf", 36)
-        self.options = ["Play", "play painful", "exit"]
-        self.option_sprite = []
-        for i in self.options:
-            self.option_sprite.append(self.option_font.render(i, 10, const.C_RED))
-
-        pygame.mixer.music.load('assets/sounds/S59-55 Final Stage 3.wav')
-        pygame.mixer.music.play(-1)
-        pygame.mixer.music.set_volume(1)
-        self.CHANGE_SOUND = pygame.mixer.Sound('assets/sounds/ui_change_selection.wav')
-        self.OK_SOUND = pygame.mixer.Sound('assets/sounds/ui_button_confirm.wav')
-
-        self.result = const.NO
-        self.option = const.OPTION_PLAY
-        self.option_sprite[self.option] = self.option_font.render(self.options[self.option], 10, const.C_GOLDEN)
-        self.fade = particle.Fade(const.MENU_FADE_IN, False)
-
-        self.title_group = pygame.sprite.GroupSingle(self.Title())
-        self.option_group = pygame.sprite.OrderedUpdates()
-
-    def draw(self):
-        screen = pygame.display.get_surface()
-        screen.fill(const.C_BLACK)
-        self.title_group.draw(screen)
-        screen.blit(self.option_sprite[const.OPTION_PLAY],
-                    self.option_sprite[const.OPTION_PLAY].get_rect(centerx=const.RESOLUTION[0] / 2,
-                                                                   centery=const.RESOLUTION[1] / 2 - 100))
-        screen.blit(self.option_sprite[const.OPTION_PLAY_PAINFUL],
-                    self.option_sprite[const.OPTION_PLAY_PAINFUL].get_rect(centerx=const.RESOLUTION[0] / 2,
-                                                                           centery=const.RESOLUTION[1] / 2))
-        screen.blit(self.option_sprite[const.OPTION_EXIT],
-                    self.option_sprite[const.OPTION_EXIT].get_rect(centerx=const.RESOLUTION[0] / 2,
-                                                                   centery=const.RESOLUTION[1] / 2 + 100))
-        self.fade.draw(screen, None)
-
-        pygame.display.update()
-
-    def update(self):
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    self.change_option((self.option + 1) % const.OPTIONS)
-                if event.key == pygame.K_UP:
-                    self.change_option((self.option - 1) % const.OPTIONS)
-                if event.key == pygame.K_SPACE:
-                    self.select_option()
-            if event.type == pygame.JOYBUTTONDOWN:
-                if event.button == const.B_A:
-                    self.select_option()
-            if event.type == pygame.JOYHATMOTION:
-                if event.value[1] == -1:
-                    self.change_option((self.option + 1) % const.OPTIONS)
-                if event.value[1] == 1:
-                    self.change_option((self.option - 1) % const.OPTIONS)
-        self.fade.update()
-
-    def select_option(self):
-        self.OK_SOUND.play()
-        pygame.mixer.music.fadeout(const.MENU_FADE_OUT * const.FRAME_RATE)
-        self.fade = particle.Fade(const.MENU_FADE_OUT, True, self.confirm_selection)
-
-    def confirm_selection(self):
-        if self.option == const.OPTION_EXIT:
-            self.app.stop()
-        if self.option == const.OPTION_PLAY:
-            self.app.switch_state(Game())
-        if self.option == const.OPTION_PLAY_PAINFUL:
-            self.app.switch_state(Game(True))
-
-    def change_option(self, option):
-        self.option_sprite[self.option] = self.option_font.render(self.options[self.option], 10, const.C_RED)
-        self.option_sprite[option] = self.option_font.render(self.options[option], 10, const.C_GOLDEN)
-        self.option = option
-        self.CHANGE_SOUND.play()
-
-
-# Context for STATE PATTERN
-class Application:
-    def __init__(self):
-        pygame.mixer.pre_init(22050, -16, 8, 64)
-        pygame.init()
-        pygame.mouse.set_visible(False)
-        pygame.display.set_mode(const.RESOLUTION)
-        pygame.display.set_caption("Path of Pain")
-        pygame.display.set_icon(pygame.image.load("assets/images/enemy.png"))
-
-        self.clock = pygame.time.Clock()
-        self.state = None
-        self.switched = False
-        self.switch_state(Menu())
-        if pygame.joystick.get_count() != 0:
-            pygame.joystick.Joystick(0).init()
-        self.running = True
-
-    def switch_state(self, state):
-        self.state = state
-        self.state.app = self
-        self.switched = True
-
-    def run(self):
-        while self.running:
-            self.state.update()
-            if self.switched:
-                self.switched = False
-                continue
-            self.state.draw()
-            self.clock.tick_busy_loop(const.FRAME_RATE)
-        pygame.quit()
-
-    def stop(self):
-        self.running = False
-
-
-def main():
-    app = Application()
-    app.run()
-
-
-if __name__ == '__main__':
-    main()

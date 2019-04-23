@@ -5,6 +5,7 @@ import enemy
 import pickupable
 import interface
 import base
+from enum import Enum
 
 BOX_SPRITE = None
 BOX_BREAK_SOUNDS = None
@@ -29,8 +30,14 @@ class Wall(base.AdvancedSprite):
         return screen.blit(self.image, (self.rect.x - window.x, self.rect.y - window.y - self.height))
 
 
+class BoxType(Enum):
+    EMPTY = 0
+    HEALTH = 1
+    WEAK_HEALTH = 2
+    ENEMY = 3
+
+
 # TODO make this class more general to allow different boxes: jars, skulls, etc
-# TODO boxes of different sizes????
 class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
     def __init__(self, game, pos):
         base.AdvancedSprite.__init__(self)
@@ -45,17 +52,17 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         self.rect = pygame.Rect(*pos, 50, 35)
         self.game = game
         self.offsets = [[0, 0]] + [[random.randint(-5, 5), random.randint(-5, 5)] for i in range(self.max_health - 1)]
-        # TODO better randomizer
+        # TODO betterrandomizer
         # TODO store not mode but objects itself?
         if random.randint(0, 5) == 0 and not game.painful:
             if random.randint(0, 2) == 0:
-                self.mode = const.BOX_WEAK_HEALTH
+                self.mode = BoxType.WEAK_HEALTH
             else:
-                self.mode = const.BOX_HEALTH
+                self.mode = BoxType.HEALTH
         elif random.randint(0, 15) == 0:
-            self.mode = const.BOX_ENEMY
+            self.mode = BoxType.ENEMY
         else:
-            self.mode = const.BOX_EMPTY
+            self.mode = BoxType.EMPTY
         self.y = self.rect.y
 
     def on_ok_health(self, who):
@@ -68,10 +75,10 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         self.bleed_all_dir(pos)
 
         # BOX ACTION
-        if self.mode == const.BOX_HEALTH or self.mode == const.BOX_WEAK_HEALTH:
-            heal = pickupable.Heart(self.rect.move(10, 10), self.mode == const.BOX_WEAK_HEALTH)
+        if self.mode == BoxType.HEALTH or self.mode == BoxType.WEAK_HEALTH:
+            heal = pickupable.Heart(self.rect.move(10, 10), self.mode == BoxType.WEAK_HEALTH)
             self.game.pickupable_group.add(heal)
-        if self.mode == const.BOX_ENEMY:
+        if self.mode == BoxType.ENEMY:
             # TODO temp solution, should sort out groups
             # TODO factory here
             en = enemy.Enemy(self.game, self.rect[:2])
