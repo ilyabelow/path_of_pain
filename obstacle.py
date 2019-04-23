@@ -52,9 +52,9 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         self.rect = pygame.Rect(*pos, 50, 35)
         self.game = game
         self.offsets = [[0, 0]] + [[random.randint(-5, 5), random.randint(-5, 5)] for i in range(self.max_health - 1)]
-        # TODO betterrandomizer
+        # TODO better randomizer
         # TODO store not mode but objects itself?
-        if random.randint(0, 5) == 0 and not game.painful:
+        if random.randint(0, 6) == 0 and not game.painful:
             if random.randint(0, 2) == 0:
                 self.mode = BoxType.WEAK_HEALTH
             else:
@@ -76,7 +76,8 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
 
         # BOX ACTION
         if self.mode == BoxType.HEALTH or self.mode == BoxType.WEAK_HEALTH:
-            heal = pickupable.Heart(self.rect.move(10, 10), self.mode == BoxType.WEAK_HEALTH)
+            heal = pickupable.Heart(self.game.particle_group, self.rect.move(10, 10),
+                                    self.mode == BoxType.WEAK_HEALTH)  # move(10, 10) to center out the heart
             self.game.pickupable_group.add(heal)
         if self.mode == BoxType.ENEMY:
             # TODO temp solution, should sort out groups

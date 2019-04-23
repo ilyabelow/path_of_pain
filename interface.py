@@ -93,7 +93,7 @@ class Bleeding:
                                           direction * self.all_dir_stats['speed'],
                                           random.randint(self.all_dir_stats['sizes'][0],
                                                          self.all_dir_stats['sizes'][1]),
-                                          self.one_dir_stats['fade'],
+                                          self.all_dir_stats['fade'],
                                           self.color))
 
 
