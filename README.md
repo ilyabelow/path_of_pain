@@ -2,15 +2,7 @@
 
 the best game ever
 
-## Requirements
-
-python 3.5+
-
-pygame 1.9.4+
-
-gamepad (preferable)
-
-## Controls
+## Controls (outdated)
 
 |   | move  |  attack |  dash | backdash  | exit  |  restart | switch mode  |
 | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: |
