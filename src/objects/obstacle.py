@@ -47,6 +47,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         )  # TODO square blood
         self.rect = pygame.Rect(*pos, 50, 35)
         self.game = game
+        self.enemy_factory = game.enemy_factory
         self.offsets = [[0, 0]] + [[random.randint(-5, 5), random.randint(-5, 5)] for i in range(self.max_health - 1)]
         # TODO better randomizer
         # TODO store not mode but objects itself?
@@ -73,12 +74,8 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
             heal = pickupable.Heart(self.game.particle_group, self.rect.move(10, 10))
             self.game.pickupable_group.add(heal)
         if self.mode == BoxType.ENEMY:
-            # TODO temp solution, should sort out groups
-            # TODO factory here
-            en = enemy.Enemy(self.game, self.rect[:2])
-            self.game.enemy_group.add(en)
-            self.game.hittable_group.add(en)
-            en.stun(15)
+            newborn_enemy = self.enemy_factory.create(self.rect[0], self.rect[1])
+            newborn_enemy.stun(15)
 
         self.kill()
 

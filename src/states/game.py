@@ -17,10 +17,6 @@ class Game(State):
         player.SPRITE = pygame.image.load("assets/images/player.png").convert_alpha()
         player.STUNNED_SPRITE = pygame.image.load("assets/images/player_stunned.png").convert_alpha()
         player.SURPRISED_SPRITE = pygame.image.load("assets/images/player_surprised.png").convert_alpha()
-        enemy.STUNNED_SPRITE = pygame.image.load("assets/images/enemy_stunned.png").convert_alpha()
-        enemy.SURPRISED_SPRITE = pygame.image.load("assets/images/enemy_surprised.png").convert_alpha()
-        enemy.SPRITE = pygame.image.load("assets/images/enemy.png").convert_alpha()
-        enemy.KEY_TAKEN_SPRITE = pygame.image.load("assets/images/key_taken.png").convert_alpha()
         hud.HEART_SPRITE = pygame.image.load("assets/images/heart.png").convert_alpha()
         hud.HEART_EMPTY_SPRITE = pygame.image.load("assets/images/heart_empty.png").convert_alpha()
         hud.STAMINA_SPRITE = pygame.image.load("assets/images/stamina_full.png").convert_alpha()
@@ -47,20 +43,6 @@ class Game(State):
         player.STEPS_SOUND.set_volume(1.5)  # TODO tune
         player.PICKUP_SOUND = pygame.mixer.Sound('assets/sounds/shiny_item_pickup.wav')
 
-        enemy.DASH_SOUND = pygame.mixer.Sound('assets/sounds/ruin_fat_sentry_sword.wav')
-        enemy.DASH_SOUND.set_volume(0.5)  # TODO tune
-        enemy.DASH_STATS["sound"] = enemy.DASH_SOUND
-        enemy.STARTLE_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_Fat_startle_0{}.wav'.format(i + 1)) for i
-                                in
-                                range(2)]
-        enemy.ATTACK_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_Fat_attack_0{}.wav'.format(i + 1)) for i
-                               in
-                               range(3)]
-        enemy.DEATH_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_death_0{}.wav'.format(i + 1)) for i in
-                              range(3)]
-        enemy.HEAL_SOUND = pygame.mixer.Sound('assets/sounds/focus_health_heal.wav')  # TODO find another sound
-
-        enemy.HIT_SOUND = pygame.mixer.Sound('assets/sounds/enemy_damage.wav')
 
         obstacle.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('assets/sounds/breakable_wall_hit_{}.wav'.format(i + 1)) for i
                                      in
@@ -82,11 +64,15 @@ class Game(State):
         # GROUPS INITIALIZATION
         self.render_group = base.AdvancedLayeredUpdates()
         # TODO move level generation to separate entity
+
         self.max_keys = 5
+        self.hittable_group = base.AdvancedGroup(self.render_group)
         self.hitter_group = base.AdvancedGroup(self.render_group)
         self.level_rect = pygame.Rect(0, 0, 3000, 2000)
         self.pickupable_group = base.AdvancedGroup(self.render_group)
         self.particle_group = base.AdvancedGroup(self.render_group)
+        self.enemy_group = base.AdvancedGroup(self.render_group)
+        self.enemy_factory = enemy.EnemyFactory(self, self.enemy_group, self.hittable_group)
         self.box_group = base.AdvancedGroup(self.render_group,
                                             # upper room
 
@@ -186,33 +172,32 @@ class Game(State):
 
         self.obstacle_group = base.AdvancedGroup(self.render_group, *self.wall_group, *self.box_group)
 
-        self.enemy_group = base.AdvancedGroup(self.render_group,
-                                              # bottom-left room
-                                              enemy.Enemy(self, (500, 1300)),
-                                              enemy.Enemy(self, (900, 1300)),
-                                              enemy.Enemy(self, (500, 1600)),
-                                              enemy.Enemy(self, (900, 1600)),
-                                              enemy.Enemy(self, (700, 1450)),
 
-                                              # upper room
-                                              enemy.Enemy(self, (1700, 450)),
-                                              enemy.Enemy(self, (2200, 450)),
-                                              enemy.Enemy(self, (2850, 150)),
-                                              enemy.Enemy(self, (2850, 750)),
+        # bottom-left room
+        self.enemy_factory.create(500, 1300)
+        self.enemy_factory.create(900, 1300)
+        self.enemy_factory.create(500, 1600)
+        self.enemy_factory.create(900, 1600)
+        self.enemy_factory.create(700, 1450)
 
-                                              # bottom-right
-                                              enemy.Enemy(self, (2100, 1200)),
-                                              enemy.Enemy(self, (2100, 1500)),
-                                              enemy.Enemy(self, (1800, 1500)),
+        # upper room
+        self.enemy_factory.create(1700, 450)
+        self.enemy_factory.create(2200, 450)
+        self.enemy_factory.create(2850, 150)
+        self.enemy_factory.create(2850, 750)
 
-                                              enemy.Enemy(self, (2450, 1600)),
-                                              enemy.Enemy(self, (2500, 1600)),
-                                              enemy.Enemy(self, (2450, 1550)),
-                                              enemy.Enemy(self, (2500, 1550)),
+        # bottom-right
+        self.enemy_factory.create(2100, 1200)
+        self.enemy_factory.create(2100, 1500)
+        self.enemy_factory.create(1800, 1500)
 
-                                              )
+        self.enemy_factory.create(2450, 1600)
+        self.enemy_factory.create(2500, 1600)
+        self.enemy_factory.create(2450, 1550)
+        self.enemy_factory.create(2500, 1550)
+
         self.distribute_keys()
-        self.hittable_group = base.AdvancedGroup(self.render_group, *self.enemy_group, *self.box_group)
+        self.hittable_group.add(*self.box_group)
 
         # PLAYER INITIALIZING
         if pygame.joystick.get_count() == 0:

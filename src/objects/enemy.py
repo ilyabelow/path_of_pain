@@ -1,58 +1,83 @@
-import pygame
 import random
-from src.objects import particle, pickupable
+import pygame
 from src.framework import base, clock, interface, const
+from src.objects import particle, pickupable
 
-# TODO move all of these somewhere...
-SPRITE = None
-STUNNED_SPRITE = None
-SURPRISED_SPRITE = None
-KEY_TAKEN_SPRITE = None
 
-DASH_SOUND = None
-ATTACK_SOUNDS = None
-HIT_SOUND = None
-DEATH_SOUNDS = None
-STARTLE_SOUNDS = None
-HEAL_SOUND = None
+class EnemyFactory:
+    def __init__(self, game, *groups):
+        self.game = game
+        self.groups = groups
+        self.flyweight = EnemyFlyweight()
 
-# TODO enums here?
-DASH_STATS = {"speed": 20, "length": 100, "rest": 30, "sound": DASH_SOUND}
-BACK_DASH_STATS = None  # Yet
-BLEED_ONE_DIR_STATS = {'amount': 7, 'splash': 15, 'fade': 0.5, 'sizes': [6, 8], 'speed': 10, 'offset': 50}
-BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1, 'offset': 0}
+    def create(self, x, y):
+        enemy = Enemy(self.flyweight, self.game, (x, y))
+        for group in self.groups:
+            group.add(enemy)
+        return enemy
+
+
+class EnemyFlyweight:
+    def __init__(self):
+        # TEXTURES
+        self.STUNNED_SPRITE = pygame.image.load("assets/images/enemy_stunned.png").convert_alpha()
+        self.SURPRISED_SPRITE = pygame.image.load("assets/images/enemy_surprised.png").convert_alpha()
+        self.SPRITE = pygame.image.load("assets/images/enemy.png").convert_alpha()
+        self.KEY_TAKEN_SPRITE = pygame.image.load("assets/images/key_taken.png").convert_alpha()
+
+        # SOUNDS
+        self.DASH_SOUND = pygame.mixer.Sound('assets/sounds/ruin_fat_sentry_sword.wav')
+        self.DASH_SOUND.set_volume(0.5)  # TODO tune?
+        self.STARTLE_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_Fat_startle_0{}.wav'.format(i + 1))
+                               for i in range(2)]
+        self.ATTACK_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_Fat_attack_0{}.wav'.format(i + 1))
+                              for i in range(3)]
+        self.DEATH_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_death_0{}.wav'.format(i + 1))
+                             for i in range(3)]
+        self.HIT_SOUND = pygame.mixer.Sound('assets/sounds/enemy_damage.wav')
+
+        # TODO enums here
+        self.DASH_STATS = {"speed": 20, "length": 100, "rest": 30, "sound": self.DASH_SOUND}
+        self.BACK_DASH_STATS = None  # Yet?
+        self.BLEED_ONE_DIR_STATS = {'amount': 7, 'splash': 15, 'fade': 0.5, 'sizes': [6, 8], 'speed': 10, 'offset': 50}
+        self.BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1, 'offset': 0}
+
+        self.STAY_TIME = (50, 90)
+        self.WANDER_TIME = (20, 40)
+        self.UNITED_TIME = (30, 90)
+
+        self.HITBOX = (50, 50)
 
 
 # TODO make this class more abstract to make building more types of enemies
 # TODO MORE ENEMIES MORE CONTENT
 class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.Bleeding, interface.Pickuping):
-    STAY_TIME = (50, 90)
-    WANDER_TIME = (20, 40)
-    UNITED_TIME = (30, 90)
 
-    def __init__(self, game, coords):
+    def __init__(self, flyweight, game, coords):
         base.AdvancedSprite.__init__(self)
-        interface.Moving.__init__(self, coords, game.obstacle_group, DASH_STATS, None)
+        interface.Moving.__init__(self, coords, game.obstacle_group, flyweight.DASH_STATS, None)
         interface.Healthy.__init__(
             self,
             const.enemy_health,
-            [HEAL_SOUND],
-            [HIT_SOUND],
-            DEATH_SOUNDS
+            [None],
+            [flyweight.HIT_SOUND],
+            flyweight.DEATH_SOUNDS
         )
         interface.Bleeding.__init__(
             self,
             game.particle_group,
-            BLEED_ONE_DIR_STATS,
-            BLEED_ALL_DIR_STATS,
+            flyweight.BLEED_ONE_DIR_STATS,
+            flyweight.BLEED_ALL_DIR_STATS,
             const.C_RED
         )
         interface.Pickuping.__init__(
             self,
             game.pickupable_group
         )
+        self.flyweight = flyweight
         self.game = game
-        self.rect = pygame.Rect(0, 0, 50, 50)  # hitbox
+        # TODO make it in one line?
+        self.rect = pygame.Rect(0, 0, flyweight.HITBOX[0], flyweight.HITBOX[1])
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
         # CLOCKS
         self.spot_clock = clock.Clock(self.unblock_movement, const.enemy_spot_time)
@@ -60,10 +85,10 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         self.idle_clock = clock.Clock(self.move_in_idle)
 
         # INITIAL IDLE
-        self.idle_clock.wind_up(random.randint(*self.UNITED_TIME))
+        # TODO move to strategy
+        self.idle_clock.wind_up(random.randint(*flyweight.UNITED_TIME))
         self.idle = True
         self.moving = bool(random.randint(0, 2))
-
         self.has_key = False
 
         self.clock_ticker = clock.ClockTicker(self)
@@ -76,7 +101,6 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
     def drop_key(self):
         if self.has_key:
-            # TODO make better key positioning
             self.game.pickupable_group.add(pickupable.Key(self.pos, self.face))
             self.has_key = False
 
@@ -107,7 +131,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             self.speed = const.V_ZERO
             self.game.particle_group.add(
                 particle.Exclamation(self.pos + const.V_RIGHT.rotate(-45) * 40, 10))  # ! will be place to upper-right
-            random.choice(STARTLE_SOUNDS).play()
+            random.choice(self.flyweight.STARTLE_SOUNDS).play()
             self.drop_key()
             self.face = -dist.normalize()
             self.can_be_moved = False
@@ -122,21 +146,21 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             self.idle = True
             self.moving = False
             self.can_be_moved = True
-            self.idle_clock.wind_up(random.randint(*self.UNITED_TIME))
+            self.idle_clock.wind_up(random.randint(*self.flyweight.UNITED_TIME))
         elif dist.length() < const.enemy_dash_radius and self.next_dash_clock.is_not_running():
             self.prepare_to_dash_clock.wind_up()
-            random.choice(ATTACK_SOUNDS).play()
+            random.choice(self.flyweight.ATTACK_SOUNDS).play()
             self.speed = const.V_ZERO
             self.can_be_moved = False
 
     def move_in_idle(self):
         if self.moving:
             self.moving = False
-            self.idle_clock.wind_up(random.randint(*self.STAY_TIME))
+            self.idle_clock.wind_up(random.randint(*self.flyweight.STAY_TIME))
         else:
             self.moving = True
             self.face.rotate_ip(random.randint(-180, 180))  # 360 degrees
-            self.idle_clock.wind_up(random.randint(*self.WANDER_TIME))
+            self.idle_clock.wind_up(random.randint(*self.flyweight.WANDER_TIME))
 
     def do_pickup(self, what):
         if isinstance(what, pickupable.Key):
@@ -149,16 +173,16 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
     def draw(self, screen, window):
         if self.stun_clock.is_running():
-            image = STUNNED_SPRITE
+            image = self.flyweight.STUNNED_SPRITE
         elif self.spot_clock.is_running():
-            image = SURPRISED_SPRITE
+            image =  self.flyweight.SURPRISED_SPRITE
         else:
-            image = SPRITE
+            image =  self.flyweight.SPRITE
         if self.has_key:
             # Drawing enemy + key on a bigger surface
             ext_image = pygame.Surface((100, 100), pygame.SRCALPHA, 32)
             ext_image.blit(image, (25, 25))
-            ext_image.blit(KEY_TAKEN_SPRITE, (0, 25))
+            ext_image.blit( self.flyweight.KEY_TAKEN_SPRITE, (0, 25))
             image = ext_image
         rotated_image = pygame.transform.rotate(image, self.face.angle_to(const.V_UP))
         # tl;dr image is padded when rotated, this method allows to center image back
