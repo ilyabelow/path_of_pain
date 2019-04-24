@@ -74,7 +74,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
             heal = pickupable.Heart(self.game.particle_group, self.rect.move(10, 10))
             self.game.pickupable_group.add(heal)
         if self.mode == BoxType.ENEMY:
-            newborn_enemy = self.enemy_factory.create(self.rect[0], self.rect[1])
+            newborn_enemy = self.enemy_factory.create(self.rect[:2])
             newborn_enemy.stun(15)
 
         self.kill()

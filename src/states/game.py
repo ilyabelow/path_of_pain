@@ -1,9 +1,11 @@
-import pygame
 import random
-from src.objects import enemy, obstacle, player, particle, pickupable, sword, hud
+
+import pygame
+
 from src.framework import base, controller, const
-from src.framework.const import Button
 from src.framework.base import State
+from src.framework.const import Button
+from src.objects import enemy, obstacle, player, particle, pickupable, sword, hud
 from src.states import menu
 
 
@@ -13,10 +15,6 @@ class Game(State):
         self.painful = painful
         self.window = pygame.display.get_surface().get_rect()
         # TODO move assets init to separate module
-        # SPRITES INITIALIZATION
-        player.SPRITE = pygame.image.load("assets/images/player.png").convert_alpha()
-        player.STUNNED_SPRITE = pygame.image.load("assets/images/player_stunned.png").convert_alpha()
-        player.SURPRISED_SPRITE = pygame.image.load("assets/images/player_surprised.png").convert_alpha()
         hud.HEART_SPRITE = pygame.image.load("assets/images/heart.png").convert_alpha()
         hud.HEART_EMPTY_SPRITE = pygame.image.load("assets/images/heart_empty.png").convert_alpha()
         hud.STAMINA_SPRITE = pygame.image.load("assets/images/stamina_full.png").convert_alpha()
@@ -32,21 +30,8 @@ class Game(State):
         sword.SWING_SOUNDS = [pygame.mixer.Sound('assets/sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
         sword.CLING_SOUND = pygame.mixer.Sound('assets/sounds/sword_hit_reject.wav')
 
-        player.DASH_SOUND = pygame.mixer.Sound('assets/sounds/hero_dash.wav')
-        player.DASH_STATS["sound"] = player.DASH_SOUND
-        player.BACK_DASH_STATS["sound"] = player.DASH_SOUND
-        player.HIT_SOUND = pygame.mixer.Sound('assets/sounds/hero_damage.wav')
-        player.DEATH_SOUND = pygame.mixer.Sound('assets/sounds/hero_death_extra_details.wav')
-        player.HEAL_SOUND = pygame.mixer.Sound('assets/sounds/focus_health_heal.wav')
-        player.HEARTBEAT_SOUND = pygame.mixer.Sound('assets/sounds/heartbeat_B_01.wav')
-        player.STEPS_SOUND = pygame.mixer.Sound('assets/sounds/hero_run_footsteps_stone.wav')
-        player.STEPS_SOUND.set_volume(1.5)  # TODO tune
-        player.PICKUP_SOUND = pygame.mixer.Sound('assets/sounds/shiny_item_pickup.wav')
-
-
-        obstacle.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('assets/sounds/breakable_wall_hit_{}.wav'.format(i + 1)) for i
-                                     in
-                                     range(2)]
+        obstacle.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('assets/sounds/breakable_wall_hit_{}.wav'.format(i + 1))
+                                     for i in range(2)]
 
         self.WIN_SOUND = pygame.mixer.Sound('assets/sounds/secret_discovered_temp.wav')
         self.WIN_SOUND.set_volume(2)  # TODO tune
@@ -172,41 +157,24 @@ class Game(State):
 
         self.obstacle_group = base.AdvancedGroup(self.render_group, *self.wall_group, *self.box_group)
 
-
-        # bottom-left room
-        self.enemy_factory.create(500, 1300)
-        self.enemy_factory.create(900, 1300)
-        self.enemy_factory.create(500, 1600)
-        self.enemy_factory.create(900, 1600)
-        self.enemy_factory.create(700, 1450)
-
-        # upper room
-        self.enemy_factory.create(1700, 450)
-        self.enemy_factory.create(2200, 450)
-        self.enemy_factory.create(2850, 150)
-        self.enemy_factory.create(2850, 750)
-
-        # bottom-right
-        self.enemy_factory.create(2100, 1200)
-        self.enemy_factory.create(2100, 1500)
-        self.enemy_factory.create(1800, 1500)
-
-        self.enemy_factory.create(2450, 1600)
-        self.enemy_factory.create(2500, 1600)
-        self.enemy_factory.create(2450, 1550)
-        self.enemy_factory.create(2500, 1550)
+        enemies_coords = (500, 1300), (900, 1300), (500, 1300), (900, 1300), (500, 1600), (900, 1600), (700, 1450), \
+                         (1700, 450), (2200, 450), (2850, 150), (2850, 750), (2100, 1200), (2100, 1500), (1800, 1500), \
+                         (2450, 1600), (2500, 1600), (2450, 1550), (2500, 1550)
+        for coord in enemies_coords:
+            self.enemy_factory.create(coord)
 
         self.distribute_keys()
         self.hittable_group.add(*self.box_group)
 
         # PLAYER INITIALIZING
+        self.player_group = base.AdvancedGroup(self.render_group)
         if pygame.joystick.get_count() == 0:
             ctrlr = controller.Keyboard()
         else:
             ctrlr = controller.Joystick()
-        self.player = player.Player(self, (400, 300), ctrlr)
+        self.player_factory = player.PlayerFactory(self, self.player_group)
+        self.player = self.player_factory.create(ctrlr, (400, 300))
         self.player.fetch_screen()
-        self.player_group = base.AdvancedGroup(self.render_group, self.player)
 
         self.prev_rect = [self.window]
         self.fade = particle.Fade(const.GAME_FADE_IN, False, self.deploy_logo)

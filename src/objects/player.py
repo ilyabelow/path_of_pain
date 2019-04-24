@@ -1,23 +1,42 @@
 import pygame
+
 from src.framework import base, clock, interface, const
 from src.objects import pickupable, sword, hud
 
-SPRITE = None
-STUNNED_SPRITE = None
-SURPRISED_SPRITE = None
 
-DASH_SOUND = None
-HIT_SOUND = None
-DEATH_SOUND = None
-HEAL_SOUND = None
-HEARTBEAT_SOUND = None
-STEPS_SOUND = None
-PICKUP_SOUND = None
+class PlayerFactory:
+    def __init__(self, game, *groups):
+        self.game = game
+        self.groups = groups
+        self.flyweight = PlayerFlyweight()
 
-DASH_STATS = {"speed": 36, "length": 180, "rest": 5, "cost": 1, "sound": DASH_SOUND}  # TODO balance
-BACK_DASH_STATS = {"speed": 25, "length": 100, "rest": 5, "cost": 1, "sound": DASH_SOUND}
-BLEED_ONE_DIR_STATS = {'amount': 10, 'splash': 15, 'fade': 0.5, 'sizes': [6, 10], 'speed': 10, 'offset': 100}
-BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1, 'offset': 0}
+    def create(self, controller, pos):
+        player = Player(self.flyweight, self.game, pos, controller)
+        for group in self.groups:
+            group.add(player)
+        return player
+
+
+class PlayerFlyweight:
+    def __init__(self):
+        self.SPRITE = pygame.image.load("assets/images/player.png").convert_alpha()
+        self.STUNNED_SPRITE = pygame.image.load("assets/images/player_stunned.png").convert_alpha()
+        self.SURPRISED_SPRITE = pygame.image.load("assets/images/player_surprised.png").convert_alpha()
+
+        self.DASH_SOUND = pygame.mixer.Sound('assets/sounds/hero_dash.wav')
+        self.HIT_SOUND = pygame.mixer.Sound('assets/sounds/hero_damage.wav')
+        self.DEATH_SOUND = pygame.mixer.Sound('assets/sounds/hero_death_extra_details.wav')
+        self.HEAL_SOUND = pygame.mixer.Sound('assets/sounds/focus_health_heal.wav')
+        self.HEARTBEAT_SOUND = pygame.mixer.Sound('assets/sounds/heartbeat_B_01.wav')
+        self.STEPS_SOUND = pygame.mixer.Sound('assets/sounds/hero_run_footsteps_stone.wav')
+        self.STEPS_SOUND.set_volume(1.5)  # TODO tune
+        self.PICKUP_SOUND = pygame.mixer.Sound('assets/sounds/shiny_item_pickup.wav')
+
+        self.DASH_STATS = {"speed": 36, "length": 180, "rest": 5, "cost": 1, "sound": self.DASH_SOUND}  # TODO balance
+        self.BACK_DASH_STATS = {"speed": 25, "length": 100, "rest": 5, "cost": 1, "sound": self.DASH_SOUND}
+        self.BLEED_ONE_DIR_STATS = {'amount': 10, 'splash': 15, 'fade': 0.5, 'sizes': [6, 10], 'speed': 10,
+                                    'offset': 100}
+        self.BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1, 'offset': 0}
 
 
 class Player(base.AdvancedSprite,
@@ -27,23 +46,23 @@ class Player(base.AdvancedSprite,
              interface.Bleeding,
              interface.Tired):
 
-    def __init__(self, game, coords, controller):
+    def __init__(self, flyweight, game, coords, controller):
         base.AdvancedSprite.__init__(self)
-        interface.Moving.__init__(self, coords, game.obstacle_group, DASH_STATS, BACK_DASH_STATS)
+        interface.Moving.__init__(self, coords, game.obstacle_group, flyweight.DASH_STATS, flyweight.BACK_DASH_STATS)
         interface.Healthy.__init__(
             self,
             const.player_health if not game.painful else 1,
-            [HEAL_SOUND],
-            [HIT_SOUND],
-            [DEATH_SOUND],
+            [flyweight.HEAL_SOUND],
+            [flyweight.HIT_SOUND],
+            [flyweight.DEATH_SOUND],
             20
         )
         interface.Pickuping.__init__(self, game.pickupable_group)
         interface.Bleeding.__init__(
             self,
             game.particle_group,
-            BLEED_ONE_DIR_STATS,
-            BLEED_ALL_DIR_STATS,
+            flyweight.BLEED_ONE_DIR_STATS,
+            flyweight.BLEED_ALL_DIR_STATS,
             const.C_BLACK
         )
         interface.Tired.__init__(self, 10, 7)  # TODO move to constants? TODO balance
@@ -51,6 +70,7 @@ class Player(base.AdvancedSprite,
         self.keys = 0
         self.look_away = const.V_ZERO
         self.game = game
+        self.flyweight = flyweight
         self.rect = pygame.Rect(0, 0, 50, 50)  # hitbox
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
 
@@ -73,7 +93,7 @@ class Player(base.AdvancedSprite,
     def do_pickup(self, what):
         if isinstance(what, pickupable.Key):
             self.keys += 1
-            PICKUP_SOUND.play()
+            self.flyweight.PICKUP_SOUND.play()
             self.key_hud.makeup()
             if self.keys == self.game.max_keys:
                 self.game.win()
@@ -100,11 +120,11 @@ class Player(base.AdvancedSprite,
 
     def draw(self, screen, window):
         if self.stun_clock.is_running():
-            image = STUNNED_SPRITE
+            image = self.flyweight.STUNNED_SPRITE
         elif self.surprised_clock.is_running():
-            image = SURPRISED_SPRITE
+            image = self.flyweight.SURPRISED_SPRITE
         else:
-            image = SPRITE
+            image = self.flyweight.SPRITE
         rotated_image = pygame.transform.rotate(image, self.face.angle_to(const.V_UP))
         center_rect = rotated_image.get_rect()
         return screen.blit(rotated_image,
@@ -115,13 +135,13 @@ class Player(base.AdvancedSprite,
         self.health_hud.makeup()
 
     def on_low_health(self, who):
-        HEARTBEAT_SOUND.play(-1)
+        self.flyweight.HEARTBEAT_SOUND.play(-1)
         pygame.mixer.music.set_volume(const.MUSIC_MUTED_VOLUME)
 
     def on_zero_health(self, who):
         self.stop_stepping()
-        HEARTBEAT_SOUND.stop()
-        DEATH_SOUND.play()
+        self.flyweight.HEARTBEAT_SOUND.stop()
+        self.flyweight.DEATH_SOUND.play()
         self.sword.kill()
         self.kill()
         self.bleed_all_dir(self.pos)
@@ -136,7 +156,7 @@ class Player(base.AdvancedSprite,
 
     def after_healing(self):
         self.health_hud.makeup()
-        HEARTBEAT_SOUND.stop()
+        self.flyweight.HEARTBEAT_SOUND.stop()
         pygame.mixer.music.set_volume(const.MUSIC_NORMAL_VOLUME)
 
     def fetch_screen(self):
@@ -153,12 +173,12 @@ class Player(base.AdvancedSprite,
 
     def start_stepping(self):
         if not self.steps_are_stepping:
-            STEPS_SOUND.play(-1)
+            self.flyweight.STEPS_SOUND.play(-1)
             self.steps_are_stepping = True
 
     def stop_stepping(self):
         if self.steps_are_stepping:
-            STEPS_SOUND.stop()
+            self.flyweight.STEPS_SOUND.stop()
             self.steps_are_stepping = False
 
     def try_to_dash(self):

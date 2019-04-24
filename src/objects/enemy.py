@@ -10,8 +10,8 @@ class EnemyFactory:
         self.groups = groups
         self.flyweight = EnemyFlyweight()
 
-    def create(self, x, y):
-        enemy = Enemy(self.flyweight, self.game, (x, y))
+    def create(self, pos):
+        enemy = Enemy(self.flyweight, self.game, pos)
         for group in self.groups:
             group.add(enemy)
         return enemy
