@@ -1,4 +1,5 @@
 import pygame
+
 import base
 import const
 
@@ -38,7 +39,7 @@ class HealthHUD(HUD):
     def makeup(self):
         # IMAGE COMPOSING
         self.image = pygame.Surface(
-            (HEART_SPRITE.get_width() * (self.owner.max_health + self.owner.weak_health), HEART_SPRITE.get_height()),
+            (HEART_SPRITE.get_width() * self.owner.max_health, HEART_SPRITE.get_height()),
             pygame.SRCALPHA, 32)
         # normal hearts
         for i in range(self.owner.max_health):
@@ -46,9 +47,6 @@ class HealthHUD(HUD):
                 self.image.blit(HEART_SPRITE, (i * HEART_SPRITE.get_width(), 0))
             else:
                 self.image.blit(HEART_EMPTY_SPRITE, (i * HEART_SPRITE.get_width(), 0))
-        # weak hearts
-        for i in range(self.owner.weak_health):
-            self.image.blit(HEART_WEAK_SPRITE, ((i + self.owner.max_health) * HEART_SPRITE.get_width(), 0))
 
 
 class KeyHUD(HUD):

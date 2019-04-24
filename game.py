@@ -33,7 +33,6 @@ class Game(State):
         hud.HEART_EMPTY_SPRITE = pygame.image.load("assets/images/heart_empty.png").convert_alpha()
         hud.STAMINA_SPRITE = pygame.image.load("assets/images/stamina_full.png").convert_alpha()
         hud.STAMINA_EMPTY_SPRITE = pygame.image.load("assets/images/stamina_empty.png").convert_alpha()
-        hud.HEART_WEAK_SPRITE = pygame.image.load("assets/images/weak_heart.png").convert_alpha()
         hud.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()  # TODO another image
         pickupable.LITTLE_HEART_SPRITE = pygame.image.load("assets/images/little_heart.png").convert_alpha()
         pickupable.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()

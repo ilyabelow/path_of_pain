@@ -88,7 +88,8 @@ class Menu(State):
                 if event.button == Button.A.value:
                     self.select_option()
                 if event.button == Button.BACK.value:
-                    self.app.stop()
+                    self.set_option(Option.EXIT)
+                    self.select_option()
             if event.type == pygame.JOYHATMOTION:
                 if event.value[1] == -1:
                     self.shift_option(1)
@@ -110,6 +111,9 @@ class Menu(State):
             self.app.switch_state(Game(True))
 
     def shift_option(self, shift):
-        self.option = Option((self.option.value + shift) % len(Option))
+        self.set_option(Option((self.option.value + shift) % len(Option)))
+
+    def set_option(self, option):
+        self.option = option
         self.option_group.update()
         self.CHANGE_SOUND.play()

@@ -36,12 +36,12 @@ class Sword(base.AdvancedSprite):
         self.clock_ticker = clock.ClockTicker(self)
 
     def swing(self):
-        if self.next_swing_clock.is_not_running and self.owner.available(3):
+        if self.next_swing_clock.is_not_running and self.owner.stamina_available(STAMINA_COST):
             self.next_swing_clock.wind_up(SWING_WAIT)
             self.current_swing_clock.wind_up(SWING_DURATION)
             self.right_hand = not self.right_hand  # switch hand, just for aesthetics
 
-            self.owner.work(STAMINA_COST)
+            self.owner.stamina_drain(STAMINA_COST)
             # HITTING
             self.pos = self.owner.pos + self.owner.face * 70
             # TODO good hitbox for sword

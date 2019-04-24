@@ -11,22 +11,17 @@ class Healthy:
                  heal_sounds=None,
                  hit_sounds=None,
                  death_sounds=None,
-                 invulnerability=-1,
-                 weak_health=0):
+                 invulnerability=-1):
         self.max_health = max_health
         self.health = max_health
-        self.weak_health = weak_health
         self.invulnerability_clock = clock.Clock(None, invulnerability)
 
         self.heal_sounds = heal_sounds
         self.hit_sounds = hit_sounds
         self.death_sounds = death_sounds
 
-    def heal(self, amount, weak):
-        if not weak:
-            self.health = min(self.max_health, self.health + amount)
-        else:
-            self.weak_health += amount
+    def heal(self, amount):
+        self.health = min(self.max_health, self.health + amount)
         if self.death_sounds is not None:
             random.choice(self.heal_sounds).play()
         self.after_healing()
@@ -37,16 +32,12 @@ class Healthy:
     def hit(self, amount, who):
         if self.invulnerability_clock.is_not_running():
             self.invulnerability_clock.wind_up()
-
-            if self.weak_health != 0:
-                self.weak_health -= amount
-            else:
-                self.health -= amount
+            self.health -= amount
             if self.hit_sounds is not None:
                 random.choice(self.hit_sounds).play()
             self.on_any_health(who)
 
-            if self.health + self.weak_health == 1:  # TODO generalize low health
+            if self.health == 1:  # TODO generalize low health
                 self.on_low_health(who)
             if self.health == 0:
                 if self.death_sounds is not None:
@@ -73,10 +64,10 @@ class Tired:
         self.rest_speed = rest_speed
         self.max_stamina = max_stamina
         self.stamina = max_stamina
-        self.rest_clock = clock.Clock(self.rest, rest_speed)
+        self.rest_clock = clock.Clock(self.stamina_rest, rest_speed)
 
     # TODO fool proofing?
-    def rest(self):
+    def stamina_rest(self):
         self.stamina += 1
         if self.stamina >= self.max_stamina:
             self.rest_clock.hard_stop()
@@ -84,11 +75,11 @@ class Tired:
             self.rest_clock.wind_up()
 
     # TODO fool proofing?
-    def work(self, cost):
+    def stamina_drain(self, cost):
         self.stamina -= cost
         self.rest_clock.wind_up()
 
-    def available(self, desired):
+    def stamina_available(self, desired):
         return self.stamina >= desired
 
 

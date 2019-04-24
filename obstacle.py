@@ -33,8 +33,7 @@ class Wall(base.AdvancedSprite):
 class BoxType(Enum):
     EMPTY = 0
     HEALTH = 1
-    WEAK_HEALTH = 2
-    ENEMY = 3
+    ENEMY = 2
 
 
 # TODO make this class more general to allow different boxes: jars, skulls, etc
@@ -55,10 +54,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         # TODO better randomizer
         # TODO store not mode but objects itself?
         if random.randint(0, 6) == 0 and not game.painful:
-            if random.randint(0, 2) == 0:
-                self.mode = BoxType.WEAK_HEALTH
-            else:
-                self.mode = BoxType.HEALTH
+            self.mode = BoxType.HEALTH
         elif random.randint(0, 15) == 0:
             self.mode = BoxType.ENEMY
         else:
@@ -75,9 +71,9 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         self.bleed_all_dir(pos)
 
         # BOX ACTION
-        if self.mode == BoxType.HEALTH or self.mode == BoxType.WEAK_HEALTH:
-            heal = pickupable.Heart(self.game.particle_group, self.rect.move(10, 10),
-                                    self.mode == BoxType.WEAK_HEALTH)  # move(10, 10) to center out the heart
+        if self.mode == BoxType.HEALTH:
+            # move(10, 10) to center out the heart
+            heal = pickupable.Heart(self.game.particle_group, self.rect.move(10, 10))
             self.game.pickupable_group.add(heal)
         if self.mode == BoxType.ENEMY:
             # TODO temp solution, should sort out groups

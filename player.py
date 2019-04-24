@@ -51,15 +51,15 @@ class Player(base.AdvancedSprite,
             BLEED_ALL_DIR_STATS,
             const.C_BLACK
         )
-        interface.Tired.__init__(self, 10, 10)  # TODO move to constants? TODO balance
+        interface.Tired.__init__(self, 10, 7)  # TODO move to constants? TODO balance
         self.steps_are_stepping = False
         self.keys = 0
         self.look_away = const.V_ZERO
         self.game = game
         self.rect = pygame.Rect(0, 0, 50, 50)  # hitbox
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
-        if not game.painful:
-            self.health_hud = hud.HealthHUD(self)
+
+        self.health_hud = hud.HealthHUD(self)
         self.key_hud = hud.KeyHUD(self)
         self.stamina_hud = hud.StaminaHUD(self)
 
@@ -74,6 +74,7 @@ class Player(base.AdvancedSprite,
         self.move()
         self.stamina_hud.makeup()
 
+    # TODO bleh, redo this
     def do_pickup(self, what):
         if isinstance(what, pickupable.Key):
             self.keys += 1
@@ -82,7 +83,7 @@ class Player(base.AdvancedSprite,
             if self.keys == self.game.max_keys:
                 self.game.win()
         if isinstance(what, pickupable.Heart):
-            self.heal(1, what.weak)
+            self.heal(1)
 
     def can_pickup(self, what):
         return True
@@ -116,8 +117,7 @@ class Player(base.AdvancedSprite,
 
     def on_any_health(self, who):
         self.bleed_one_dir(self.pos, (self.pos - who.pos).normalize())
-        if not self.game.painful:
-            self.health_hud.makeup()
+        self.health_hud.makeup()
 
     def on_low_health(self, who):
         HEARTBEAT_SOUND.play(-1)
@@ -167,11 +167,11 @@ class Player(base.AdvancedSprite,
             self.steps_are_stepping = False
 
     def try_to_dash(self):
-        if self.dash_clock.is_not_running() and self.available(self.dash_stats['cost']):
+        if self.dash_clock.is_not_running() and self.stamina_available(self.dash_stats['cost']):
             self.dash()
-            self.work(self.dash_stats['cost'])
+            self.stamina_drain(self.dash_stats['cost'])
 
     def try_to_back_dash(self):
-        if self.dash_clock.is_not_running() and self.available(self.back_dash_stats['cost']):
+        if self.dash_clock.is_not_running() and self.stamina_available(self.back_dash_stats['cost']):
             self.back_dash()
-            self.work(self.back_dash_stats['cost'])
+            self.stamina_drain(self.back_dash_stats['cost'])
