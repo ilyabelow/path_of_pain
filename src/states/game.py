@@ -22,12 +22,6 @@ class Game(State):
         hud.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()  # TODO another image
         pickupable.LITTLE_HEART_SPRITE = pygame.image.load("assets/images/little_heart.png").convert_alpha()
         pickupable.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()
-        sword.SPRITE = pygame.image.load("assets/images/sword.png").convert_alpha()
-        sword.SWANG_SPRITE = pygame.image.load("assets/images/sword_swang.png").convert_alpha()
-
-        # SOUND INITIALIZATION
-        sword.SWING_SOUNDS = [pygame.mixer.Sound('assets/sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
-        sword.CLING_SOUND = pygame.mixer.Sound('assets/sounds/sword_hit_reject.wav')
 
         self.WIN_SOUND = pygame.mixer.Sound('assets/sounds/secret_discovered_temp.wav')
         self.WIN_SOUND.set_volume(2)  # TODO tune
@@ -57,14 +51,15 @@ class Game(State):
         self.box_group = base.AdvancedGroup(self.render_group)
         self.obstacle_group = base.AdvancedGroup(self.render_group)
         self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group)
-        boxes_coords = (200, 200), (250, 200), (250, 250), (200, 350), (1300, 700), (1350, 750), (1450, 750), (2400, 200), \
-                ( 2400, 400), (2450, 400), (2650, 350), (2400, 500), (2400, 700), (2500, 400), (2600, 300), (2600, 600),\
-                (2700, 400), (2500, 550), (2550, 500), (200, 650), (200, 700), (250, 700), (200, 750), (250, 750), \
-                (300, 750), (650, 150), (650, 200), (1100, 1700), (1150, 1700), (1200, 1700), (300, 1450), (250, 1500), \
-                (2400, 1450), (2450, 1450), (2500, 1450), (2550, 1450), (2600, 1450), (2400, 1700), (2450, 1700), \
-                (2500, 1700), (2550, 1700), (2600, 1700), (2350, 1500), (2350, 1450), (2350, 1550), (2350, 1600), \
-                (2350, 1650), (2350, 1700), (2600, 1500), (2600, 1550), (2600, 1600), (2600, 1650), (1800, 1750), \
-                (2050, 1700)
+        boxes_coords = (200, 200), (250, 200), (250, 250), (200, 350), (1300, 700), (1350, 750), (1450, 750), (
+            2400, 200), (2400, 400), (2450, 400), (2650, 350), (2400, 500), (2400, 700), (2500, 400), (
+                           2600, 300), (2600, 600), (2700, 400), (2500, 550), (2550, 500), (200, 650), (200, 700), (
+                           250, 700), (200, 750), (250, 750), (300, 750), (650, 150), (650, 200), (1100, 1700), (
+                           1150, 1700), (1200, 1700), (300, 1450), (250, 1500), (2400, 1450), (2450, 1450), (
+                           2500, 1450), (2550, 1450), (2600, 1450), (2400, 1700), (2450, 1700), (2500, 1700), (
+                           2550, 1700), (2600, 1700), (2350, 1500), (2350, 1450), (2350, 1550), (2350, 1600), (
+                           2350, 1650), (2350, 1700), (2600, 1500), (2600, 1550), (2600, 1600), (2600, 1650), (
+                           1800, 1750), (2050, 1700)
         for box in boxes_coords:
             self.box_factory.create(box)
         enemies_coords = (500, 1300), (900, 1300), (500, 1300), (900, 1300), (500, 1600), (900, 1600), (700, 1450), \
@@ -72,6 +67,7 @@ class Game(State):
                          (2450, 1600), (2500, 1600), (2450, 1550), (2500, 1550)
         for coord in enemies_coords:
             self.enemy_factory.create(coord)
+        self.sword_factory = sword.SwordFactory(self, self.hitter_group)  # TODO redundant?
 
         self.wall_group = base.AdvancedGroup(self.render_group,
                                              # vertical center walls

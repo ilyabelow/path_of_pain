@@ -4,6 +4,7 @@ from src.framework import base, clock, interface, const
 from src.objects import pickupable, sword, hud
 
 
+# TODO unite factories
 class PlayerFactory:
     def __init__(self, game, *groups):
         self.game = game
@@ -86,7 +87,7 @@ class Player(base.AdvancedSprite,
         self.stamina_hud = hud.StaminaHUD(self)
 
         self.controller = controller
-        self.sword = sword.Sword(self)
+        self.sword = game.sword_factory.create(self)
         self.surprised_clock = clock.Clock(None, 30)  # How long player will be :0
         self.clock_ticker = clock.ClockTicker(self)
 

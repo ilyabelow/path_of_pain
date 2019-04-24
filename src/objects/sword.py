@@ -1,30 +1,48 @@
-import pygame
 import random
+
+import pygame
+
 from src.framework import base, clock, const
 
-SPRITE = None
-SWANG_SPRITE = None
 
-SWING_SOUNDS = None
-CLING_SOUND = None
+class SwordFactory:
+    def __init__(self, game, *groups):
+        self.game = game
+        self.groups = groups
+        self.flyweight = SwordFlyweight()
 
-SWING_WAIT = 3
-SWING_DURATION = 9
+    def create(self, owner):
+        sword = Sword(self.flyweight, owner)
+        for group in self.groups:
+            group.add(sword)
+        return sword
 
-STAMINA_COST = 2
+
+class SwordFlyweight:
+    def __init__(self):
+        self.SPRITE = pygame.image.load("assets/images/sword.png").convert_alpha()
+        self.SWANG_SPRITE = pygame.image.load("assets/images/sword_swang.png").convert_alpha()
+
+        self.SWING_SOUNDS = [pygame.mixer.Sound('assets/sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
+        self.CLING_SOUND = pygame.mixer.Sound('assets/sounds/sword_hit_reject.wav')
+
+        self.SWING_WAIT = 3
+        self.SWING_DURATION = 9
+
+        self.STAMINA_COST = 2
 
 
 # TODO projectiles!
 # TODO base class with better name then "hitter"
 class Sword(base.AdvancedSprite):
-    def __init__(self, owner):
+    def __init__(self, flyweight, owner):
         super(Sword, self).__init__()
         self.game = owner.game
         self.owner = owner
         self.game.hitter_group.add(self)  # redundant?
         self.pos = None
         self.rect = None
-
+        self.flyweight = flyweight
         # SWING STATS
         self.right_hand = True
 
@@ -34,12 +52,12 @@ class Sword(base.AdvancedSprite):
         self.clock_ticker = clock.ClockTicker(self)
 
     def swing(self):
-        if self.next_swing_clock.is_not_running and self.owner.stamina_available(STAMINA_COST):
-            self.next_swing_clock.wind_up(SWING_WAIT)
-            self.current_swing_clock.wind_up(SWING_DURATION)
+        if self.next_swing_clock.is_not_running and self.owner.stamina_available(self.flyweight.STAMINA_COST):
+            self.next_swing_clock.wind_up(self.flyweight.SWING_WAIT)
+            self.current_swing_clock.wind_up(self.flyweight.SWING_DURATION)
             self.right_hand = not self.right_hand  # switch hand, just for aesthetics
 
-            self.owner.stamina_drain(STAMINA_COST)
+            self.owner.stamina_drain(self.flyweight.STAMINA_COST)
             # HITTING
             self.pos = self.owner.pos + self.owner.face * 70
             # TODO good hitbox for sword
@@ -51,10 +69,10 @@ class Sword(base.AdvancedSprite):
                 entity.hit(1, self)
 
             # SOUND EFFECTS
-            random.choice(SWING_SOUNDS).play()
+            random.choice(self.flyweight.SWING_SOUNDS).play()
             wall = pygame.sprite.spritecollideany(self, self.game.wall_group)
             if wall is not None:
-                CLING_SOUND.play()
+                self.flyweight.CLING_SOUND.play()
 
     def update(self):
         self.clock_ticker.tick_all()
@@ -66,12 +84,12 @@ class Sword(base.AdvancedSprite):
 
     def draw(self, screen, window):
         if self.current_swing_clock.is_not_running():
-            image = pygame.transform.rotate(SPRITE, self.owner.face.angle_to(const.V_UP))
+            image = pygame.transform.rotate(self.flyweight.SPRITE, self.owner.face.angle_to(const.V_UP))
         else:
             if self.right_hand:
-                image = pygame.transform.rotate(pygame.transform.flip(SWANG_SPRITE, True, False),
+                image = pygame.transform.rotate(pygame.transform.flip(self.flyweight.SWANG_SPRITE, True, False),
                                                 self.owner.face.angle_to(const.V_UP) - 45)
             else:
-                image = pygame.transform.rotate(SWANG_SPRITE, self.owner.face.angle_to(const.V_UP) + 45)
+                image = pygame.transform.rotate(self.flyweight.SWANG_SPRITE, self.owner.face.angle_to(const.V_UP) + 45)
         rect = image.get_rect(centerx=self.pos.x, centery=self.pos.y)
         return screen.blit(image, (rect.x - window.x, rect.y - window.y))
