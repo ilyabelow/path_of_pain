@@ -24,14 +24,10 @@ class Game(State):
         pickupable.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()
         sword.SPRITE = pygame.image.load("assets/images/sword.png").convert_alpha()
         sword.SWANG_SPRITE = pygame.image.load("assets/images/sword_swang.png").convert_alpha()
-        obstacle.BOX_SPRITE = pygame.image.load("assets/images/box.png").convert_alpha()
 
         # SOUND INITIALIZATION
         sword.SWING_SOUNDS = [pygame.mixer.Sound('assets/sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
         sword.CLING_SOUND = pygame.mixer.Sound('assets/sounds/sword_hit_reject.wav')
-
-        obstacle.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('assets/sounds/breakable_wall_hit_{}.wav'.format(i + 1))
-                                     for i in range(2)]
 
         self.WIN_SOUND = pygame.mixer.Sound('assets/sounds/secret_discovered_temp.wav')
         self.WIN_SOUND.set_volume(2)  # TODO tune
@@ -58,80 +54,25 @@ class Game(State):
         self.particle_group = base.AdvancedGroup(self.render_group)
         self.enemy_group = base.AdvancedGroup(self.render_group)
         self.enemy_factory = enemy.EnemyFactory(self, self.enemy_group, self.hittable_group)
-        self.box_group = base.AdvancedGroup(self.render_group,
-                                            # upper room
+        self.box_group = base.AdvancedGroup(self.render_group)
+        self.obstacle_group = base.AdvancedGroup(self.render_group)
+        self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group)
+        boxes_coords = (200, 200), (250, 200), (250, 250), (200, 350), (1300, 700), (1350, 750), (1450, 750), (2400, 200), \
+                ( 2400, 400), (2450, 400), (2650, 350), (2400, 500), (2400, 700), (2500, 400), (2600, 300), (2600, 600),\
+                (2700, 400), (2500, 550), (2550, 500), (200, 650), (200, 700), (250, 700), (200, 750), (250, 750), \
+                (300, 750), (650, 150), (650, 200), (1100, 1700), (1150, 1700), (1200, 1700), (300, 1450), (250, 1500), \
+                (2400, 1450), (2450, 1450), (2500, 1450), (2550, 1450), (2600, 1450), (2400, 1700), (2450, 1700), \
+                (2500, 1700), (2550, 1700), (2600, 1700), (2350, 1500), (2350, 1450), (2350, 1550), (2350, 1600), \
+                (2350, 1650), (2350, 1700), (2600, 1500), (2600, 1550), (2600, 1600), (2600, 1650), (1800, 1750), \
+                (2050, 1700)
+        for box in boxes_coords:
+            self.box_factory.create(box)
+        enemies_coords = (500, 1300), (900, 1300), (500, 1300), (900, 1300), (500, 1600), (900, 1600), (700, 1450), \
+                         (1700, 450), (2200, 450), (2850, 150), (2850, 750), (2100, 1200), (2100, 1500), (1800, 1500), \
+                         (2450, 1600), (2500, 1600), (2450, 1550), (2500, 1550)
+        for coord in enemies_coords:
+            self.enemy_factory.create(coord)
 
-                                            obstacle.Box(self, (200, 200)),
-                                            obstacle.Box(self, (250, 200)),
-                                            obstacle.Box(self, (250, 250)),
-                                            obstacle.Box(self, (200, 350)),
-
-                                            obstacle.Box(self, (1300, 700)),
-                                            obstacle.Box(self, (1350, 750)),
-                                            obstacle.Box(self, (1450, 750)),
-
-                                            obstacle.Box(self, (2400, 200)),
-                                            obstacle.Box(self, (2400, 400)),
-                                            obstacle.Box(self, (2450, 400)),
-                                            obstacle.Box(self, (2650, 350)),
-                                            obstacle.Box(self, (2400, 500)),
-                                            obstacle.Box(self, (2400, 700)),
-                                            obstacle.Box(self, (2500, 400)),
-                                            obstacle.Box(self, (2600, 300)),
-                                            obstacle.Box(self, (2600, 600)),
-                                            obstacle.Box(self, (2700, 400)),
-                                            obstacle.Box(self, (2500, 550)),
-                                            obstacle.Box(self, (2550, 500)),
-
-                                            obstacle.Box(self, (200, 650)),
-                                            obstacle.Box(self, (200, 700)),
-                                            obstacle.Box(self, (250, 700)),
-                                            obstacle.Box(self, (200, 750)),
-                                            obstacle.Box(self, (250, 750)),
-                                            obstacle.Box(self, (300, 750)),
-
-                                            obstacle.Box(self, (650, 150)),
-                                            obstacle.Box(self, (650, 200)),
-
-                                            # bottom-left room
-
-                                            obstacle.Box(self, (1100, 1700)),
-                                            obstacle.Box(self, (1150, 1700)),
-                                            obstacle.Box(self, (1200, 1700)),
-
-                                            obstacle.Box(self, (300, 1450)),
-                                            obstacle.Box(self, (250, 1500)),
-
-                                            # bottom-right room
-
-                                            obstacle.Box(self, (2400, 1450)),
-                                            obstacle.Box(self, (2450, 1450)),
-                                            obstacle.Box(self, (2500, 1450)),
-                                            obstacle.Box(self, (2550, 1450)),
-                                            obstacle.Box(self, (2600, 1450)),
-
-                                            obstacle.Box(self, (2400, 1700)),
-                                            obstacle.Box(self, (2450, 1700)),
-                                            obstacle.Box(self, (2500, 1700)),
-                                            obstacle.Box(self, (2550, 1700)),
-                                            obstacle.Box(self, (2600, 1700)),
-
-                                            obstacle.Box(self, (2350, 1500)),
-                                            obstacle.Box(self, (2350, 1450)),
-                                            obstacle.Box(self, (2350, 1550)),
-                                            obstacle.Box(self, (2350, 1600)),
-                                            obstacle.Box(self, (2350, 1650)),
-                                            obstacle.Box(self, (2350, 1700)),
-
-                                            obstacle.Box(self, (2600, 1500)),
-                                            obstacle.Box(self, (2600, 1550)),
-                                            obstacle.Box(self, (2600, 1600)),
-                                            obstacle.Box(self, (2600, 1650)),
-
-                                            obstacle.Box(self, (1800, 1750)),
-                                            obstacle.Box(self, (2050, 1700)),
-
-                                            )
         self.wall_group = base.AdvancedGroup(self.render_group,
                                              # vertical center walls
                                              obstacle.Wall(pygame.Rect(1400, 900, 200, 500)),
@@ -155,17 +96,9 @@ class Game(State):
                                              obstacle.Wall(pygame.Rect(2900, 0, 100, 2000)),
                                              )
 
-        self.obstacle_group = base.AdvancedGroup(self.render_group, *self.wall_group, *self.box_group)
-
-        enemies_coords = (500, 1300), (900, 1300), (500, 1300), (900, 1300), (500, 1600), (900, 1600), (700, 1450), \
-                         (1700, 450), (2200, 450), (2850, 150), (2850, 750), (2100, 1200), (2100, 1500), (1800, 1500), \
-                         (2450, 1600), (2500, 1600), (2450, 1550), (2500, 1550)
-        for coord in enemies_coords:
-            self.enemy_factory.create(coord)
+        self.obstacle_group.add(*self.wall_group)
 
         self.distribute_keys()
-        self.hittable_group.add(*self.box_group)
-
         # PLAYER INITIALIZING
         self.player_group = base.AdvancedGroup(self.render_group)
         if pygame.joystick.get_count() == 0:
