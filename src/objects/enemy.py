@@ -103,7 +103,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
     def drop_key(self):
         if self.has_key:
-            self.game.pickupable_group.add(pickupable.Key(self.pos, self.face))
+            self.game.key_factory.create(self.pos, self.face)
             self.has_key = False
 
     def move(self):

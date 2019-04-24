@@ -78,8 +78,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         # BOX ACTION
         if self.mode == BoxType.HEALTH:
             # move(10, 10) to center out the heart
-            heal = pickupable.Heart(self.game.particle_group, self.rect.move(10, 10))
-            self.game.pickupable_group.add(heal)
+            self.game.heart_factory.create(self.rect.move(10, 10))
         if self.mode == BoxType.ENEMY:
             newborn_enemy = self.enemy_factory.create(self.rect[:2])
             newborn_enemy.stun(15)

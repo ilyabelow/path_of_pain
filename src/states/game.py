@@ -19,9 +19,7 @@ class Game(State):
         hud.HEART_EMPTY_SPRITE = pygame.image.load("assets/images/heart_empty.png").convert_alpha()
         hud.STAMINA_SPRITE = pygame.image.load("assets/images/stamina_full.png").convert_alpha()
         hud.STAMINA_EMPTY_SPRITE = pygame.image.load("assets/images/stamina_empty.png").convert_alpha()
-        hud.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()  # TODO another image
-        pickupable.LITTLE_HEART_SPRITE = pygame.image.load("assets/images/little_heart.png").convert_alpha()
-        pickupable.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()
+        hud.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()
 
         self.WIN_SOUND = pygame.mixer.Sound('assets/sounds/secret_discovered_temp.wav')
         self.WIN_SOUND.set_volume(2)  # TODO tune
@@ -68,7 +66,8 @@ class Game(State):
         for coord in enemies_coords:
             self.enemy_factory.create(coord)
         self.sword_factory = sword.SwordFactory(self.hitter_group)  # TODO redundant?
-
+        self.key_factory = pickupable.KeyFactory(self.pickupable_group)
+        self.heart_factory = pickupable.HeartFactory(self.pickupable_group)
         self.wall_group = base.AdvancedGroup(self.render_group,
                                              # vertical center walls
                                              obstacle.Wall(pygame.Rect(1400, 900, 200, 500)),
