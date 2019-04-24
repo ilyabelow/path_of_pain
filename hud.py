@@ -1,5 +1,4 @@
 import pygame
-
 import base
 import const
 
@@ -39,22 +38,17 @@ class HealthHUD(HUD):
     def makeup(self):
         # IMAGE COMPOSING
         self.image = pygame.Surface(
-            (HEART_SPRITE.get_width() * (
-                        self.owner.max_health + self.owner.weak_health),
-             HEART_SPRITE.get_height()),
+            (HEART_SPRITE.get_width() * (self.owner.max_health + self.owner.weak_health), HEART_SPRITE.get_height()),
             pygame.SRCALPHA, 32)
         # normal hearts
         for i in range(self.owner.max_health):
             if i < self.owner.health:
-                self.image.blit(HEART_SPRITE,
-                                (i * HEART_SPRITE.get_width(), 0))
+                self.image.blit(HEART_SPRITE, (i * HEART_SPRITE.get_width(), 0))
             else:
-                self.image.blit(HEART_EMPTY_SPRITE,
-                                (i * HEART_SPRITE.get_width(), 0))
+                self.image.blit(HEART_EMPTY_SPRITE, (i * HEART_SPRITE.get_width(), 0))
         # weak hearts
         for i in range(self.owner.weak_health):
-            self.image.blit(HEART_WEAK_SPRITE, ((i + self.owner.max_health) *
-                                                HEART_SPRITE.get_width(), 0))
+            self.image.blit(HEART_WEAK_SPRITE, ((i + self.owner.max_health) * HEART_SPRITE.get_width(), 0))
 
 
 class KeyHUD(HUD):
@@ -63,8 +57,7 @@ class KeyHUD(HUD):
 
     def makeup(self):
         # IMAGE COMPOSING
-        self.image = pygame.Surface((KEY_SPRITE.get_width() * self.owner.keys,
-                                     KEY_SPRITE.get_height()),
+        self.image = pygame.Surface((KEY_SPRITE.get_width() * self.owner.keys, KEY_SPRITE.get_height()),
                                     pygame.SRCALPHA, 32)
         # normal hearts
         for i in range(self.owner.keys):
@@ -77,15 +70,10 @@ class StaminaHUD(HUD):
         HUD.__init__(self, owner, STAMINA_POS)
 
     def makeup(self):
-        self.image = pygame.Surface((
-                                    STAMINA_SPRITE.get_width() *
-                                    self.owner.max_stamina,
-                                    STAMINA_SPRITE.get_height()),
+        self.image = pygame.Surface((STAMINA_SPRITE.get_width() * self.owner.max_stamina, STAMINA_SPRITE.get_height()),
                                     pygame.SRCALPHA, 32)
         for i in range(self.owner.max_stamina):
             if i < self.owner.stamina:
-                self.image.blit(STAMINA_SPRITE,
-                                (i * STAMINA_SPRITE.get_width(), 0))
+                self.image.blit(STAMINA_SPRITE, (i * STAMINA_SPRITE.get_width(), 0))
             else:
-                self.image.blit(STAMINA_EMPTY_SPRITE,
-                                (i * STAMINA_EMPTY_SPRITE.get_width(), 0))
+                self.image.blit(STAMINA_EMPTY_SPRITE, (i * STAMINA_EMPTY_SPRITE.get_width(), 0))

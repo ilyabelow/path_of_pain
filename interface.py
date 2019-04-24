@@ -1,10 +1,8 @@
-import random
-
 import pygame
-
 import clock
 import const
 import particle
+import random
 
 
 class Healthy:
@@ -48,7 +46,7 @@ class Healthy:
                 random.choice(self.hit_sounds).play()
             self.on_any_health(who)
 
-            if self.health + self.weak_health == 1:  # TODO gen low health
+            if self.health + self.weak_health == 1:  # TODO generalize low health
                 self.on_low_health(who)
             if self.health == 0:
                 if self.death_sounds is not None:
@@ -104,26 +102,23 @@ class Bleeding:
     def bleed_one_dir(self, pos, main_direction):
         for i in range(self.one_dir_stats['amount']):
             direction = main_direction.rotate(
-                random.randint(-self.one_dir_stats['splash'],
-                               self.one_dir_stats['splash']))
-            self.group.add(
-                particle.Blood(pos + direction * self.one_dir_stats['offset'],
-                               direction * self.one_dir_stats['speed'],
-                               random.randint(self.one_dir_stats['sizes'][0],
-                                              self.one_dir_stats['sizes'][1]),
-                               self.one_dir_stats['fade'],
-                               self.color))
+                random.randint(-self.one_dir_stats['splash'], self.one_dir_stats['splash']))
+            self.group.add(particle.Blood(pos + direction * self.one_dir_stats['offset'],
+                                          direction * self.one_dir_stats['speed'],
+                                          random.randint(self.one_dir_stats['sizes'][0],
+                                                         self.one_dir_stats['sizes'][1]),
+                                          self.one_dir_stats['fade'],
+                                          self.color))
 
     def bleed_all_dir(self, pos):
         for i in range(self.all_dir_stats['amount']):
             direction = const.V_LEFT.rotate(random.randint(-180, 180))
-            self.group.add(
-                particle.Blood(pos + direction * self.all_dir_stats['offset'],
-                               direction * self.all_dir_stats['speed'],
-                               random.randint(self.all_dir_stats['sizes'][0],
-                                              self.all_dir_stats['sizes'][1]),
-                               self.all_dir_stats['fade'],
-                               self.color))
+            self.group.add(particle.Blood(pos + direction * self.all_dir_stats['offset'],
+                                          direction * self.all_dir_stats['speed'],
+                                          random.randint(self.all_dir_stats['sizes'][0],
+                                                         self.all_dir_stats['sizes'][1]),
+                                          self.all_dir_stats['fade'],
+                                          self.color))
 
 
 # TODO move some functionality here?
@@ -152,8 +147,7 @@ class Pickuping:
         pass
 
 
-# TODO all common properties of Player and Anemy is bunched up here,
-#  needs disassembling to DIFFERENT interfaces
+# TODO all common properties of Player and Anemy is bunched up here, needs disassembling to DIFFERENT interfaces
 class Moving:
     def __init__(self, pos, collide_with, dash_stats, back_dash_stats):
         # TODO remove dull inits??? (we have to init fields in init}
@@ -167,11 +161,9 @@ class Moving:
         self.pos = pygame.Vector2(pos)
         self.speed = const.V_ZERO
 
-        # TODO make up better way to state if the object is moving.
-        # This field is used in SOME cases
+        # TODO make up better way to state if the object is moving. This field is used in SOME cases
         self.moving = False
-        # object's ability to make decision about its movement!!!
-        self.can_be_moved = True
+        self.can_be_moved = True  # object's ability to make decision about its movement!!!
 
         # BASE CLOCKS
         # TODO move to interfaces as well
@@ -181,12 +173,11 @@ class Moving:
         self.throw_back_clock = clock.Clock(self.stop)
 
     def move_and_collide(self):
-        # collision logic mostly copypasted from some example, so it works ok
+        # collision logic mostly copypasted from some example, so it works fine
         # move horizontally
         self.pos.x += self.speed.x
         self.rect.centerx = self.pos.x
-        intersected = pygame.sprite.spritecollide(self, self.collide_with,
-                                                  False)
+        intersected = pygame.sprite.spritecollide(self, self.collide_with, False)
         for wall in intersected:
             if self.speed.x < 0:
                 self.rect.left = wall.rect.right
@@ -198,8 +189,7 @@ class Moving:
         # move vertically
         self.pos.y += self.speed.y
         self.rect.centery = self.pos.y
-        intersected = pygame.sprite.spritecollide(self, self.collide_with,
-                                                  False)
+        intersected = pygame.sprite.spritecollide(self, self.collide_with, False)
         for wall in intersected:
             if self.speed.y < 0:
                 self.rect.top = wall.rect.bottom

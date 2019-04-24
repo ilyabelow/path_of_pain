@@ -1,6 +1,6 @@
+import pygame
 from enum import Enum
 
-import pygame
 
 # TODO separate framerate and game ticks
 FRAME_RATE = 30
@@ -47,9 +47,10 @@ C_BLACK = (0, 0, 0)
 C_WHITE = (255, 255, 255)
 C_GOLDEN = (255, 215, 0)
 
+
 # TODO remove this to classes themselves <-- !
 
-# TODO BALANCE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# TODO BALANCE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # ENEMY AND PLAYER STATS
 enemy_health = 3
 enemy_idle_move_speed = 2

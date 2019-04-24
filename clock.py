@@ -1,9 +1,9 @@
 # love this class
 class Clock:
-    def __init__(self, when_end=None, start_time=0):
+    def __init__(self, when_end=lambda: True, start_time=0):
         self.time = -1
         if when_end is None:
-            def when_end(): return True
+            when_end = lambda: True
         self.when_end = when_end
         self.start_time = start_time
 

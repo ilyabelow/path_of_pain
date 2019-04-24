@@ -1,12 +1,10 @@
-from enum import Enum
-
 import pygame
-
-import const
-import particle
 from base import State
-from const import Button
+import const
 from game import Game
+import particle
+from const import Button
+from enum import Enum
 
 
 class Option(Enum):
@@ -20,8 +18,7 @@ class TitleSprite(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         title_font = pygame.font.Font("assets/fonts/augustus.ttf", 128)
         self.image = title_font.render("Path of Pain", 10, const.C_RED)
-        self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2,
-                                        centery=200)
+        self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2, centery=200)
 
 
 class OptionSprite(pygame.sprite.Sprite):
@@ -36,15 +33,12 @@ class OptionSprite(pygame.sprite.Sprite):
         if self.menu.option == self.option:
             option_font = pygame.font.Font("assets/fonts/augustus.ttf", 42)
             # Bodge with '_' -> ' '
-            self.image = option_font.render(self.option.name.replace('_', ' '),
-                                            10, const.C_GOLDEN)
+            self.image = option_font.render(self.option.name.replace('_', ' '), 10, const.C_GOLDEN)
         else:
             option_font = pygame.font.Font("assets/fonts/augustus.ttf", 36)
-            self.image = option_font.render(self.option.name.replace('_', ' '),
-                                            10, const.C_RED)
+            self.image = option_font.render(self.option.name.replace('_', ' '), 10, const.C_RED)
         self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2,
-                                        centery=const.RESOLUTION[1] / 2 +
-                                        self.option.value * 100)
+                                        centery=const.RESOLUTION[1] / 2 + + self.option.value * 100)
 
 
 class Menu(State):
@@ -54,10 +48,8 @@ class Menu(State):
         pygame.mixer.music.load('assets/sounds/S59-55 Final Stage 3.wav')
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(1)
-        self.CHANGE_SOUND = pygame.mixer.Sound(
-            'assets/sounds/ui_change_selection.wav')
-        self.OK_SOUND = pygame.mixer.Sound(
-            'assets/sounds/ui_button_confirm.wav')
+        self.CHANGE_SOUND = pygame.mixer.Sound('assets/sounds/ui_change_selection.wav')
+        self.OK_SOUND = pygame.mixer.Sound('assets/sounds/ui_button_confirm.wav')
 
         # OPTION AND TITLE INIT
         self.title_group = pygame.sprite.GroupSingle(TitleSprite())
@@ -105,8 +97,7 @@ class Menu(State):
         self.fade.update()
 
     def select_option(self):
-        self.fade = particle.Fade(const.MENU_FADE_OUT, True,
-                                  self.confirm_selection)
+        self.fade = particle.Fade(const.MENU_FADE_OUT, True, self.confirm_selection)
         pygame.mixer.music.fadeout(const.MENU_FADE_OUT * const.FRAME_RATE)
         self.OK_SOUND.play()
 

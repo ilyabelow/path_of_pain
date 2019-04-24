@@ -36,8 +36,7 @@ class AdvancedLayeredUpdates(pygame.sprite.LayeredUpdates):
         init_rect = self._init_rect
         for spr in self.sprites():
             rec = spritedict[spr]
-            newrect = spr.draw(surface,
-                               window)  # <--------------- code insertion here
+            newrect = spr.draw(surface, window)  # <---------------------- code insertion here
             if rec is init_rect:
                 dirty_append(newrect)
             else:
@@ -61,7 +60,7 @@ class AdvancedLayeredUpdates(pygame.sprite.LayeredUpdates):
                 if not self.has_internal(sprite):
                     self.add_internal(sprite, layer)
                     sprite.add_internal(self)
-                    sprite.fetch_layer()  # <------------- code insertion here
+                    sprite.fetch_layer()  # <--------------------------- code insertion here
             else:
                 try:
                     self.add(*sprite, **kwargs)
@@ -87,10 +86,8 @@ class AdvancedGroup(pygame.sprite.Group):
                 if not self.has_internal(sprite):
                     self.add_internal(sprite)
                     sprite.add_internal(self)
-                    # TODO deleting sprite from particular group
-                    #  = undefined behaviour
-                    self.render_group.add(
-                        sprite)  # <------------------ code insertion here
+                    # TODO deleting sprite from particular group = undefined behaviour
+                    self.render_group.add(sprite)  # <----------------------------------- code insertion here
             else:
                 try:
                     self.add(*sprite)
