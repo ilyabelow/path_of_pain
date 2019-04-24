@@ -38,6 +38,13 @@ class PlayerFlyweight:
                                     'offset': 100}
         self.BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1, 'offset': 0}
 
+        self.health = 5
+        self.move_speed = 12
+        self.invulnerability_duration = 25
+        self.throwback_length = 144
+        self.throwback_speed = 36
+        self.stun_duration = 8
+
 
 class Player(base.AdvancedSprite,
              interface.Moving,
@@ -51,7 +58,7 @@ class Player(base.AdvancedSprite,
         interface.Moving.__init__(self, coords, game.obstacle_group, flyweight.DASH_STATS, flyweight.BACK_DASH_STATS)
         interface.Healthy.__init__(
             self,
-            const.player_health if not game.painful else 1,
+            flyweight.health if not game.painful else 1,
             [flyweight.HEAL_SOUND],
             [flyweight.HIT_SOUND],
             [flyweight.DEATH_SOUND],
@@ -112,7 +119,7 @@ class Player(base.AdvancedSprite,
                 self.start_stepping()
             else:
                 self.stop_stepping()
-            self.speed = self.face * self.moving * const.player_move_speed
+            self.speed = self.face * self.moving * self.flyweight.move_speed
         if self.speed:
             self.move_and_collide()
         self.fetch_screen()
@@ -149,9 +156,9 @@ class Player(base.AdvancedSprite,
 
     def on_ok_health(self, who):
         self.throw_back((self.pos - who.pos).normalize(),
-                        const.player_throwback_speed,
-                        const.player_throwback_length,
-                        const.player_stun_duration)
+                        self.flyweight.throwback_speed,
+                        self.flyweight.throwback_length,
+                        self.flyweight.stun_duration)
         self.can_be_moved = False
 
     def after_healing(self):

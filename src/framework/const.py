@@ -47,41 +47,19 @@ C_BLACK = (0, 0, 0)
 C_WHITE = (255, 255, 255)
 C_GOLDEN = (255, 215, 0)
 
-
-# TODO remove this to classes themselves <-- !
-
-# TODO BALANCE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# ENEMY AND PLAYER STATS
-enemy_health = 3
-enemy_idle_move_speed = 2
-enemy_move_speed = 4
-enemy_resting_move_speed = 2
-enemy_chase_radius = 300
-enemy_unchase_radius = 700
-enemy_dash_radius = 120
-enemy_spot_time = 10
-enemy_attack_time = 5
-enemy_throwback_length = 15
-enemy_throwback_speed = 3
-enemy_stun_duration = 7
-
-player_health = 5
-player_move_speed = 12
-player_invulnerability_duration = 25
-player_throwback_length = 144
-player_throwback_speed = 36
-player_stun_duration = 8
-
+# FADE
 GAME_FADE_IN = 10
 GAME_FADE_OUT = 10
 MENU_FADE_IN = 30
 MENU_FADE_OUT = 30
 
+# SPETIAL LAYERS
 IMP_PARTICLE_Y = 3000
 HUD_Y = 4000
 FADE_Y = 5000
 
 # TODO tune
+# TODO make proper music box
 MUSIC_NORMAL_VOLUME = 0.3
 MUSIC_MUTED_VOLUME = 0.15
 MUSIC_FADE_OUT = 2500

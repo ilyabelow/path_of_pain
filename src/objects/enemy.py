@@ -1,5 +1,7 @@
 import random
+
 import pygame
+
 from src.framework import base, clock, interface, const
 from src.objects import particle, pickupable
 
@@ -47,6 +49,19 @@ class EnemyFlyweight:
         self.UNITED_TIME = (30, 90)
 
         self.HITBOX = (50, 50)
+        # STATS
+        self.health = 3
+        self.idle_move_speed = 2
+        self.move_speed = 4
+        self.resting_move_speed = 2
+        self.chase_radius = 300
+        self.unchase_radius = 700
+        self.dash_radius = 120
+        self.spot_time = 10
+        self.attack_time = 5
+        self.throwback_length = 15
+        self.throwback_speed = 3
+        self.stun_duration = 7
 
 
 # TODO make this class more abstract to make building more types of enemies
@@ -58,7 +73,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         interface.Moving.__init__(self, coords, game.obstacle_group, flyweight.DASH_STATS, None)
         interface.Healthy.__init__(
             self,
-            const.enemy_health,
+            flyweight.health,
             [None],
             [flyweight.HIT_SOUND],
             flyweight.DEATH_SOUNDS
@@ -80,8 +95,8 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         self.rect = pygame.Rect(0, 0, flyweight.HITBOX[0], flyweight.HITBOX[1])
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
         # CLOCKS
-        self.spot_clock = clock.Clock(self.unblock_movement, const.enemy_spot_time)
-        self.prepare_to_dash_clock = clock.Clock(self.dash, const.enemy_attack_time)
+        self.spot_clock = clock.Clock(self.unblock_movement, flyweight.spot_time)
+        self.prepare_to_dash_clock = clock.Clock(self.dash, flyweight.attack_time)
         self.idle_clock = clock.Clock(self.move_in_idle)
 
         # INITIAL IDLE
@@ -112,11 +127,11 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
                 self.move_when_chasing()
         if self.can_be_moved:
             if self.idle:
-                speed_abs = const.enemy_idle_move_speed
+                speed_abs = self.flyweight.idle_move_speed
             elif self.next_dash_clock.is_running():
-                speed_abs = const.enemy_resting_move_speed
+                speed_abs = self.flyweight.resting_move_speed
             else:
-                speed_abs = const.enemy_move_speed
+                speed_abs = self.flyweight.move_speed
             self.speed = self.moving * self.face * speed_abs
 
         self.move_and_collide()
@@ -126,7 +141,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
     def move_when_idle(self):
         dist = self.pos - self.game.player.pos
-        if dist and dist.length() < const.enemy_chase_radius and self.game.player.alive():
+        if dist and dist.length() < self.flyweight.chase_radius and self.game.player.alive():
             self.spot_clock.wind_up()
             self.speed = const.V_ZERO
             self.game.particle_group.add(
@@ -142,12 +157,12 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
     def move_when_chasing(self):
         dist = self.pos - self.game.player.pos
         self.face = -dist.normalize()  # TODO fix problem with normalizing
-        if dist.length() > const.enemy_unchase_radius or not self.game.player.alive():
+        if dist.length() > self.flyweight.unchase_radius or not self.game.player.alive():
             self.idle = True
             self.moving = False
             self.can_be_moved = True
             self.idle_clock.wind_up(random.randint(*self.flyweight.UNITED_TIME))
-        elif dist.length() < const.enemy_dash_radius and self.next_dash_clock.is_not_running():
+        elif dist.length() < self.flyweight.dash_radius and self.next_dash_clock.is_not_running():
             self.prepare_to_dash_clock.wind_up()
             random.choice(self.flyweight.ATTACK_SOUNDS).play()
             self.speed = const.V_ZERO
@@ -175,14 +190,14 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         if self.stun_clock.is_running():
             image = self.flyweight.STUNNED_SPRITE
         elif self.spot_clock.is_running():
-            image =  self.flyweight.SURPRISED_SPRITE
+            image = self.flyweight.SURPRISED_SPRITE
         else:
-            image =  self.flyweight.SPRITE
+            image = self.flyweight.SPRITE
         if self.has_key:
             # Drawing enemy + key on a bigger surface
             ext_image = pygame.Surface((100, 100), pygame.SRCALPHA, 32)
             ext_image.blit(image, (25, 25))
-            ext_image.blit( self.flyweight.KEY_TAKEN_SPRITE, (0, 25))
+            ext_image.blit(self.flyweight.KEY_TAKEN_SPRITE, (0, 25))
             image = ext_image
         rotated_image = pygame.transform.rotate(image, self.face.angle_to(const.V_UP))
         # tl;dr image is padded when rotated, this method allows to center image back
@@ -200,6 +215,6 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
     def on_ok_health(self, who):
         self.throw_back((self.pos - who.pos).normalize(),
-                        const.enemy_throwback_speed,
-                        const.enemy_throwback_length,
-                        const.enemy_stun_duration)
+                        self.flyweight.throwback_speed,
+                        self.flyweight.throwback_length,
+                        self.flyweight.stun_duration)
