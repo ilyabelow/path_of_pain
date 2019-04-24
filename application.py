@@ -34,6 +34,7 @@ class Application:
                 continue
             self.state.draw()
             self.clock.tick_busy_loop(const.FRAME_RATE)
+            # print(self.clock.get_fps())
         pygame.quit()
 
     def stop(self):

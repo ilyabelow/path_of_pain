@@ -2,7 +2,7 @@ import pygame
 
 from src.framework import base
 from src.framework import clock, interface, const
-from src.objects import pickupable, hud
+from src.objects import pickupable
 
 
 class PlayerFlyweight:
@@ -69,9 +69,9 @@ class Player(base.AdvancedSprite,
         self.rect = pygame.Rect(0, 0, 50, 50)  # hitbox
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
 
-        self.health_hud = hud.HealthHUD(self)
-        self.key_hud = hud.KeyHUD(self)
-        self.stamina_hud = hud.StaminaHUD(self)
+        self.health_hud = game.hud_factory.create_health(self)
+        self.key_hud = game.hud_factory.create_keys(self)
+        self.stamina_hud = game.hud_factory.create_stamina(self)
 
         self.controller = controller
         self.sword = game.sword_factory.create(self)

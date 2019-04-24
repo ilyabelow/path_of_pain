@@ -14,15 +14,9 @@ class Game(State):
         State.__init__(self)
         self.painful = painful
         self.window = pygame.display.get_surface().get_rect()
-        # TODO move assets init to separate module
-        hud.HEART_SPRITE = pygame.image.load("assets/images/heart.png").convert_alpha()
-        hud.HEART_EMPTY_SPRITE = pygame.image.load("assets/images/heart_empty.png").convert_alpha()
-        hud.STAMINA_SPRITE = pygame.image.load("assets/images/stamina_full.png").convert_alpha()
-        hud.STAMINA_EMPTY_SPRITE = pygame.image.load("assets/images/stamina_empty.png").convert_alpha()
-        hud.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()
 
         self.WIN_SOUND = pygame.mixer.Sound('assets/sounds/secret_discovered_temp.wav')
-        self.WIN_SOUND.set_volume(2)  # TODO tune
+        self.WIN_SOUND.set_volume(2)
 
         # MUSIC INITIALIZATION
         # TODO proper music controller
@@ -51,6 +45,7 @@ class Game(State):
         self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group)
         self.wall_group = base.AdvancedGroup(self.render_group)
         self.wall_factory = obstacle.WallFactory(self.wall_group)
+        self.hud_factory = hud.HUDFactory(self.render_group)
         boxes_coords = (200, 200), (250, 200), (250, 250), (200, 350), (1300, 700), (1350, 750), (1450, 750), (
             2400, 200), (2400, 400), (2450, 400), (2650, 350), (2400, 500), (2400, 700), (2500, 400), (
                            2600, 300), (2600, 600), (2700, 400), (2500, 550), (2550, 500), (200, 650), (200, 700), (
