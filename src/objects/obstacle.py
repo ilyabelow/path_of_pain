@@ -1,8 +1,10 @@
-import pygame
 import random
-from src.objects import pickupable
-from src.framework import base, interface, const
 from enum import Enum
+
+import pygame
+
+from src.framework import base, interface, const
+from src.objects import pickupable
 
 
 class Wall(base.AdvancedSprite):
@@ -27,25 +29,12 @@ class BoxType(Enum):
     ENEMY = 2
 
 
-class BoxFactory:
-    def __init__(self, game, *groups):
-        self.game = game
-        self.groups = groups
-        self.flyweight = BoxFlyweight()
-
-    def create(self, pos):
-        box = Box(self.flyweight, self.game, pos)
-        for group in self.groups:
-            group.add(box)
-        return box
-
-
 class BoxFlyweight:
     def __init__(self):
         self.BOX_SPRITE = pygame.image.load("assets/images/box.png").convert_alpha()
 
         self.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('assets/sounds/breakable_wall_hit_{}.wav'.format(i + 1))
-                                     for i in range(2)]
+                                 for i in range(2)]
         self.BLEED_ONE_DIR_STATS = {'amount': 5, 'splash': 45, 'fade': 2, 'sizes': [10, 15], 'speed': 6, 'offset': 10}
         self.BLEED_ALL_DIR_STATS = {'amount': 15, 'fade': 2, 'sizes': [15, 20], 'speed': 6, 'offset': 0}
 
@@ -104,3 +93,6 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
                 self.rect.x - window.x + self.offsets[i][0],
                 self.rect.y - window.y - i * 15 + self.offsets[i][1] - 8)))  # TODO height = 8, generalize
         return rects[0].unionall(rects[1:])
+
+
+BoxFactory = base.get_factory_with_game(Box, BoxFlyweight)

@@ -67,7 +67,7 @@ class Game(State):
                          (2450, 1600), (2500, 1600), (2450, 1550), (2500, 1550)
         for coord in enemies_coords:
             self.enemy_factory.create(coord)
-        self.sword_factory = sword.SwordFactory(self, self.hitter_group)  # TODO redundant?
+        self.sword_factory = sword.SwordFactory(self.hitter_group)  # TODO redundant?
 
         self.wall_group = base.AdvancedGroup(self.render_group,
                                              # vertical center walls
@@ -102,7 +102,7 @@ class Game(State):
         else:
             ctrlr = controller.Joystick()
         self.player_factory = player.PlayerFactory(self, self.player_group)
-        self.player = self.player_factory.create(ctrlr, (400, 300))
+        self.player = self.player_factory.create((400, 300), ctrlr)
         self.player.fetch_screen()
 
         self.prev_rect = [self.window]
