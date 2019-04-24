@@ -36,7 +36,6 @@ class Game(State):
         hud.HEART_WEAK_SPRITE = pygame.image.load("assets/images/weak_heart.png").convert_alpha()
         hud.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()  # TODO another image
         pickupable.LITTLE_HEART_SPRITE = pygame.image.load("assets/images/little_heart.png").convert_alpha()
-        pickupable.LITTLE_HEART_WEAK_SPRITE = pygame.image.load("assets/images/little_weak_heart.png").convert_alpha()
         pickupable.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()
         sword.SPRITE = pygame.image.load("assets/images/sword.png").convert_alpha()
         sword.SWANG_SPRITE = pygame.image.load("assets/images/sword_swang.png").convert_alpha()
