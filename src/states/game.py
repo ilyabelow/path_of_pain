@@ -49,6 +49,8 @@ class Game(State):
         self.box_group = base.AdvancedGroup(self.render_group)
         self.obstacle_group = base.AdvancedGroup(self.render_group)
         self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group)
+        self.wall_group = base.AdvancedGroup(self.render_group)
+        self.wall_factory = obstacle.WallFactory(self.wall_group)
         boxes_coords = (200, 200), (250, 200), (250, 250), (200, 350), (1300, 700), (1350, 750), (1450, 750), (
             2400, 200), (2400, 400), (2450, 400), (2650, 350), (2400, 500), (2400, 700), (2500, 400), (
                            2600, 300), (2600, 600), (2700, 400), (2500, 550), (2550, 500), (200, 650), (200, 700), (
@@ -68,29 +70,19 @@ class Game(State):
         self.sword_factory = sword.SwordFactory(self.hitter_group)  # TODO redundant?
         self.key_factory = pickupable.KeyFactory(self.pickupable_group)
         self.heart_factory = pickupable.HeartFactory(self.pickupable_group)
-        self.wall_group = base.AdvancedGroup(self.render_group,
-                                             # vertical center walls
-                                             obstacle.Wall(pygame.Rect(1400, 900, 200, 500)),
-                                             obstacle.Wall(pygame.Rect(1400, 1600, 200, 300)),
-
-                                             # horizontal center walls
-                                             obstacle.Wall(pygame.Rect(100, 900, 500, 200)),
-                                             obstacle.Wall(pygame.Rect(900, 900, 500, 200)),
-                                             obstacle.Wall(pygame.Rect(1600, 900, 500, 200)),
-                                             obstacle.Wall(pygame.Rect(2400, 900, 500, 200)),
-                                             # pillars
-                                             obstacle.Wall(pygame.Rect(900, 400, 200, 200), 90),
-                                             obstacle.Wall(pygame.Rect(1400, 400, 200, 200), 120),
-                                             obstacle.Wall(pygame.Rect(1900, 400, 200, 200), 150),
-                                             obstacle.Wall(pygame.Rect(1800, 1300, 200, 200), 30),
-
-                                             # border walls
-                                             obstacle.Wall(pygame.Rect(100, 0, 2800, 100)),
-                                             obstacle.Wall(pygame.Rect(0, 0, 100, 2000)),
-                                             obstacle.Wall(pygame.Rect(0, 1900, 3000, 150)),
-                                             obstacle.Wall(pygame.Rect(2900, 0, 100, 2000)),
-                                             )
-
+        # TODO redo walls input
+        # vertical center walls
+        walls_rects = (1400, 900, 200, 500), (1400, 1600, 200, 300), (
+            # horizontal center walls
+            100, 900, 500, 200), (900, 900, 500, 200), (1600, 900, 500, 200), (2400, 900, 500, 200), (
+                          # pillars
+                          900, 400, 200, 200, 90), (1400, 400, 200, 200, 120), (1900, 400, 200, 200, 150), (
+                          1800, 1300, 200, 200, 30), (
+                          # border walls
+                          100, 0, 2800, 100), (0, 0, 100, 2000), (0, 1900, 3000, 150), (
+                          2900, 0, 100, 2000)
+        for wall in walls_rects:
+            self.wall_factory.create(wall[:4], wall[-1] if len(wall) == 5 else 50)  # TODO remove this bodge
         self.obstacle_group.add(*self.wall_group)
 
         self.distribute_keys()

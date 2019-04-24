@@ -4,11 +4,21 @@ from enum import Enum
 import pygame
 
 from src.framework import base, interface, const
-from src.objects import pickupable
+
+
+class WallFactory:
+    def __init__(self, *groups):
+        self.groups = groups
+
+    def create(self, dimentions, height=50):
+        product = Wall(pygame.Rect(*dimentions), height)
+        for group in self.groups:
+            group.add(product)
+        return product
 
 
 class Wall(base.AdvancedSprite):
-    def __init__(self, rect, height=50):
+    def __init__(self, rect, height):
         base.AdvancedSprite.__init__(self)
         self.WALL_MAX_BASE_HEIGHT = 25  # dunno how to call it, it's actually 1/2 of player
         base_height = min(self.WALL_MAX_BASE_HEIGHT, height // 2)
