@@ -1,9 +1,6 @@
 import pygame
-import base
-import interface
+from src.framework import base, clock, interface, const
 import random
-import const
-import clock
 
 LITTLE_HEART_SPRITE = None
 

@@ -1,7 +1,6 @@
 import pygame
 
-import base
-import const
+from src.framework import base, const
 
 HEART_SPRITE = None
 HEART_EMPTY_SPRITE = None

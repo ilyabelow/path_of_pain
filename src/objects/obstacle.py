@@ -1,10 +1,7 @@
 import pygame
 import random
-import const
-import enemy
-import pickupable
-import interface
-import base
+from src.objects import enemy, pickupable
+from src.framework import base, interface, const
 from enum import Enum
 
 BOX_SPRITE = None

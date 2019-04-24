@@ -1,18 +1,10 @@
-import const
-import controller
-import obstacle
 import pygame
-import enemy
-import player
-import particle
 import random
-import base
-import hud
-import pickupable
-import sword
-from const import Button
-from base import State
-import menu
+from src.objects import enemy, obstacle, player, particle, pickupable, sword, hud
+from src.framework import base, controller, const
+from src.framework.const import Button
+from src.framework.base import State
+from src.states import menu
 
 
 class Game(State):

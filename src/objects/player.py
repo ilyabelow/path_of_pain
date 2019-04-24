@@ -1,11 +1,6 @@
 import pygame
-import const
-import sword
-import hud
-import clock
-import interface
-import base
-import pickupable
+from src.framework import base, clock, interface, const
+from src.objects import pickupable, sword, hud
 
 SPRITE = None
 STUNNED_SPRITE = None

@@ -1,7 +1,5 @@
 import pygame
-import const
-import base
-import clock
+from src.framework import base, clock, const
 from enum import Enum
 
 

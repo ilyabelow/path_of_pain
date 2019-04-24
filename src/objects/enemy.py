@@ -1,11 +1,7 @@
 import pygame
 import random
-import const
-import particle
-import clock
-import interface
-import base
-import pickupable
+from src.objects import particle, pickupable
+from src.framework import base, clock, interface, const
 
 # TODO move all of these somewhere...
 SPRITE = None

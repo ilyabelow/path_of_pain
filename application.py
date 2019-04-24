@@ -1,6 +1,6 @@
 import pygame
-from menu import Menu
-import const
+from src.states.menu import Menu
+from src.framework import const
 
 
 # Context for STATE PATTERN

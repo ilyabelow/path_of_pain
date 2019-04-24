@@ -1,9 +1,9 @@
 import pygame
-from base import State
-import const
-from game import Game
-import particle
-from const import Button
+from src.framework.base import State
+from src.framework import const
+from src.states import game
+from src.objects import particle
+from src.framework.const import Button
 from enum import Enum
 
 
@@ -106,9 +106,9 @@ class Menu(State):
         if self.option == Option.EXIT:
             self.app.stop()
         if self.option == Option.PLAY:
-            self.app.switch_state(Game())
+            self.app.switch_state(game.Game())
         if self.option == Option.PLAY_PAINFUL:
-            self.app.switch_state(Game(True))
+            self.app.switch_state(game.Game(True))
 
     def shift_option(self, shift):
         self.set_option(Option((self.option.value + shift) % len(Option)))

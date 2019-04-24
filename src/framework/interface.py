@@ -1,8 +1,7 @@
 import pygame
-import clock
-import const
-import particle
 import random
+from src.framework import clock, const
+from src.objects import particle
 
 
 class Healthy:

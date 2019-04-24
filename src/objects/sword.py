@@ -1,8 +1,6 @@
-import const
 import pygame
 import random
-import clock
-import base
+from src.framework import base, clock, const
 
 SPRITE = None
 SWANG_SPRITE = None
