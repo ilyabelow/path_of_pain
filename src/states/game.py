@@ -41,13 +41,15 @@ class Game(State):
         self.key_factory = pickupable.KeyFactory(self.pickupable_group)
         self.heart_factory = pickupable.HeartFactory(self.pickupable_group)
         self.player_factory = player.PlayerFactory(self, self.player_group)
-
+        self.fade_factory = particle.FadeFactory(self.particle_group)
+        self.title_factory = particle.TitleFactory(self.particle_group)
         # LEVEL INITIALIZATION
         self.level_rect = None
         self.max_keys = 0
         self.player = None
 
         self.room_num = 1
+        self.prev_rect = None
         self.reset_level()
 
     def init_room(self):
@@ -143,21 +145,16 @@ class Game(State):
     def reset_level(self):
         self.init_room()
         self.prev_rect = [self.window]
-        # TODO particle factory
-        self.fade = particle.Fade(const.GAME_FADE_IN, False, self.deploy_logo)
-        self.render_group.add(self.fade)
-        self.update()  # TODO remove
+        self.fade_factory.create(const.GAME_FADE_IN, False, self.deploy_logo)
+        self.update()  # TODO remove bodge
 
     def fade_out(self, action_after_faded):
-        self.fade = particle.Fade(const.GAME_FADE_OUT, True, action_after_faded)
-        self.render_group.add(self.fade)
+        self.fade_factory.create(const.GAME_FADE_OUT, True, action_after_faded)
         pygame.mixer.fadeout(const.GAME_FADE_OUT)
         pygame.mixer.music.fadeout(const.GAME_FADE_OUT * const.FRAME_RATE)
 
     def deploy_logo(self):
-        self.particle_group.add(
-            particle.Title(pygame.image.load('assets/images/{}_level{}.png'.format(1, self.painful * '_painful')),
-                           (5, 20, 30, 20)))  # ok stage duration
+        self.title_factory.create('assets/images/{}_level{}.png'.format(1, self.painful * '_painful'), (5, 20, 30, 20))
 
     def update(self):
         # EVENT HANDLING (Now it is just exiting, hmm)
@@ -182,7 +179,6 @@ class Game(State):
         self.hitter_group.update()
         self.enemy_group.update()
         self.particle_group.update()
-        self.fade.update()
 
     def draw(self):
         # DRAWING

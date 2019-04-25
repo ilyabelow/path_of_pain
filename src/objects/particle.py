@@ -1,7 +1,11 @@
-import pygame
-from src.framework import base, clock, const
 from enum import Enum
 
+import pygame
+
+from src.framework import base, clock, const
+
+
+# TODO particle factory (really useful!)
 
 # TODO make base class for particles
 
@@ -34,7 +38,6 @@ class Blood(base.AdvancedSprite):
 class Exclamation(base.AdvancedSprite):
     def __init__(self, pos, lifetime):
         base.AdvancedSprite.__init__(self)
-        # TODO move font somewhere in shared place?
         font = pygame.font.Font(None, 80)
         self.image = font.render("!", 3, const.C_BLACK)
         self.rect = self.image.get_rect(centerx=pos.x, centery=pos.y)
@@ -47,6 +50,16 @@ class Exclamation(base.AdvancedSprite):
 
     def draw(self, screen, window):
         return screen.blit(self.image, (self.rect.x - window.x, self.rect.y - window.y))
+
+
+class FadeFactory:
+    def __init__(self, group):
+        self.group = group
+
+    def create(self, duration, to_black, when_stops):
+        product = Fade(duration, to_black, when_stops)
+        self.group.add(product)
+        return product
 
 
 class Fade(base.AdvancedSprite):
@@ -79,11 +92,21 @@ class TitleState(Enum):
     FADE_OUT = 3
 
 
-# TODO make customizable position
+class TitleFactory:
+    def __init__(self, group):
+        self.group = group
+
+    def create(self, filename, state_durations):
+        product = Title(filename, state_durations)
+        self.group.add(product)
+        return product
+
+
+# TODO make customizable positioning?
 class Title(base.AdvancedSprite):
-    def __init__(self, image, state_durations):
+    def __init__(self, filename, state_durations):
         base.AdvancedSprite.__init__(self)
-        self.image = image
+        self.image = pygame.image.load(filename)
         self.stage = TitleState.WAIT
         self.state_durations = state_durations
         self.clock = clock.Clock(self.next_stage)
