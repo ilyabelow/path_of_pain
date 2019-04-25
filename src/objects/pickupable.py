@@ -5,6 +5,27 @@ import pygame
 from src.framework import base, clock, interface, const
 
 
+class HeartFactory:
+    def __init__(self, *groups, load=False):
+        self.groups = groups
+        self.flyweight = None
+        if load:
+            self.load()
+
+    def create(self, coords):
+        product = Heart(self.flyweight, coords)
+        for group in self.groups:
+            group.add(product)
+        return product
+
+    def load(self):
+        if self.flyweight is None:
+            self.flyweight = HeartFlyweight()
+
+    def unload(self):
+        self.flyweight = None
+
+
 class HeartFlyweight:
     def __init__(self):
         self.LITTLE_HEART_SPRITE = pygame.image.load("assets/images/little_heart.png").convert_alpha()
@@ -28,7 +49,25 @@ class Heart(base.AdvancedSprite, interface.Pickupable):
         self.death_clock.tick()
 
 
-HeartFactory = base.get_factory(Heart, HeartFlyweight)
+class KeyFactory:
+    def __init__(self, *groups, load=False):
+        self.groups = groups
+        self.flyweight = None
+        if load:
+            self.load()
+
+    def create(self, coords, face):
+        product = Key(self.flyweight, coords, face)
+        for group in self.groups:
+            group.add(product)
+        return product
+
+    def load(self):
+        if self.flyweight is None:
+            self.flyweight = KeyFlyweight()
+
+    def unload(self):
+        self.flyweight = None
 
 
 class KeyFlyweight:
@@ -53,6 +92,3 @@ class Key(base.AdvancedSprite, interface.Pickupable):
 
     def draw(self, screen, window):
         return screen.blit(self.image, (self.im_rect.x - window.x, self.im_rect.y - window.y))
-
-
-KeyFactory = base.get_factory(Key, KeyFlyweight)

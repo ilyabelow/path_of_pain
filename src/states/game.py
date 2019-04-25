@@ -37,7 +37,7 @@ class Game(State):
         self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group)
         self.wall_factory = obstacle.WallFactory(self.wall_group, self.obstacle_group)
         self.hud_factory = hud.HUDFactory(self.render_group)
-        self.sword_factory = sword.SwordFactory(self.hitter_group)  # TODO redundant?
+        self.sword_factory = sword.SwordFactory(self.hitter_group)
         self.key_factory = pickupable.KeyFactory(self.pickupable_group)
         self.heart_factory = pickupable.HeartFactory(self.pickupable_group)
         self.player_factory = player.PlayerFactory(self, self.player_group)
@@ -51,7 +51,13 @@ class Game(State):
         self.reset_level()
 
     def init_room(self):
-        # TODO factory deletion that are not in use
+        self.enemy_factory.load()
+        self.box_factory.load()
+        self.hud_factory.load()
+        self.sword_factory.load()
+        self.key_factory.load()
+        self.heart_factory.load()
+        self.player_factory.load()
         for v in dir(self):
             if v.rfind('_group') != -1:
                 getattr(self, v).empty()
@@ -77,14 +83,14 @@ class Game(State):
                                2550, 1700), (2600, 1700), (2350, 1500), (2350, 1450), (2350, 1550), (2350, 1600), (
                                2350, 1650), (2350, 1700), (2600, 1500), (2600, 1550), (2600, 1600), (2600, 1650), (
                                1800, 1750), (2050, 1700)
-            for box in boxes_coords:
-                self.box_factory.create(box)
+            for coords in boxes_coords:
+                self.box_factory.create(coords)
             enemies_coords = (500, 1300), (900, 1300), (500, 1300), (900, 1300), (500, 1600), (900, 1600), (700, 1450), \
                              (1700, 450), (2200, 450), (2850, 150), (2850, 750), (2100, 1200), (2100, 1500), (
                                  1800, 1500), \
                              (2450, 1600), (2500, 1600), (2450, 1550), (2500, 1550)
-            for coord in enemies_coords:
-                self.enemy_factory.create(coord)
+            for coords in enemies_coords:
+                self.enemy_factory.create(coords)
             self.max_keys = 5
             self.distribute_keys()
 

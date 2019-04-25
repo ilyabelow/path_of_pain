@@ -112,36 +112,4 @@ class State:
     def draw(self):
         pass
 
-    # TODO shared method to fade out
-
-
-# TODO remove bodge with sending Game object
-def get_factory_with_game(obj_type, flyweight):
-    class Factory:
-        def __init__(self, game, *groups):
-            self.game = game
-            self.groups = groups
-            self.flyweight = flyweight()
-
-        def create(self, *args):
-            product = obj_type(self.flyweight, self.game, *args)
-            for group in self.groups:
-                group.add(product)
-            return product
-
-    return Factory
-
-
-def get_factory(obj_type, flyweight):
-    class Factory:
-        def __init__(self, *groups):
-            self.groups = groups
-            self.flyweight = flyweight()
-
-        def create(self, *args):
-            product = obj_type(self.flyweight, *args)
-            for group in self.groups:
-                group.add(product)
-            return product
-
-    return Factory
+    # TODO shared method to fade in/out

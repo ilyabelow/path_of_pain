@@ -39,6 +39,28 @@ class BoxType(Enum):
     ENEMY = 2
 
 
+class BoxFactory:
+    def __init__(self, game, *groups, load=False):
+        self.groups = groups
+        self.flyweight = None
+        if load:
+            self.load()
+        self.game = game
+
+    def create(self, coords):
+        product = Box(self.flyweight, self.game, coords)
+        for group in self.groups:
+            group.add(product)
+        return product
+
+    def load(self):
+        if self.flyweight is None:
+            self.flyweight = BoxFlyweight()
+
+    def unload(self):
+        self.flyweight = None
+
+
 class BoxFlyweight:
     def __init__(self):
         self.BOX_SPRITE = pygame.image.load("assets/images/box.png").convert_alpha()
@@ -66,8 +88,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         self.flyweight = flyweight
         self.enemy_factory = game.enemy_factory
         self.offsets = [[0, 0]] + [[random.randint(-5, 5), random.randint(-5, 5)] for i in range(self.max_health - 1)]
-        # TODO better randomizer
-        # TODO store not mode but objects itself?
+        # TODO better randomizer?
         if random.randint(0, 6) == 0 and not game.painful:
             self.mode = BoxType.HEALTH
         elif random.randint(0, 15) == 0:
@@ -102,6 +123,3 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
                 self.rect.x - window.x + self.offsets[i][0],
                 self.rect.y - window.y - i * 15 + self.offsets[i][1] - 8)))  # TODO height = 8, generalize
         return rects[0].unionall(rects[1:])
-
-
-BoxFactory = base.get_factory_with_game(Box, BoxFlyweight)

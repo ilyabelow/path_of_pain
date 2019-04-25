@@ -5,6 +5,28 @@ from src.framework import clock, interface, const
 from src.objects import pickupable
 
 
+class PlayerFactory:
+    def __init__(self, game, *groups, load=False):
+        self.groups = groups
+        self.flyweight = None
+        if load:
+            self.load()
+        self.game = game
+
+    def create(self, coords, controller):
+        product = Player(self.flyweight, self.game, coords, controller)
+        for group in self.groups:
+            group.add(product)
+        return product
+
+    def load(self):
+        if self.flyweight is None:
+            self.flyweight = PlayerFlyweight()
+
+    def unload(self):
+        self.flyweight = None
+
+
 class PlayerFlyweight:
     def __init__(self):
         self.SPRITE = pygame.image.load("assets/images/player.png").convert_alpha()
@@ -185,6 +207,3 @@ class Player(base.AdvancedSprite,
         if self.dash_clock.is_not_running() and self.stamina_available(self.back_dash_stats['cost']):
             self.back_dash()
             self.stamina_drain(self.back_dash_stats['cost'])
-
-
-PlayerFactory = base.get_factory_with_game(Player, PlayerFlyweight)

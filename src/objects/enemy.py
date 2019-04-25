@@ -6,6 +6,28 @@ from src.framework import base, clock, interface, const
 from src.objects import particle, pickupable
 
 
+class EnemyFactory:
+    def __init__(self, game, *groups, load=False):
+        self.groups = groups
+        self.game = game
+        self.flyweight = None
+        if load:
+            self.load()
+
+    def create(self, coords):
+        product = Enemy(self.flyweight, self.game, coords)
+        for group in self.groups:
+            group.add(product)
+        return product
+
+    def load(self):
+        if self.flyweight is None:
+            self.flyweight = EnemyFlyweight()
+
+    def unload(self):
+        self.flyweight = None
+
+
 class EnemyFlyweight:
     def __init__(self):
         # TEXTURES
@@ -205,6 +227,3 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
                         self.flyweight.throwback_speed,
                         self.flyweight.throwback_length,
                         self.flyweight.stun_duration)
-
-
-EnemyFactory = base.get_factory_with_game(Enemy, EnemyFlyweight)

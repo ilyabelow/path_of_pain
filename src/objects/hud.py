@@ -78,11 +78,12 @@ class StaminaHUD(HUD):
                                 (i * self.flyweight.STAMINA_EMPTY_SPRITE.get_width(), 0))
 
 
-# TODO redo
 class HUDFactory:
-    def __init__(self, *groups):
+    def __init__(self, *groups, load=False):
         self.groups = groups
-        self.flyweight = HUDFlyweight()
+        self.flyweight = None
+        if load:
+            self.load()
 
     def create(self, hud_type, owner):
         product = hud_type(self.flyweight, owner)
@@ -98,3 +99,10 @@ class HUDFactory:
 
     def create_stamina(self, owner):
         return self.create(StaminaHUD, owner)
+
+    def load(self):
+        if self.flyweight is None:
+            self.flyweight = HUDFlyweight()
+
+    def unload(self):
+        self.flyweight = None

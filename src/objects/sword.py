@@ -5,6 +5,27 @@ import pygame
 from src.framework import base, clock, const
 
 
+class SwordFactory:
+    def __init__(self, *groups, load=False):
+        self.groups = groups
+        self.flyweight = None
+        if load:
+            self.load()
+
+    def create(self, owner):
+        product = Sword(self.flyweight, owner)
+        for group in self.groups:
+            group.add(product)
+        return product
+
+    def load(self):
+        if self.flyweight is None:
+            self.flyweight = SwordFlyweight()
+
+    def unload(self):
+        self.flyweight = None
+
+
 class SwordFlyweight:
     def __init__(self):
         self.SPRITE = pygame.image.load("assets/images/sword.png").convert_alpha()
@@ -80,6 +101,3 @@ class Sword(base.AdvancedSprite):
                 image = pygame.transform.rotate(self.flyweight.SWANG_SPRITE, self.owner.face.angle_to(const.V_UP) + 45)
         rect = image.get_rect(centerx=self.pos.x, centery=self.pos.y)
         return screen.blit(image, (rect.x - window.x, rect.y - window.y))
-
-
-SwordFactory = base.get_factory(Sword, SwordFlyweight)
