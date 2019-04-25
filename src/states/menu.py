@@ -1,10 +1,12 @@
-import pygame
-from src.framework.base import State
-from src.framework import const
-from src.states import game
-from src.objects import particle
-from src.framework.const import Button
 from enum import Enum
+
+import pygame
+
+from src.framework import const
+from src.framework.base import State
+from src.framework.const import Button
+from src.objects import particle
+from src.states import game
 
 
 class Option(Enum):
@@ -38,7 +40,7 @@ class OptionSprite(pygame.sprite.Sprite):
             option_font = pygame.font.Font("assets/fonts/augustus.ttf", 36)
             self.image = option_font.render(self.option.name.replace('_', ' '), 10, const.C_RED)
         self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2,
-                                        centery=const.RESOLUTION[1] / 2 + + self.option.value * 100)
+                                        centery=const.RESOLUTION[1] / 2 + self.option.value * 100 - 100)
 
 
 class Menu(State):
@@ -56,7 +58,7 @@ class Menu(State):
         self.option_group = pygame.sprite.OrderedUpdates()
         for i in Option:
             self.option_group.add(OptionSprite(self, i))
-
+        self.blood = pygame.image.load('assets/images/menu_blood.png')
         # STATE INIT
         self.option = Option.PLAY
         self.option_group.update()
@@ -64,12 +66,11 @@ class Menu(State):
 
     def draw(self):
         screen = pygame.display.get_surface()
-        # TODO cooler background
         screen.fill(const.C_BLACK)
+        screen.blit(self.blood, self.blood.get_rect(bottom=const.RESOLUTION[1], right=const.RESOLUTION[0]))
         self.title_group.draw(screen)
         self.option_group.draw(screen)
         self.fade.draw(screen, None)
-
         pygame.display.update()
 
     def update(self):
