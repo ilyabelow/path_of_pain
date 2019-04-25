@@ -15,6 +15,7 @@ class Game(State):
         self.painful = painful
         self.window = pygame.display.get_surface().get_rect()
 
+        # WIN SOUND
         self.WIN_SOUND = pygame.mixer.Sound('assets/sounds/secret_discovered_temp.wav')
         self.WIN_SOUND.set_volume(2)
 
@@ -29,23 +30,31 @@ class Game(State):
         pygame.mixer.music.play(loops=-1)
 
         # GROUPS INITIALIZATION
-        self.render_group = base.AdvancedLayeredUpdates()
         # TODO move level generation to separate entity
-
-        self.max_keys = 5
+        self.render_group = base.AdvancedLayeredUpdates()
         self.hittable_group = base.AdvancedGroup(self.render_group)
         self.hitter_group = base.AdvancedGroup(self.render_group)
-        self.level_rect = pygame.Rect(0, 0, 3000, 2000)
         self.pickupable_group = base.AdvancedGroup(self.render_group)
         self.particle_group = base.AdvancedGroup(self.render_group)
         self.enemy_group = base.AdvancedGroup(self.render_group)
-        self.enemy_factory = enemy.EnemyFactory(self, self.enemy_group, self.hittable_group)
         self.box_group = base.AdvancedGroup(self.render_group)
-        self.obstacle_group = base.AdvancedGroup(self.render_group)
-        self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group)
         self.wall_group = base.AdvancedGroup(self.render_group)
-        self.wall_factory = obstacle.WallFactory(self.wall_group)
+        self.obstacle_group = base.AdvancedGroup(self.render_group)
+        self.player_group = base.AdvancedGroup(self.render_group)
+
+        # FACTORIES INITIALIZATION
+        self.enemy_factory = enemy.EnemyFactory(self, self.enemy_group, self.hittable_group)
+        self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group)
+        self.wall_factory = obstacle.WallFactory(self.wall_group, self.obstacle_group)
         self.hud_factory = hud.HUDFactory(self.render_group)
+        self.sword_factory = sword.SwordFactory(self.hitter_group)  # TODO redundant?
+        self.key_factory = pickupable.KeyFactory(self.pickupable_group)
+        self.heart_factory = pickupable.HeartFactory(self.pickupable_group)
+        self.player_factory = player.PlayerFactory(self, self.player_group)
+
+
+        # LEVEL INITIALIZATIOB
+        self.level_rect = pygame.Rect(0, 0, 3000, 2000)
         boxes_coords = (200, 200), (250, 200), (250, 250), (200, 350), (1300, 700), (1350, 750), (1450, 750), (
             2400, 200), (2400, 400), (2450, 400), (2650, 350), (2400, 500), (2400, 700), (2500, 400), (
                            2600, 300), (2600, 600), (2700, 400), (2500, 550), (2550, 500), (200, 650), (200, 700), (
@@ -62,10 +71,9 @@ class Game(State):
                          (2450, 1600), (2500, 1600), (2450, 1550), (2500, 1550)
         for coord in enemies_coords:
             self.enemy_factory.create(coord)
-        self.sword_factory = sword.SwordFactory(self.hitter_group)  # TODO redundant?
-        self.key_factory = pickupable.KeyFactory(self.pickupable_group)
-        self.heart_factory = pickupable.HeartFactory(self.pickupable_group)
-        # TODO redo walls input
+        self.max_keys = 5
+        self.distribute_keys()
+        # TODO redo walls input because now it is DISGUSTING
         # vertical center walls
         walls_rects = (1400, 900, 200, 500), (1400, 1600, 200, 300), (
             # horizontal center walls
@@ -78,20 +86,17 @@ class Game(State):
                           2900, 0, 100, 2000)
         for wall in walls_rects:
             self.wall_factory.create(wall[:4], wall[-1] if len(wall) == 5 else 50)  # TODO remove this bodge
-        self.obstacle_group.add(*self.wall_group)
 
-        self.distribute_keys()
         # PLAYER INITIALIZING
-        self.player_group = base.AdvancedGroup(self.render_group)
         if pygame.joystick.get_count() == 0:
             ctrlr = controller.Keyboard()
         else:
             ctrlr = controller.Joystick()
-        self.player_factory = player.PlayerFactory(self, self.player_group)
         self.player = self.player_factory.create((400, 300), ctrlr)
-        self.player.fetch_screen()
 
+        self.player.fetch_screen()
         self.prev_rect = [self.window]
+        # TODO particle factory
         self.fade = particle.Fade(const.GAME_FADE_IN, False, self.deploy_logo)
         self.render_group.add(self.fade)
 
@@ -151,7 +156,7 @@ class Game(State):
             if event.type == pygame.QUIT:  # hard quit
                 pygame.quit()
 
-        # UPDATING
+        # UPDATING (order matters?)
         self.pickupable_group.update()
         self.player_group.update()
         self.hitter_group.update()
@@ -161,9 +166,9 @@ class Game(State):
 
     def draw(self):
         # DRAWING
-        # see what areas are updating
-        # self.screen.fill(const.C_BLACK, (0, 0, *const.RESOLUTION))
         screen = pygame.display.get_surface()
+        # see what areas are updating
+        # screen.fill(const.C_BLACK, (0, 0, *const.RESOLUTION))
         for r in self.prev_rect:
             screen.fill(const.C_BACKGROUND, r)
         rect = self.render_group.draw_all(screen, self.window)
