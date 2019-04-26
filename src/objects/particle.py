@@ -75,6 +75,9 @@ class Fade(base.AdvancedSprite):
 
     def update(self):
         self.clock.tick()
+        # TODO temp solution
+        if self.clock.is_not_running():
+            self.kill()
 
     def draw(self, screen, window):
         image = pygame.Surface(const.RESOLUTION).convert_alpha()

@@ -1,5 +1,7 @@
-import pygame
 import random
+
+import pygame
+
 from src.framework import clock, const
 from src.objects import particle
 
@@ -220,4 +222,12 @@ class Moving:
         self.speed = const.V_ZERO
 
     def move(self):
+        pass
+
+
+class Interactive:
+    def __init__(self):
+        pass
+
+    def interact(self, who):
         pass

@@ -76,9 +76,9 @@ class AdvancedLayeredUpdates(pygame.sprite.LayeredUpdates):
 
 
 class AdvancedGroup(pygame.sprite.Group):
-    def __init__(self, render_group, *sprites):
+    def __init__(self, render_group=None):
         self.render_group = render_group
-        pygame.sprite.Group.__init__(self, *sprites)
+        pygame.sprite.Group.__init__(self)
 
     def add(self, *sprites):
         for sprite in sprites:
@@ -87,7 +87,8 @@ class AdvancedGroup(pygame.sprite.Group):
                     self.add_internal(sprite)
                     sprite.add_internal(self)
                     # TODO deleting sprite from particular group = undefined behaviour
-                    self.render_group.add(sprite)  # <----------------------------------- code insertion here
+                    if self.render_group is not None:
+                        self.render_group.add(sprite)  # <----------------------------------- code insertion here
             else:
                 try:
                     self.add(*sprite)

@@ -62,7 +62,7 @@ class Menu(State):
         # STATE INIT
         self.option = Option.PLAY
         self.option_group.update()
-        self.fade = particle.Fade(const.MENU_FADE_IN, False)
+        self.fade = particle.Fade(const.MENU_FADE_IN, False)  # TODO move somehow fade to group
 
     def draw(self):
         screen = pygame.display.get_surface()
@@ -84,7 +84,8 @@ class Menu(State):
                 if event.key == pygame.K_SPACE:
                     self.select_option()
                 if event.key == pygame.K_ESCAPE:
-                    self.app.stop()
+                    self.set_option(Option.EXIT)
+                    self.select_option()
             if event.type == pygame.JOYBUTTONDOWN:
                 if event.button == Button.A.value:
                     self.select_option()

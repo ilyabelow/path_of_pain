@@ -1,11 +1,14 @@
 import pygame
+
 from src.framework.const import Button, Axis
+
 
 class Controller:
     def __init__(self):
         self.dash_pressed = False
         self.back_dash_pressed = False
         self.swing_pressed = False
+        self.interact_pressed = False
 
     def check(self, obj):
         obj.look_away = self.check_look() * 300
@@ -35,6 +38,16 @@ class Controller:
             self.back_dash_pressed = True
         else:
             self.back_dash_pressed = False
+
+        if self.check_interact():
+            if not self.interact_pressed:
+                obj.try_to_interact()
+            self.interact_pressed = True
+        else:
+            self.interact_pressed = False
+
+    def check_interact(self):
+        pass
 
     def check_dash(self):
         pass
@@ -78,6 +91,9 @@ class Joystick(Controller):
 
     def check_back_dash(self):
         return self.joystick.get_button(Button.B.value)
+
+    def check_interact(self):
+        return self.joystick.get_button(Button.Y.value)
 
     def dead_zone(x):
         if abs(x) < 0.1:

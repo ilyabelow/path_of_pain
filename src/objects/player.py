@@ -13,8 +13,8 @@ class PlayerFactory:
             self.load()
         self.game = game
 
-    def create(self, coords, controller):
-        product = Player(self.flyweight, self.game, coords, controller)
+    def create(self, coords):
+        product = Player(self.flyweight, self.game, coords)
         for group in self.groups:
             group.add(product)
         return product
@@ -63,7 +63,7 @@ class Player(base.AdvancedSprite,
              interface.Bleeding,
              interface.Tired):
 
-    def __init__(self, flyweight, game, coords, controller):
+    def __init__(self, flyweight, game, coords):
         base.AdvancedSprite.__init__(self)
         interface.Moving.__init__(self, coords, game.obstacle_group, flyweight.DASH_STATS, flyweight.BACK_DASH_STATS)
         interface.Healthy.__init__(
@@ -95,7 +95,6 @@ class Player(base.AdvancedSprite,
         self.key_hud = game.hud_factory.create_keys(self)
         self.stamina_hud = game.hud_factory.create_stamina(self)
 
-        self.controller = controller
         self.sword = game.sword_factory.create(self)
         self.surprised_clock = clock.Clock(None, 30)  # How long player will be :0
         self.clock_ticker = clock.ClockTicker(self)
@@ -112,8 +111,6 @@ class Player(base.AdvancedSprite,
             self.keys += 1
             self.flyweight.PICKUP_SOUND.play()
             self.key_hud.makeup()
-            if self.keys == self.game.max_keys:
-                self.game.win()
         if isinstance(what, pickupable.Heart):
             self.heal(1)
 
@@ -122,7 +119,7 @@ class Player(base.AdvancedSprite,
 
     def move(self):
         if self.can_be_moved:
-            self.controller.check(self)
+            self.game.input_method.check(self)
         # separate ifs because controller can stop
         if self.can_be_moved:
             if self.moving:
@@ -207,3 +204,10 @@ class Player(base.AdvancedSprite,
         if self.dash_clock.is_not_running() and self.stamina_available(self.back_dash_stats['cost']):
             self.back_dash()
             self.stamina_drain(self.back_dash_stats['cost'])
+
+    def try_to_interact(self):
+        for interactive in self.game.interactive_group:
+            interactive.interact(self)
+
+    def surprise_me(self, time):
+        self.surprised_clock.wind_up(time)

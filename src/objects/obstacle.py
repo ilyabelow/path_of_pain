@@ -6,6 +6,79 @@ import pygame
 from src.framework import base, interface, const
 
 
+class DoorFactory:
+    def __init__(self, *groups, load=False):
+        self.groups = groups
+        self.flyweight = None
+        if load:
+            self.load()
+
+    def create(self, coords, next_level, locks):
+        product = Door(self.flyweight, coords, next_level, locks)
+        for group in self.groups:
+            group.add(product)
+        return product
+
+    def load(self):
+        if self.flyweight is None:
+            self.flyweight = DoorFlyweight()
+
+    def unload(self):
+        self.flyweight = None
+
+
+class DoorFlyweight:
+    def __init__(self):
+        self.DOOR_OPENED_SPRITE = pygame.image.load("assets/images/door_opened.png").convert_alpha()
+        self.DOOR_LOCKED_SPRITE = pygame.image.load("assets/images/door_locked.png").convert_alpha()
+        self.LOCK_SPRITE = pygame.image.load("assets/images/lock.png").convert_alpha()
+        self.KEY_TURN_SOUND = pygame.mixer.Sound('assets/sounds/shiny_item_pickup.wav')
+        self.OPENED_SOUND = pygame.mixer.Sound('assets/sounds/gate_open.wav')
+
+
+class Door(base.AdvancedSprite, interface.Interactive):
+    def __init__(self, flyweight, coords, next_level, locks):
+        base.AdvancedSprite.__init__(self)
+        interface.Interactive.__init__(self)
+        self.flyweight = flyweight
+        self.max_locks = locks
+        self.locks = locks
+        self.next_level = next_level
+        self.locked = True
+        self.coords = coords
+        self.rect = pygame.Rect(coords[0], coords[1] - 100, 100, 100)
+        self.y = self.rect.bottom
+
+    def draw(self, screen, window):
+        if self.locked:
+            rect = screen.blit(self.flyweight.DOOR_LOCKED_SPRITE, (self.rect.x - window.x, self.rect.y - window.y))
+            for i in range(self.locks):
+                screen.blit(self.flyweight.LOCK_SPRITE,
+                            (self.rect.x - window.x + i * self.flyweight.LOCK_SPRITE.get_width(),
+                             self.rect.y - window.y + 60))
+            return rect
+        return screen.blit(self.flyweight.DOOR_OPENED_SPRITE, (self.rect.x - window.x, self.rect.y - window.y))
+
+    def interact(self, who):
+        if abs(const.V_UP.angle_to(who.face)) < 90 and \
+                (who.rect.right > self.rect.left or
+                 who.rect.left < self.rect.right) and \
+                who.rect.top < self.rect.bottom:
+            if self.locked:
+                if self.locks == 0:
+                    self.locked = False
+                    who.surprise_me(10)
+                    self.flyweight.OPENED_SOUND.play()
+                elif who.keys >= 1:
+                    who.keys -= 1
+                    self.locks -= 1
+                    self.flyweight.KEY_TURN_SOUND.play()
+                    who.key_hud.makeup()
+
+            else:
+                who.game.reset_level(self.next_level)
+
+
 class WallFactory:
     def __init__(self, *groups):
         self.groups = groups
