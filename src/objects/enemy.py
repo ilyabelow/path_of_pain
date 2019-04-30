@@ -125,7 +125,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
     def drop_key(self):
         if self.has_key:
-            self.game.key_factory.create(self.pos, self.face)
+            self.game.key_factory.create((self.pos.x, self.pos.y), self.face)
             self.has_key = False
 
     def move(self):
@@ -165,7 +165,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
 
     def move_when_chasing(self):
         dist = self.pos - self.game.player.pos
-        self.face = -dist.normalize()  # TODO fix problem with normalizing
+        self.face = -dist.normalize()  # TODO fix problem with normalizing 0 vector
         if dist.length() > self.flyweight.unchase_radius or not self.game.player.alive():
             self.idle = True
             self.moving = False

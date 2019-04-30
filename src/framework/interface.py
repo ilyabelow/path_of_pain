@@ -82,6 +82,7 @@ class Tired:
         return self.stamina >= desired
 
 
+# TODO remove (because it is UGLY) and make similar functionality elsewhere
 class Bleeding:
     def __init__(self, group, one_dir_stats, all_dir_stats, color):
         self.all_dir_stats = all_dir_stats
@@ -129,7 +130,7 @@ class Pickuping:
                 p.kill()
                 self.do_pickup(p)
 
-    # TODO BAD INTERFACE
+    # TODO BAD INTERFACE >:(
     def do_pickup(self, what):
         pass
 
@@ -139,7 +140,7 @@ class Pickuping:
 
 # TODO all common properties of Player and Enemy is bunched up here, needs disassembling to DIFFERENT interfaces (how?)
 class Moving:
-    def __init__(self, pos, collide_with, dash_stats, back_dash_stats):
+    def __init__(self, coords, collide_with, dash_stats, back_dash_stats):
         # TODO unpack dash stats
         self.back_dash_stats = back_dash_stats
         self.dash_stats = dash_stats
@@ -147,7 +148,7 @@ class Moving:
         self.collide_with = collide_with
         self.face = const.V_LEFT.rotate(random.randint(-180, 180))
 
-        self.pos = pygame.Vector2(pos)
+        self.pos = pygame.Vector2(coords)
         self.speed = const.V_ZERO
 
         # TODO make up better way to state if the object is moving. This field is used in SOME cases

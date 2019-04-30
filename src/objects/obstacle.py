@@ -147,7 +147,7 @@ class BoxFlyweight:
 
 # TODO make this class more general to allow different boxes: jars, skulls, etc
 class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
-    def __init__(self, flyweight, game, pos):
+    def __init__(self, flyweight, game, coords):
         base.AdvancedSprite.__init__(self)
         interface.Healthy.__init__(self, random.randint(1, 3), None, flyweight.BOX_BREAK_SOUNDS, None)
         interface.Bleeding.__init__(
@@ -157,7 +157,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
             flyweight.BLEED_ALL_DIR_STATS,
             const.C_BOX
         )  # TODO square blood
-        self.rect = pygame.Rect(*pos, 50, 35)
+        self.rect = pygame.Rect(*coords, 50, 35)
         self.game = game
         self.flyweight = flyweight
         self.enemy_factory = game.enemy_factory
@@ -183,7 +183,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         # BOX ACTION
         if self.mode == BoxType.HEALTH:
             # move(10, 10) to center out the heart
-            self.game.heart_factory.create(self.rect.move(10, 10))
+            self.game.heart_factory.create(self.rect.move(10, 10)[:2])
         if self.mode == BoxType.ENEMY:
             newborn_enemy = self.enemy_factory.create(self.rect[:2])
             newborn_enemy.stun(15)

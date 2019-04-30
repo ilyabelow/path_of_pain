@@ -5,9 +5,10 @@ from src.framework import base, const
 
 class HUDFlyweight:
     def __init__(self):
-        self.KEYS_POS = (30, 180)
-        self.HEARTS_POS = (30, 30)
-        self.STAMINA_POS = (30, 120)
+        # TODO remove this somewhere in a more appropriate palce I guess
+        self.KEYS_COORDS = (30, 180)
+        self.HEARTS_COORDS = (30, 30)
+        self.STAMINA_COORDS = (30, 120)
 
         self.HEART_SPRITE = pygame.image.load("assets/images/heart.png").convert_alpha()
         self.HEART_EMPTY_SPRITE = pygame.image.load("assets/images/heart_empty.png").convert_alpha()
@@ -17,17 +18,17 @@ class HUDFlyweight:
 
 
 class HUD(base.AdvancedSprite):
-    def __init__(self, flyweight, owner, pos):
+    def __init__(self, flyweight, owner, coords):
         base.AdvancedSprite.__init__(self)
         self.flyweight = flyweight
         self.y = const.HUD_Y
         self.image = None
-        self.pos = pos
+        self.coords = coords
         self.owner = owner
         self.makeup()
 
     def draw(self, screen, window):
-        return screen.blit(self.image, self.pos)
+        return screen.blit(self.image, self.coords)
 
     def makeup(self):
         pass
@@ -35,7 +36,7 @@ class HUD(base.AdvancedSprite):
 
 class HealthHUD(HUD):
     def __init__(self, flyweight, owner):
-        HUD.__init__(self, flyweight, owner, flyweight.HEARTS_POS)
+        HUD.__init__(self, flyweight, owner, flyweight.HEARTS_COORDS)
 
     def makeup(self):
         # IMAGE COMPOSING
@@ -51,7 +52,7 @@ class HealthHUD(HUD):
 
 class KeyHUD(HUD):
     def __init__(self, flyweight, owner):
-        HUD.__init__(self, flyweight, owner, flyweight.KEYS_POS)
+        HUD.__init__(self, flyweight, owner, flyweight.KEYS_COORDS)
 
     def makeup(self):
         # IMAGE COMPOSING
@@ -65,7 +66,7 @@ class KeyHUD(HUD):
 # TODO redesign those big ugly circles
 class StaminaHUD(HUD):
     def __init__(self, flyweight, owner):
-        HUD.__init__(self, flyweight, owner, flyweight.STAMINA_POS)
+        HUD.__init__(self, flyweight, owner, flyweight.STAMINA_COORDS)
 
     def makeup(self):
         self.image = pygame.Surface((self.flyweight.STAMINA_SPRITE.get_width() * self.owner.max_stamina,

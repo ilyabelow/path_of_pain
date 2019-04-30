@@ -61,7 +61,6 @@ class Sword(base.AdvancedSprite):
 
         self.move()
 
-
     def swing(self):
         if self.next_swing_clock.is_not_running and self.owner.stamina_available(self.flyweight.STAMINA_COST):
             self.next_swing_clock.wind_up(self.flyweight.SWING_WAIT)

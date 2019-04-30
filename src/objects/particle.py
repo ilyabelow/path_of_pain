@@ -5,19 +5,19 @@ import pygame
 from src.framework import base, clock, const
 
 
-# TODO particle factory (really useful!)
+# TODO particle factory (it will really useful here!)
 
 # TODO make base class for particles
 
 # TODO rename and make more general?
 class Blood(base.AdvancedSprite):
-    def __init__(self, position, speed, size, fadeout, color):
+    def __init__(self, pos, speed, size, fadeout, color):
         base.AdvancedSprite.__init__(self)
         # TODO more customisable blood
         self.color = color
         self.speed = speed
         self.fadeout = fadeout
-        self.pos = position
+        self.pos = pos
         self.size = size
 
     def update(self, *args):
