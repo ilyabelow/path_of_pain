@@ -6,12 +6,14 @@ from src.framework import const
 
 
 def init(game):
+    # RESET ALL GROUPS
     for v in dir(game):
         if v.rfind('_group') != -1:
             getattr(game, v).empty()
-    # TODO better switch-case
     if game.room_num == 1:
+        keys_on_level = 5
         # TODO shortcut for factory loadings
+        # LOAD NEEDED AND UNLOADED REDUNDANT FACTORIES
         game.enemy_factory.load()
         game.box_factory.load()
         game.hud_factory.load()
@@ -31,6 +33,7 @@ def init(game):
         pygame.mixer.music.set_volume(const.MUSIC_NORMAL_VOLUME)
         pygame.mixer.music.play(loops=-1)
 
+        # BOXES GENERATION
         boxes_coords = (200, 200), (250, 200), (250, 250), (200, 350), (1300, 700), (1350, 750), (1450, 750), (
             2400, 200), (2400, 400), (2450, 400), (2650, 350), (2400, 500), (2400, 700), (2500, 400), (
                            2600, 300), (2600, 600), (2700, 400), (2500, 550), (2550, 500), (200, 650), (200, 700), (
@@ -42,17 +45,21 @@ def init(game):
                            1800, 1750), (2050, 1700)
         for coords in boxes_coords:
             game.box_factory.create(coords)
+
+        # ENEMIES GENERATION
         enemies_coords = (500, 1300), (900, 1300), (500, 1300), (900, 1300), (500, 1600), (900, 1600), (700, 1450), \
                          (1700, 450), (2200, 450), (2850, 150), (2850, 750), (2100, 1200), (2100, 1500), (
                              1800, 1500), \
                          (2450, 1600), (2500, 1600), (2450, 1550), (2500, 1550)
         for coords in enemies_coords:
             game.enemy_factory.create(coords)
-        game.door_factory.create((1450, 125), 2, 5)
-        distribute_keys(game, 5)
+        distribute_keys(game, keys_on_level)
+        # DOOR GENERATION
+        game.door_factory.create((1450, 125), 2, keys_on_level)
         game.title = '{}STAGE ONE'.format(game.painful * 'PAINFUL ')
 
         # TODO redo walls input because now it is DISGUSTING
+        # 5th number in a tuple is height, if there are 4 values, height is default
         # vertical center walls
         walls_rects = (1400, 900, 200, 500), (1400, 1600, 200, 300), (
             # horizontal center walls
@@ -69,7 +76,8 @@ def init(game):
         # PLAYER INITIALIZING
         game.player = game.player_factory.create((400, 300))
     if game.room_num == 2:
-        # TODO shortcut for factory loadings
+        # TODO unite level generation?
+        # see comment above
         game.enemy_factory.load()
         game.box_factory.unload()
         game.hud_factory.load()
@@ -81,8 +89,6 @@ def init(game):
         game.level_rect = pygame.Rect(0, 0, *const.RESOLUTION)
         game.title = 'FALSE {}MASTER'.format(game.painful * 'PAIN ')
 
-        # MUSIC INITIALIZATION
-        # TODO proper music controller
         if game.painful:
             pygame.mixer.music.load('assets/sounds/S87-168 Nightmare Grimm.wav')
         else:
@@ -107,13 +113,12 @@ def init(game):
             100, const.RESOLUTION[1], const.RESOLUTION[0] - 200, 100), (
             0, 0, 100, const.RESOLUTION[1] + 100), (const.RESOLUTION[0] - 100, 0, 100, const.RESOLUTION[1] + 100)
         for wall in walls_rects:
-            game.wall_factory.create(wall[:4], wall[-1] if len(wall) == 5 else 50)  # TODO remove this bodge
-
-        # PLAYER INITIALIZING
+            game.wall_factory.create(wall[:4], wall[-1] if len(wall) == 5 else 50)
         game.player = game.player_factory.create((const.RESOLUTION[0] / 2, const.RESOLUTION[1] - 300))
     if game.room_num == 3:
         print('yay you win now get out')
         game.to_main_menu()
+
 
 def distribute_keys(game, keys):
     if len(game.enemy_group) < keys:
