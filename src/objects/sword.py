@@ -59,6 +59,9 @@ class Sword(base.AdvancedSprite):
         self.next_swing_clock = clock.Clock()
         self.clock_ticker = clock.ClockTicker(self)
 
+        self.move()
+
+
     def swing(self):
         if self.next_swing_clock.is_not_running and self.owner.stamina_available(self.flyweight.STAMINA_COST):
             self.next_swing_clock.wind_up(self.flyweight.SWING_WAIT)
@@ -82,12 +85,15 @@ class Sword(base.AdvancedSprite):
             if wall is not None:
                 self.flyweight.CLING_SOUND.play()
 
-    def update(self):
-        self.clock_ticker.tick_all()
+    def move(self):
         if self.current_swing_clock.is_not_running():
             self.pos = self.owner.pos + self.owner.face.rotate(90) * (80 * self.right_hand - 40)
         else:
             self.pos = self.owner.pos + self.owner.face * 70
+
+    def update(self):
+        self.clock_ticker.tick_all()
+        self.move()
         self.fetch_layer(self.owner.pos.y)  # TODO make better layer calculation
 
     def draw(self, screen, window):

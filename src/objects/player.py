@@ -159,7 +159,7 @@ class Player(base.AdvancedSprite,
         self.sword.kill()
         self.kill()
         self.bleed_all_dir(self.pos)
-        pygame.mixer.music.fadeout(const.MUSIC_FADE_OUT)
+        pygame.mixer.music.fadeout(const.MUSIC_FADE_OUT_DEATH)
 
     def on_ok_health(self, who):
         self.throw_back((self.pos - who.pos).normalize(),

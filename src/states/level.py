@@ -66,13 +66,52 @@ def init(game):
             game.wall_factory.create(wall[:4], wall[-1] if len(wall) == 5 else 50)  # TODO remove this bodge
 
         # PLAYER INITIALIZING
-
         game.player = game.player_factory.create((400, 300))
-        game.player.fetch_screen()
     if game.room_num == 2:
-        print("yay you won now get out")
-        game.to_main_menu()
+        # TODO shortcut for factory loadings
+        game.enemy_factory.load()
+        game.box_factory.unload()
+        game.hud_factory.load()
+        game.sword_factory.load()
+        game.key_factory.unload()
+        game.heart_factory.unload()
+        game.player_factory.load()
+        game.door_factory.load()
+        game.level_rect = pygame.Rect(0, 0, *const.RESOLUTION)
 
+        # MUSIC INITIALIZATION
+        # TODO proper music controller
+        if game.painful:
+            pygame.mixer.music.load('assets/sounds/S87-168 Nightmare Grimm.wav')
+        else:
+            pygame.mixer.music.load('assets/sounds/S82-115 Grimm.wav')
+        pygame.mixer.music.set_volume(const.MUSIC_NORMAL_VOLUME)
+        pygame.mixer.music.play(loops=-1)
+
+        boss = game.enemy_factory.create((const.RESOLUTION[0] / 2, const.RESOLUTION[1] / 2))
+
+        # TODO OMG this bodge is SO DIRTY please, me, build proper architecture ALREADY I CAN'T STAND THIS ANYMORE
+        def on_zero_health(who):
+            boss.bleed_all_dir(boss.pos)
+            boss.game.player.surprise_me(30)
+            win_sound = pygame.mixer.Sound('assets/sounds/secret_discovered_temp.wav')
+            win_sound.play()
+            boss.game.door_factory.create((const.RESOLUTION[0] / 2 - 50, 125), 3, 0)
+            boss.game.wall_factory.create((const.RESOLUTION[0] / 2 - 100, 0, 200, 100), 130)
+            pygame.mixer.music.fadeout(const.MUSIC_FADE_OUT_WIN)
+            boss.kill()
+        boss.on_zero_health = on_zero_health
+        walls_rects = (100, 0, const.RESOLUTION[0] - 200, 100), (
+            100, const.RESOLUTION[1], const.RESOLUTION[0] - 200, 100), (
+            0, 0, 100, const.RESOLUTION[1] + 100), (const.RESOLUTION[0] - 100, 0, 100, const.RESOLUTION[1] + 100)
+        for wall in walls_rects:
+            game.wall_factory.create(wall[:4], wall[-1] if len(wall) == 5 else 50)  # TODO remove this bodge
+
+        # PLAYER INITIALIZING
+        game.player = game.player_factory.create((const.RESOLUTION[0] / 2, const.RESOLUTION[1] - 300))
+    if game.room_num == 3:
+        print('yay you win now get out')
+        game.to_main_menu()
 
 def distribute_keys(game, keys):
     if len(game.enemy_group) < keys:

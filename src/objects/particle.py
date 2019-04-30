@@ -82,9 +82,10 @@ class Fade(base.AdvancedSprite):
     def draw(self, screen, window):
         image = pygame.Surface(const.RESOLUTION).convert_alpha()
         if self.to_black:
-            image.fill((0, 0, 0, 255 * ((self.duration - self.clock.how_much_is_left() - 1) / self.duration)))
+            # TODO remove bodge with abs()
+            image.fill((0, 0, 0, 255 * (abs(self.duration - self.clock.how_much_is_left()) / self.duration)))
         else:
-            image.fill((0, 0, 0, int(255 * ((self.clock.how_much_is_left() + 1) / self.duration))))
+            image.fill((0, 0, 0, int(255 * (abs(self.clock.how_much_is_left()) / self.duration))))
         return screen.blit(image, (0, 0))
 
 

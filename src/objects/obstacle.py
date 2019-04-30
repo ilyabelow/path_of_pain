@@ -67,11 +67,12 @@ class Door(base.AdvancedSprite, interface.Interactive):
             if self.locked:
                 if self.locks == 0:
                     self.locked = False
-                    who.surprise_me(10)
                     self.flyweight.OPENED_SOUND.play()
                 elif who.keys >= 1:
                     who.keys -= 1
                     self.locks -= 1
+                    if self.locks == 0:
+                        who.surprise_me(10)
                     self.flyweight.KEY_TURN_SOUND.play()
                     who.key_hud.makeup()
 
@@ -99,7 +100,7 @@ class Wall(base.AdvancedSprite):
         self.image.fill((137, 107, 77))
         self.rect = rect
         pygame.draw.rect(self.image, (117, 90, 63), (0, rect.h + base_height, rect.w, height))
-        self.y = rect.y
+        self.y = rect.centery  # TODO workout a better solution
         self.height = height
 
     def draw(self, screen, window):
