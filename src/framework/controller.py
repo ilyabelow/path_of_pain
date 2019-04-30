@@ -121,3 +121,6 @@ class Keyboard(Controller):
 
     def check_back_dash(self):
         return pygame.key.get_pressed()[pygame.K_a]
+
+    def check_interact(self):
+        return pygame.key.get_pressed()[pygame.K_f]
