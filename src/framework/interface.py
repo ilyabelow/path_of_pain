@@ -67,15 +67,13 @@ class Tired:
         self.stamina = max_stamina
         self.rest_clock = clock.Clock(self.stamina_rest, rest_speed)
 
-    # TODO fool proofing?
     def stamina_rest(self):
         self.stamina += 1
         if self.stamina >= self.max_stamina:
-            self.rest_clock.hard_stop()
+            self.rest_clock.stop()
         else:
             self.rest_clock.wind_up()
 
-    # TODO fool proofing?
     def stamina_drain(self, cost):
         self.stamina -= cost
         self.rest_clock.wind_up()
@@ -113,7 +111,7 @@ class Bleeding:
                                           self.color))
 
 
-# TODO move some functionality here?
+# TODO move some functionality here???????
 class Pickupable:
     def __init__(self):
         pass
@@ -131,7 +129,7 @@ class Pickuping:
                 p.kill()
                 self.do_pickup(p)
 
-    # TODO BAD INTERFACE???
+    # TODO BAD INTERFACE
     def do_pickup(self, what):
         pass
 
@@ -139,10 +137,9 @@ class Pickuping:
         pass
 
 
-# TODO all common properties of Player and Anemy is bunched up here, needs disassembling to DIFFERENT interfaces
+# TODO all common properties of Player and Enemy is bunched up here, needs disassembling to DIFFERENT interfaces (how?)
 class Moving:
     def __init__(self, pos, collide_with, dash_stats, back_dash_stats):
-        # TODO remove dull inits??? (we have to init fields in init}
         # TODO unpack dash stats
         self.back_dash_stats = back_dash_stats
         self.dash_stats = dash_stats

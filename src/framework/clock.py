@@ -1,4 +1,3 @@
-# love this class
 class Clock:
     def __init__(self, when_end=None, start_time=0):
         self.time = -1
@@ -26,7 +25,7 @@ class Clock:
     def is_running(self):
         return self.time >= 0
 
-    def hard_stop(self):
+    def stop(self):
         self.time = -1
 
     def soft_stop(self):

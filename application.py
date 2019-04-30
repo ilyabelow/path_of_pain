@@ -7,7 +7,6 @@ from src.states.menu import Menu
 # Context for STATE PATTERN
 class Application:
     def __init__(self):
-        # TODO stop sound from lagging as much
         pygame.mixer.pre_init(22050, -16, 8, 64)
         pygame.init()
         pygame.mouse.set_visible(False)
