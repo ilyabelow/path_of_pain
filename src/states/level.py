@@ -114,7 +114,16 @@ def init(game):
             0, 0, 100, const.RESOLUTION[1] + 100), (const.RESOLUTION[0] - 100, 0, 100, const.RESOLUTION[1] + 100)
         for wall in walls_rects:
             game.wall_factory.create(wall[:4], wall[-1] if len(wall) == 5 else 50)
+        # TODO do not recreate player each time
+        # wtf did I just wrote
+        health = -1
+        if game.player is not None:
+            health = game.player.health
+        # I hate myself
         game.player = game.player_factory.create((const.RESOLUTION[0] / 2, const.RESOLUTION[1] - 300))
+        if health != -1:
+            game.player.health = health
+            game.player.health_hud.makeup()
     if game.room_num == 3:
         print('yay you win now get out')
         game.to_main_menu()
