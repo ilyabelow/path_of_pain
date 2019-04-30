@@ -11,9 +11,6 @@ from src.states import menu, level
 class Game(State):
     def __init__(self, painful=False):
         State.__init__(self)
-        self.painful = painful
-        self.window = pygame.display.get_surface().get_rect()
-
         # TODO move level storage into another entity? or is it a little bit on an overstretch?
         # GROUPS INITIALIZATION
         self.render_group = base.AdvancedLayeredUpdates()
@@ -40,29 +37,39 @@ class Game(State):
         self.door_factory = obstacle.DoorFactory(self.interactive_group)
         self.fade_factory = particle.FadeFactory(self.particle_group)
         self.title_factory = particle.TitleFactory(self.particle_group)
-        # LEVEL INITIALIZATION
-        self.level_rect = None
-        self.player = None
-
+        # CONTROLLER INITIALIZATION
         if pygame.joystick.get_count() == 0:
             self.input_method = controller.Keyboard()
         else:
             self.input_method = controller.Joystick()
+        # ADDITIONAL LEVEL INITIALIZATION
+        # TODO sort there out
+        self.painful = painful
+        self.level_rect = None
+        self.player = None
         self.title = None
         self.room_num = 1  # tee hee
+        self.please_do_reset = False
+        # DRAWING TOOLS INITIALIZATION
         self.prev_rect = None
-
+        self.window = pygame.display.get_surface().get_rect()
+        # SET UP LEVEL
         self.do_reset_level()
 
     def to_main_menu(self):
         self.app.switch_state(menu.Menu())
 
+    # TODO sort out all these RESETS (may be good naming system will help)
     def reset_level(self, room_num=None):
         self.room_num = room_num if room_num is not None else self.room_num
-        self.fade_out(self.do_reset_level)
+        self.fade_out(self.mark_level_reset)
+
+    def mark_level_reset(self):
+        self.please_do_reset = True
 
     def do_reset_level(self):
         level.init(self)
+        self.please_do_reset = False
         self.prev_rect = [self.window]
         self.fade_factory.create(const.GAME_FADE_IN, False, self.deploy_logo)
 
@@ -71,9 +78,11 @@ class Game(State):
         pygame.mixer.fadeout(const.GAME_FADE_OUT)
         pygame.mixer.music.fadeout(const.GAME_FADE_OUT * const.FRAME_RATE)
 
+    # TODO refactor these, for real though ^ >:(
+
     def deploy_logo(self):
-        # TODO remove naming plug
         title_font = pygame.font.Font("assets/fonts/augustus.ttf", 100)
+        # TODO not bodge-like outline drawing
         title = title_font.render(self.title, 10, const.C_BLACK)
         title.blit(title_font.render(self.title, 10, const.C_BLACK), (-1, 0))
         title.blit(title_font.render(self.title, 10, const.C_BLACK), (1, 0))
@@ -99,21 +108,24 @@ class Game(State):
             if event.type == pygame.QUIT:  # hard quit
                 pygame.quit()
 
-        # UPDATING (order matters?)
-        # TODO it should be guaranteed that in one of these updates level will not be reset
+        # UPDATING
+        # TODO think if order matters
         self.pickupable_group.update()
         self.player_group.update()
         self.hitter_group.update()
         self.enemy_group.update()
-        self.particle_group.update()  # <------ here goes level reset => fall
+        self.particle_group.update()
+
+        # not bad, ok solution! :P
+        if self.please_do_reset:  # actual level reset is performed after everything is updated
+            self.do_reset_level()
 
     def draw(self):
-        # DRAWING
         screen = pygame.display.get_surface()
-        # see what areas are updating
-        # screen.fill(const.C_BLACK, (0, 0, *const.RESOLUTION))
+        # screen.fill(const.C_BLACK, (0, 0, *const.RESOLUTION)) #  see what areas are updating
         for r in self.prev_rect:
             screen.fill(const.C_BACKGROUND, r)
+        # TODO don't draw objects that are not on screen (COMPLICATED)
         rect = self.render_group.draw_all(screen, self.window)
         pygame.display.update()
         self.prev_rect.clear()
