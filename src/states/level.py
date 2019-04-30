@@ -50,6 +50,7 @@ def init(game):
             game.enemy_factory.create(coords)
         game.door_factory.create((1450, 125), 2, 5)
         distribute_keys(game, 5)
+        game.title = '{}STAGE ONE'.format(game.painful * 'PAINFUL ')
 
         # TODO redo walls input because now it is DISGUSTING
         # vertical center walls
@@ -78,6 +79,7 @@ def init(game):
         game.player_factory.load()
         game.door_factory.load()
         game.level_rect = pygame.Rect(0, 0, *const.RESOLUTION)
+        game.title = 'FALSE {}MASTER'.format(game.painful * 'PAIN ')
 
         # MUSIC INITIALIZATION
         # TODO proper music controller

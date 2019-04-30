@@ -100,17 +100,17 @@ class TitleFactory:
     def __init__(self, group):
         self.group = group
 
-    def create(self, filename, state_durations):
-        product = Title(filename, state_durations)
+    def create(self, image, state_durations):
+        product = Title(image, state_durations)
         self.group.add(product)
         return product
 
 
 # TODO make customizable positioning?
 class Title(base.AdvancedSprite):
-    def __init__(self, filename, state_durations):
+    def __init__(self, image, state_durations):
         base.AdvancedSprite.__init__(self)
-        self.image = pygame.image.load(filename)
+        self.image = image
         self.stage = TitleState.WAIT
         self.state_durations = state_durations
         self.clock = clock.Clock(self.next_stage)

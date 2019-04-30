@@ -48,9 +48,10 @@ class Game(State):
             self.input_method = controller.Keyboard()
         else:
             self.input_method = controller.Joystick()
-
+        self.title = None
         self.room_num = 1  # tee hee
         self.prev_rect = None
+
         self.do_reset_level()
 
     def to_main_menu(self):
@@ -72,7 +73,14 @@ class Game(State):
 
     def deploy_logo(self):
         # TODO remove naming plug
-        self.title_factory.create('assets/images/{}_level{}.png'.format(1, self.painful * '_painful'), (5, 20, 30, 20))
+        title_font = pygame.font.Font("assets/fonts/augustus.ttf", 100)
+        title = title_font.render(self.title, 10, const.C_BLACK)
+        title.blit(title_font.render(self.title, 10, const.C_BLACK), (-1, 0))
+        title.blit(title_font.render(self.title, 10, const.C_BLACK), (1, 0))
+        title.blit(title_font.render(self.title, 10, const.C_BLACK), (0, -1))
+        title.blit(title_font.render(self.title, 10, const.C_BLACK), (0, 1))
+        title.blit(title_font.render(self.title, 10, const.C_RED), (0, 0))
+        self.title_factory.create(title, (5, 20, 30, 20))
 
     def update(self):
         # EVENT HANDLING (Now it is just exiting, hmm)
