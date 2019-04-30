@@ -24,7 +24,7 @@ class Game(State):
         self.obstacle_group = base.AdvancedGroup(self.render_group)
         self.player_group = base.AdvancedGroup(self.render_group)
         self.interactive_group = base.AdvancedGroup(self.render_group)
-
+        self.fade_group = base.AdvancedGroup(self.render_group)
         # FACTORIES INITIALIZATION
         self.enemy_factory = enemy.EnemyFactory(self, self.enemy_group, self.hittable_group)
         self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group)
@@ -35,7 +35,7 @@ class Game(State):
         self.heart_factory = pickupable.HeartFactory(self.pickupable_group)
         self.player_factory = player.PlayerFactory(self, self.player_group)
         self.door_factory = obstacle.DoorFactory(self.interactive_group)
-        self.fade_factory = particle.FadeFactory(self.particle_group)
+        self.fade_factory = particle.FadeFactory(self.fade_group)
         self.title_factory = particle.TitleFactory(self.particle_group)
         # CONTROLLER INITIALIZATION
         if pygame.joystick.get_count() == 0:
@@ -94,6 +94,8 @@ class Game(State):
     def update(self):
         # EVENT HANDLING (Now it is just exiting, hmm)
         for event in pygame.event.get():
+            if self.fade_group.__len__() != 0:
+                break
             # TODO move to controller!!! and rewrite Controller to listen to events from queue
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -115,6 +117,7 @@ class Game(State):
         self.hitter_group.update()
         self.enemy_group.update()
         self.particle_group.update()
+        self.fade_group.update()
 
         # not bad, ok solution! :P
         if self.please_do_reset:  # actual level reset is performed after everything is updated

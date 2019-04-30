@@ -2,7 +2,7 @@ from enum import Enum
 
 import pygame
 
-from src.framework import const
+from src.framework import const, base
 from src.framework.base import State
 from src.framework.const import Button
 from src.objects import particle
@@ -15,21 +15,26 @@ class Option(Enum):
     EXIT = 2
 
 
-class TitleSprite(pygame.sprite.Sprite):
+class TitleSprite(base.AdvancedSprite):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
+        base.AdvancedSprite.__init__(self)
         title_font = pygame.font.Font("assets/fonts/augustus.ttf", 128)
         self.image = title_font.render("Path of Pain", 10, const.C_RED)
         self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2, centery=200)
+        self.y = const.HUD_Y
+
+    def draw(self, screen, offset):
+        return screen.blit(self.image, self.rect)
 
 
-class OptionSprite(pygame.sprite.Sprite):
+class OptionSprite(base.AdvancedSprite):
     def __init__(self, menu, option):
-        pygame.sprite.Sprite.__init__(self)
+        base.AdvancedSprite.__init__(self)
         self.menu = menu
         self.option = option
         self.image = None
         self.rect = None
+        self.y = const.HUD_Y
 
     def update(self):
         if self.menu.option == self.option:
@@ -41,6 +46,9 @@ class OptionSprite(pygame.sprite.Sprite):
             self.image = option_font.render(self.option.name.replace('_', ' '), 10, const.C_RED)
         self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2,
                                         centery=const.RESOLUTION[1] / 2 + self.option.value * 100 - 100)
+
+    def draw(self, screen, offset):
+        return screen.blit(self.image, self.rect)
 
 
 class Menu(State):
@@ -54,28 +62,33 @@ class Menu(State):
         self.OK_SOUND = pygame.mixer.Sound('assets/sounds/ui_button_confirm.wav')
 
         # OPTION AND TITLE INIT
-        self.title_group = pygame.sprite.GroupSingle(TitleSprite())
-        self.option_group = pygame.sprite.OrderedUpdates()
+        self.render_group = base.AdvancedLayeredUpdates()
+        self.title_group = base.AdvancedGroup(self.render_group)
+        self.option_group = base.AdvancedGroup(self.render_group)
+        self.fade_group = base.AdvancedGroup(self.render_group)
+
+        self.title_group.add(TitleSprite())
         for i in Option:
             self.option_group.add(OptionSprite(self, i))
         self.blood = pygame.image.load('assets/images/menu_blood.png')
         # STATE INIT
         self.option = Option.PLAY
         self.option_group.update()
-        self.fade = particle.Fade(const.MENU_FADE_IN, False)  # TODO move somehow fade to group
+        self.fade_factory = particle.FadeFactory(self.fade_group)
+        self.fade_factory.create(const.MENU_FADE_IN, False)
 
     def draw(self):
         screen = pygame.display.get_surface()
         screen.fill(const.C_BLACK)
         screen.blit(self.blood, self.blood.get_rect(bottom=const.RESOLUTION[1], right=const.RESOLUTION[0]))
-        self.title_group.draw(screen)
-        self.option_group.draw(screen)
-        self.fade.draw(screen, None)
+        self.render_group.draw_all(screen, None)
         pygame.display.update()
 
     def update(self):
         # TODO move to controller? change controller?
         for event in pygame.event.get():
+            if self.fade_group.__len__() != 0:
+                break
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DOWN:
                     self.shift_option(+1)
@@ -97,10 +110,10 @@ class Menu(State):
                     self.shift_option(1)
                 if event.value[1] == 1:
                     self.shift_option(-1)
-        self.fade.update()
+        self.fade_group.update()
 
     def select_option(self):
-        self.fade = particle.Fade(const.MENU_FADE_OUT, True, self.confirm_selection)
+        self.fade_factory.create(const.MENU_FADE_OUT, True, self.confirm_selection)
         pygame.mixer.music.fadeout(const.MENU_FADE_OUT * const.FRAME_RATE)
         self.OK_SOUND.play()
 

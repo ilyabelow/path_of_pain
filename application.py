@@ -1,11 +1,13 @@
 import pygame
-from src.states.menu import Menu
+
 from src.framework import const
+from src.states.menu import Menu
 
 
 # Context for STATE PATTERN
 class Application:
     def __init__(self):
+        # TODO stop sound from lagging as much
         pygame.mixer.pre_init(22050, -16, 8, 64)
         pygame.init()
         pygame.mouse.set_visible(False)
@@ -39,6 +41,7 @@ class Application:
 
     def stop(self):
         self.running = False
+        self.switched = True  # It will not be redrawn right after stopping
 
 
 def main():

@@ -56,7 +56,7 @@ class FadeFactory:
     def __init__(self, group):
         self.group = group
 
-    def create(self, duration, to_black, when_stops):
+    def create(self, duration, to_black, when_stops=None):
         product = Fade(duration, to_black, when_stops)
         self.group.add(product)
         return product
@@ -85,7 +85,7 @@ class Fade(base.AdvancedSprite):
             # TODO remove bodge with abs()
             image.fill((0, 0, 0, 255 * (abs(self.duration - self.clock.how_much_is_left()) / self.duration)))
         else:
-            image.fill((0, 0, 0, int(255 * (abs(self.clock.how_much_is_left()) / self.duration))))
+            image.fill((0, 0, 0, 255 * (abs(self.clock.how_much_is_left()) / self.duration)))
         return screen.blit(image, (0, 0))
 
 

@@ -1,6 +1,6 @@
-import pygame
 from enum import Enum
 
+import pygame
 
 # TODO separate framerate and game ticks
 FRAME_RATE = 30
@@ -49,9 +49,9 @@ C_GOLDEN = (255, 215, 0)
 
 # FADE
 GAME_FADE_IN = 10
-GAME_FADE_OUT = 10
-MENU_FADE_IN = 30
-MENU_FADE_OUT = 30
+GAME_FADE_OUT = 20
+MENU_FADE_IN = 10
+MENU_FADE_OUT = 20
 
 # SPETIAL LAYERS
 IMP_PARTICLE_Y = 3000

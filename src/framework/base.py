@@ -17,9 +17,10 @@ class AdvancedSprite(pygame.sprite.Sprite):
                 if isinstance(g, AdvancedLayeredUpdates):
                     self.drawing_group = g
                     break
+        # y is None is used for static objects that does not change layers
         if y is not None:
             self.y = y
-        self.drawing_group.change_layer(self, self.y // 50)
+        self.drawing_group.change_layer(self, self.y // 50)  # TODO // 50? may be not?
 
 
 # TODO rethink what is written below. can give unexpected results!!!!!
