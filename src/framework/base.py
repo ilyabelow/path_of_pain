@@ -145,9 +145,19 @@ class State:
         self.app = None
 
     def update(self):
+        """
+        Update all objects that are held in the state
+
+        :return: None
+        """
         pass
 
     def draw(self):
+        """
+        Draw all objects that are held in the state
+
+        :return: None
+        """
         pass
 
     # TODO shared method to fade in/out

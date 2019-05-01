@@ -1,3 +1,5 @@
+"""Module with different interfaces that implement extra object behaviour"""
+
 import random
 
 import pygame
@@ -6,6 +8,8 @@ from src.framework import clock, const
 
 
 class Healthy:
+    """Interface for objects with health"""
+
     def __init__(self,
                  max_health,
                  heal_sounds=None,
@@ -60,6 +64,8 @@ class Healthy:
 
 
 class Tired:
+    """Interface for objects with stamina"""
+
     def __init__(self, max_stamina, rest_speed):
         self.rest_speed = rest_speed
         self.max_stamina = max_stamina
@@ -83,6 +89,8 @@ class Tired:
 
 # TODO remove (because it is UGLY) and make similar functionality elsewhere
 class Bleeding:
+    """Interface for shortcut for bleeding in two modes - in one direction and in all directions"""
+
     def __init__(self, factory, one_dir_stats, all_dir_stats, color):
         self.all_dir_stats = all_dir_stats
         self.one_dir_stats = one_dir_stats
@@ -111,11 +119,18 @@ class Bleeding:
 
 # TODO move some functionality here???????
 class Pickupable:
+    """Interface for objects that can be picked up"""
+
     def __init__(self):
         pass
 
 
+# TODO strong connection between these two ^ v
+
+# TODO remove may be?
 class Pickuping:
+    """Interface for objects that can pick up other objects"""
+
     def __init__(self, what_to_pickup):
         self.what_to_pickup = what_to_pickup
 
@@ -137,6 +152,8 @@ class Pickuping:
 
 # TODO all common properties of Player and Enemy is bunched up here, needs disassembling to DIFFERENT interfaces (how?)
 class Moving:
+    """Interface for objects that perform complex movement"""
+
     def __init__(self, coords, collide_with, dash_stats, back_dash_stats):
         # TODO unpack dash stats
         self.back_dash_stats = back_dash_stats
@@ -221,6 +238,7 @@ class Moving:
 
 
 class Interactive:
+    """Interface for objects that can be interacted with"""
     def __init__(self):
         pass
 
