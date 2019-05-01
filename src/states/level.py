@@ -12,7 +12,7 @@ def init(game):
             getattr(game, v).empty()
     if game.room_num == 1:
         keys_on_level = 5
-        # TODO shortcut for factory loadings
+        # TODO shortcut for factory loadings (THERE ARE NOT ALL THE FACTORIES!!!!!)
         # LOAD NEEDED AND UNLOADED REDUNDANT FACTORIES
         game.enemy_factory.load()
         game.box_factory.load()
@@ -22,6 +22,7 @@ def init(game):
         game.heart_factory.load()
         game.player_factory.load()
         game.door_factory.load()
+
         game.level_rect = pygame.Rect(0, 0, 3000, 2000)
 
         # MUSIC INITIALIZATION

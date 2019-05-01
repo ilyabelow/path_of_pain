@@ -152,7 +152,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         interface.Healthy.__init__(self, random.randint(1, 3), None, flyweight.BOX_BREAK_SOUNDS, None)
         interface.Bleeding.__init__(
             self,
-            game.particle_group,
+            game.blood_factory,
             flyweight.BLEED_ONE_DIR_STATS,
             flyweight.BLEED_ALL_DIR_STATS,
             const.C_BOX

@@ -5,9 +5,18 @@ import pygame
 from src.framework import base, clock, const
 
 
-# TODO particle factory (it will really useful here!)
+# TODO make template factories for different blood (abstract factory may be? bridge? WHO KNOWS???)
 
-# TODO make base class for particles
+class BloodFactory:
+    def __init__(self, *groups):
+        self.groups = groups
+
+    def create(self, pos, speed, size, fadeout, color):
+        product = Blood(pos, speed, size, fadeout, color)
+        for group in self.groups:
+            group.add(product)
+        return product
+
 
 # TODO rename and make more general?
 class Blood(base.AdvancedSprite):

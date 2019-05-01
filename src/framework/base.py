@@ -17,6 +17,8 @@ class AdvancedSprite(pygame.sprite.Sprite):
                 if isinstance(g, AdvancedLayeredUpdates):
                     self.drawing_group = g
                     break
+            else:
+                raise BaseException('AdvancedSprite must be added to AdvancedLayeredUpdates')
         # y is None is used for static objects that does not change layers
         if y is not None:
             self.y = y

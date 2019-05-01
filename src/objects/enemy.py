@@ -89,7 +89,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         )
         interface.Bleeding.__init__(
             self,
-            game.particle_group,
+            game.blood_factory,
             flyweight.BLEED_ONE_DIR_STATS,
             flyweight.BLEED_ALL_DIR_STATS,
             const.C_RED

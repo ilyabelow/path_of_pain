@@ -3,7 +3,6 @@ import random
 import pygame
 
 from src.framework import clock, const
-from src.objects import particle
 
 
 class Healthy:
@@ -84,32 +83,30 @@ class Tired:
 
 # TODO remove (because it is UGLY) and make similar functionality elsewhere
 class Bleeding:
-    def __init__(self, group, one_dir_stats, all_dir_stats, color):
+    def __init__(self, factory, one_dir_stats, all_dir_stats, color):
         self.all_dir_stats = all_dir_stats
         self.one_dir_stats = one_dir_stats
-        self.group = group
+        self.factory = factory
         self.color = color
 
     def bleed_one_dir(self, pos, main_direction):
         for i in range(self.one_dir_stats['amount']):
             direction = main_direction.rotate(
                 random.randint(-self.one_dir_stats['splash'], self.one_dir_stats['splash']))
-            self.group.add(particle.Blood(pos + direction * self.one_dir_stats['offset'],
-                                          direction * self.one_dir_stats['speed'],
-                                          random.randint(self.one_dir_stats['sizes'][0],
-                                                         self.one_dir_stats['sizes'][1]),
-                                          self.one_dir_stats['fade'],
-                                          self.color))
+            self.factory.create(pos + direction * self.one_dir_stats['offset'],
+                                direction * self.one_dir_stats['speed'],
+                                random.randint(self.one_dir_stats['sizes'][0], self.one_dir_stats['sizes'][1]),
+                                self.one_dir_stats['fade'],
+                                self.color)
 
     def bleed_all_dir(self, pos):
         for i in range(self.all_dir_stats['amount']):
             direction = const.V_LEFT.rotate(random.randint(-180, 180))
-            self.group.add(particle.Blood(pos + direction * self.all_dir_stats['offset'],
-                                          direction * self.all_dir_stats['speed'],
-                                          random.randint(self.all_dir_stats['sizes'][0],
-                                                         self.all_dir_stats['sizes'][1]),
-                                          self.all_dir_stats['fade'],
-                                          self.color))
+            self.factory.create(pos + direction * self.all_dir_stats['offset'],
+                                direction * self.all_dir_stats['speed'],
+                                random.randint(self.all_dir_stats['sizes'][0], self.all_dir_stats['sizes'][1]),
+                                self.all_dir_stats['fade'],
+                                self.color)
 
 
 # TODO move some functionality here???????
