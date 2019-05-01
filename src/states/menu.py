@@ -15,26 +15,21 @@ class Option(Enum):
     EXIT = 2
 
 
-class TitleSprite(base.AdvancedSprite):
+class TitleSprite(pygame.sprite.Sprite):
     def __init__(self):
-        base.AdvancedSprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self)
         title_font = pygame.font.Font("assets/fonts/augustus.ttf", 128)
         self.image = title_font.render("Path of Pain", 10, const.C_RED)
         self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2, centery=200)
-        self.y = const.HUD_Y
-
-    def draw(self, screen, offset):
-        return screen.blit(self.image, self.rect)
 
 
-class OptionSprite(base.AdvancedSprite):
+class OptionSprite(pygame.sprite.Sprite):
     def __init__(self, menu, option):
-        base.AdvancedSprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self)
         self.menu = menu
         self.option = option
         self.image = None
         self.rect = None
-        self.y = const.HUD_Y
 
     def update(self):
         if self.menu.option == self.option:
@@ -46,9 +41,6 @@ class OptionSprite(base.AdvancedSprite):
             self.image = option_font.render(self.option.name.replace('_', ' '), 10, const.C_RED)
         self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2,
                                         centery=const.RESOLUTION[1] / 2 + self.option.value * 100 - 100)
-
-    def draw(self, screen, offset):
-        return screen.blit(self.image, self.rect)
 
 
 class Menu(State):
@@ -63,18 +55,19 @@ class Menu(State):
 
         # OPTION AND TITLE INIT
         self.render_group = base.AdvancedLayeredUpdates()
-        self.title_group = base.AdvancedGroup(self.render_group)
-        self.option_group = base.AdvancedGroup(self.render_group)
-        self.fade_group = base.AdvancedGroup(self.render_group)
+        self.title_group = pygame.sprite.GroupSingle()
+        self.option_group = pygame.sprite.Group()
+        self.fade_group = pygame.sprite.GroupSingle()
 
         self.title_group.add(TitleSprite())
         for i in Option:
             self.option_group.add(OptionSprite(self, i))
+        self.render_group.add(*self.title_group.sprites(), *self.option_group.sprites())
         self.blood = pygame.image.load('assets/images/menu_blood.png')
         # STATE INIT
         self.option = Option.PLAY
         self.option_group.update()
-        self.fade_factory = particle.FadeFactory(self.fade_group)
+        self.fade_factory = particle.FadeFactory(self.fade_group, self.render_group)
         self.fade_factory.create(const.MENU_FADE_IN, False)
 
     def draw(self):

@@ -53,12 +53,13 @@ class Exclamation(base.AdvancedSprite):
 
 
 class FadeFactory:
-    def __init__(self, group):
-        self.group = group
+    def __init__(self, *groups):
+        self.groups = groups
 
     def create(self, duration, to_black, when_stops=None):
         product = Fade(duration, to_black, when_stops)
-        self.group.add(product)
+        for group in self.groups:
+            group.add(product)
         return product
 
 
@@ -97,12 +98,13 @@ class TitleState(Enum):
 
 
 class TitleFactory:
-    def __init__(self, group):
-        self.group = group
+    def __init__(self, *groups):
+        self.groups = groups
 
     def create(self, image, state_durations):
         product = Title(image, state_durations)
-        self.group.add(product)
+        for group in self.groups:
+            group.add(product)
         return product
 
 

@@ -23,8 +23,6 @@ class AdvancedSprite(pygame.sprite.Sprite):
         self.drawing_group.change_layer(self, self.y // 50)  # TODO // 50? may be not?
 
 
-# TODO rethink what is written below. can give unexpected results!!!!!
-
 class AdvancedLayeredUpdates(pygame.sprite.LayeredUpdates):
     def __init__(self, *sprites):
         pygame.sprite.LayeredUpdates.__init__(self, *sprites)
@@ -37,7 +35,12 @@ class AdvancedLayeredUpdates(pygame.sprite.LayeredUpdates):
         init_rect = self._init_rect
         for spr in self.sprites():
             rec = spritedict[spr]
-            newrect = spr.draw(surface, window)  # <---------------------- code insertion here
+            # it will try to use more specialized method for drawing sprites if there is one,
+            # otherwise it will use standard method
+            if hasattr(spr, 'draw'):
+                newrect = spr.draw(surface, window)  # <---------------------- code insertion here
+            else:
+                newrect = surface.blit(spr.image, spr.rect)  # TODO add window support somewhere?
             if rec is init_rect:
                 dirty_append(newrect)
             else:
@@ -48,6 +51,7 @@ class AdvancedLayeredUpdates(pygame.sprite.LayeredUpdates):
                     dirty_append(rec)
             spritedict[spr] = newrect
         return dirty
+
 
     def add(self, *sprites, **kwargs):
         if not sprites:
@@ -61,7 +65,8 @@ class AdvancedLayeredUpdates(pygame.sprite.LayeredUpdates):
                 if not self.has_internal(sprite):
                     self.add_internal(sprite, layer)
                     sprite.add_internal(self)
-                    sprite.fetch_layer()  # <--------------------------- code insertion here
+                    if hasattr(sprite, 'fetch_layer'):  # can add non-Advanced sprites
+                        sprite.fetch_layer()  # <--------------------------- code insertion here
             else:
                 try:
                     self.add(*sprite, **kwargs)
@@ -73,34 +78,6 @@ class AdvancedLayeredUpdates(pygame.sprite.LayeredUpdates):
                                 spr.add_internal(self)
                     elif not self.has_internal(sprite):
                         self.add_internal(sprite, layer)
-                        sprite.add_internal(self)
-
-
-class AdvancedGroup(pygame.sprite.Group):
-    def __init__(self, render_group=None):
-        self.render_group = render_group
-        pygame.sprite.Group.__init__(self)
-
-    def add(self, *sprites):
-        for sprite in sprites:
-            if isinstance(sprite, AdvancedSprite):
-                if not self.has_internal(sprite):
-                    self.add_internal(sprite)
-                    sprite.add_internal(self)
-                    # TODO deleting sprite from particular group = undefined behaviour
-                    if self.render_group is not None:
-                        self.render_group.add(sprite)  # <----------------------------------- code insertion here
-            else:
-                try:
-                    self.add(*sprite)
-                except (TypeError, AttributeError):
-                    if hasattr(sprite, '_spritegroup'):
-                        for spr in sprite.sprites():
-                            if not self.has_internal(spr):
-                                self.add_internal(spr)
-                                spr.add_internal(self)
-                    elif not self.has_internal(sprite):
-                        self.add_internal(sprite)
                         sprite.add_internal(self)
 
 
