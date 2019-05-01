@@ -1,3 +1,4 @@
+"""Module with some application-wide constants"""
 from enum import Enum
 
 import pygame
@@ -53,13 +54,14 @@ GAME_FADE_OUT = 10
 MENU_FADE_IN = 10
 MENU_FADE_OUT = 20
 
-# SPETIAL LAYERS
+# SPECIAL LAYERS
 IMP_PARTICLE_Y = 3000
 HUD_Y = 4000
 FADE_Y = 5000
 
 # TODO tune
 # TODO make proper music box
+# MUSIC STATS
 MUSIC_NORMAL_VOLUME = 0.3
 MUSIC_MUTED_VOLUME = 0.15
 MUSIC_FADE_OUT_DEATH = 2500
