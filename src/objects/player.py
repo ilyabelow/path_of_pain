@@ -48,12 +48,12 @@ class PlayerFlyweight:
                                     'offset': 100}
         self.BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1, 'offset': 0}
 
-        self.health = 5
-        self.move_speed = 12
-        self.invulnerability_duration = 25
-        self.throwback_length = 144
-        self.throwback_speed = 36
-        self.stun_duration = 8
+        self.MAX_HEALTH = 5
+        self.MOVE_SPEED = 12
+        self.INVULNERABILITY_DURATION = 25
+        self.THROWBACK_LENGTH = 144
+        self.THROWBACK_SPEED = 36
+        self.STUN_DURATION = 8
 
 
 class Player(base.AdvancedSprite,
@@ -68,11 +68,11 @@ class Player(base.AdvancedSprite,
         interface.Moving.__init__(self, coords, game.obstacle_group, flyweight.DASH_STATS, flyweight.BACK_DASH_STATS)
         interface.Healthy.__init__(
             self,
-            flyweight.health if not game.painful else 1,
+            flyweight.MAX_HEALTH if not game.painful else 1,
             [flyweight.HEAL_SOUND],
             [flyweight.HIT_SOUND],
             [flyweight.DEATH_SOUND],
-            20
+            flyweight.INVULNERABILITY_DURATION
         )
         interface.Pickuping.__init__(self, game.pickupable_group)
         interface.Bleeding.__init__(
@@ -126,7 +126,7 @@ class Player(base.AdvancedSprite,
                 self.start_stepping()
             else:
                 self.stop_stepping()
-            self.speed = self.face * self.moving * self.flyweight.move_speed
+            self.speed = self.face * self.moving * self.flyweight.MOVE_SPEED
         if self.speed:
             self.move_and_collide()
         self.fetch_screen()
@@ -163,9 +163,9 @@ class Player(base.AdvancedSprite,
 
     def on_ok_health(self, who):
         self.throw_back((self.pos - who.pos).normalize(),
-                        self.flyweight.throwback_speed,
-                        self.flyweight.throwback_length,
-                        self.flyweight.stun_duration)
+                        self.flyweight.THROWBACK_SPEED,
+                        self.flyweight.THROWBACK_LENGTH,
+                        self.flyweight.STUN_DURATION)
         self.can_be_moved = False
 
     def after_healing(self):
