@@ -38,7 +38,9 @@ class Game(State):
         self.door_factory = obstacle.DoorFactory(self.interactive_group, self.render_group)
         self.fade_factory = particle.FadeFactory(self.fade_group, self.render_group)
         self.title_factory = particle.TitleFactory(self.particle_group, self.render_group)
+        # TODO move these to associated classes => do not store them in Game
         self.blood_factory = particle.BloodFactory(self.particle_group, self.render_group)
+        self.exclamation_factory = particle.ExclamationFactory(self.particle_group, self.render_group)
         # CONTROLLER INITIALIZATION
         if pygame.joystick.get_count() == 0:
             self.input_method = controller.Keyboard()

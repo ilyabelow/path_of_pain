@@ -3,7 +3,7 @@ import random
 import pygame
 
 from src.framework import base, clock, interface, const
-from src.objects import particle, pickupable
+from src.objects import pickupable
 
 
 class EnemyFactory:
@@ -153,8 +153,8 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         if dist and dist.length() < self.flyweight.chase_radius and self.game.player.alive():
             self.spot_clock.wind_up()
             self.speed = const.V_ZERO
-            self.game.particle_group.add(
-                particle.Exclamation(self.pos + const.V_RIGHT.rotate(-45) * 40, 10))  # ! will be place to upper-right
+            # ! will be place to upper-right
+            self.game.exclamation_factory.create(self.pos + const.V_RIGHT.rotate(-45) * 40, 10)
             random.choice(self.flyweight.STARTLE_SOUNDS).play()
             self.drop_key()
             self.face = -dist.normalize()

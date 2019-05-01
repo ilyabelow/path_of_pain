@@ -21,7 +21,7 @@ class HUD(base.AdvancedSprite):
     def __init__(self, flyweight, owner, coords):
         base.AdvancedSprite.__init__(self)
         self.flyweight = flyweight
-        self.y = const.HUD_Y
+        self.postponed_fetch_layer(const.HUD_Y)
         self.image = None
         self.coords = coords
         self.owner = owner

@@ -44,13 +44,24 @@ class Blood(base.AdvancedSprite):
         return screen.blit(image, (self.pos.x - window.x, self.pos.y - window.y))
 
 
+class ExclamationFactory:
+    def __init__(self, *groups):
+        self.groups = groups
+
+    def create(self, pos, lifetime):
+        product = Exclamation(pos, lifetime)
+        for group in self.groups:
+            group.add(product)
+        return product
+
+
 class Exclamation(base.AdvancedSprite):
     def __init__(self, pos, lifetime):
         base.AdvancedSprite.__init__(self)
         font = pygame.font.Font(None, 80)
         self.image = font.render("!", 3, const.C_BLACK)
         self.rect = self.image.get_rect(centerx=pos.x, centery=pos.y)
-        self.y = const.IMP_PARTICLE_Y
+        self.postponed_fetch_layer(const.IMP_PARTICLE_Y)
         self.clock = clock.Clock(self.kill, lifetime)
         self.clock.wind_up()
 
@@ -79,7 +90,7 @@ class Fade(base.AdvancedSprite):
             when_stops = self.kill
         self.to_black = to_black
         self.duration = duration
-        self.y = const.FADE_Y
+        self.postponed_fetch_layer(const.FADE_Y)
         self.clock = clock.Clock(when_stops, duration)
         self.clock.wind_up()
 
@@ -126,7 +137,7 @@ class Title(base.AdvancedSprite):
         self.state_durations = state_durations
         self.clock = clock.Clock(self.next_stage)
         self.clock.wind_up(self.state_durations[self.stage.value])
-        self.y = const.HUD_Y
+        self.postponed_fetch_layer(const.IMP_PARTICLE_Y)
 
     def update(self):
         self.clock.tick()

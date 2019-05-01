@@ -47,7 +47,7 @@ class Door(base.AdvancedSprite, interface.Interactive):
         self.locked = True
         self.coords = coords
         self.rect = pygame.Rect(coords[0], coords[1] - 100, 100, 100)
-        self.y = self.rect.bottom
+        self.postponed_fetch_layer(self.rect.bottom)
 
     def draw(self, screen, window):
         if self.locked:
@@ -100,7 +100,7 @@ class Wall(base.AdvancedSprite):
         self.image.fill((137, 107, 77))
         self.rect = rect
         pygame.draw.rect(self.image, (117, 90, 63), (0, rect.h + base_height, rect.w, height))
-        self.y = rect.centery  # TODO workout a better solution
+        self.postponed_fetch_layer(rect.centery)  # TODO workout a better solution
         self.height = height
 
     def draw(self, screen, window):
@@ -169,7 +169,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
             self.mode = BoxType.ENEMY
         else:
             self.mode = BoxType.EMPTY
-        self.y = self.rect.y
+        self.postponed_fetch_layer(self.rect.y)
 
     def on_ok_health(self, who):
         pos = pygame.Vector2((self.rect.centerx, self.rect.centery - (self.health - 1) * 15))
