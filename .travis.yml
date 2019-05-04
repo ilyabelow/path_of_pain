@@ -1,4 +1,16 @@
+# This project is written on python indeed
 language: python
+# I run it on python3.4 on my machine so test it on 3.4 I guess
 python:
   - "3.4"
+# command to install dependencies
+# I know it's is default, I want to state it explicitly
+install:
+  - pip install -r requirements.txt
+# Plug
 script: echo "Hello World!"
+# notify commiter on EVERY build
+notifications:
+  email:
+    on_success: always
+    on_failure: always
