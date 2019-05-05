@@ -9,6 +9,12 @@ Simple top view slasher build on pygame
 | keyboard  | arrows  | None |s  |  d |  a | f | Esc | Tab  | 
 |  gamepad | LS  | RS  |X  | A  | B | Y | Back  | Start  | 
 
+Works best with gamepad
+
 ### Launching the game
 
-> pygame3 path_of_pain/launch.py
+> python3 launch.py
+
+### Installing via pip
+
+Still in development
