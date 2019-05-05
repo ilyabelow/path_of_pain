@@ -1,12 +1,14 @@
 # Path of Pain
 
-the best game ever
+Simple top view slasher build on pygame
 
-## Controls (outdated)
+### Controls
 
-|   | move  |  attack |  dash | backdash  | interact | exit  |  restart | switch mode  |
-| :------------: | :------------: | :------------: | :------------: | :------------:| :------------: | :------------: | :------------: | :------------: |
-| keyboard  | arrows  | s  |  d |  a | f | Esc | Tab  | p  |
-|  gamepad | LS  | X  | A  | B | Y | Back  | Start  |  Home |
+|    | move  | look around |  attack |  dash | backdash  | interact | exit/menu  |  restart |
+| :------------: | :------------: |:------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: |
+| keyboard  | arrows  | None |s  |  d |  a | f | Esc | Tab  | 
+|  gamepad | LS  | RS  |X  | A  | B | Y | Back  | Start  | 
 
-> TODO: better README.md
+### Launching the game
+
+> pygame3 path_of_pain/launch.py
