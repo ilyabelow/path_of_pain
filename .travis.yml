@@ -7,7 +7,7 @@ python:
 # I know it's is default, I want to state it explicitly
 install:
   - pip install -r requirements.txt
-  - pip install --user --upgrade setuptools wheel twine
+  - pip install setuptools wheel twine
 # Plug
 script:
   - python3 setup.py sdist bdist_wheel
