@@ -41,12 +41,3 @@ class Application:
     def stop(self):
         self.running = False
         self.switched = True  # It will not be redrawn right after stopping
-
-
-def main():
-    app = Application()
-    app.run()
-
-
-if __name__ == '__main__':
-    main()
