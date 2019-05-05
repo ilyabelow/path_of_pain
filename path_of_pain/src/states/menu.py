@@ -2,11 +2,12 @@ from enum import Enum
 
 import pygame
 
-from src.framework import const, base
-from src.framework.base import State
-from src.framework.const import Button
-from src.objects import particle
-from src.states import game
+from path_of_pain.src.framework import base
+from path_of_pain.src.framework import const
+from path_of_pain.src.framework.base import State
+from path_of_pain.src.framework.const import Button
+from path_of_pain.src.objects import particle
+from path_of_pain.src.states import game
 
 
 class Option(Enum):
@@ -18,8 +19,8 @@ class Option(Enum):
 class TitleSprite(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        title_font = pygame.font.Font("assets/fonts/augustus.ttf", 128)
-        self.image = title_font.render("Path of Pain", 10, const.C_RED)
+        title_font = pygame.font.Font(const.FNT_PATH + 'augustus.ttf', 128)
+        self.image = title_font.render('Path of Pain', 10, const.C_RED)
         self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2, centery=200)
 
 
@@ -33,11 +34,11 @@ class OptionSprite(pygame.sprite.Sprite):
 
     def update(self):
         if self.menu.option == self.option:
-            option_font = pygame.font.Font("assets/fonts/augustus.ttf", 42)
+            option_font = pygame.font.Font(const.FNT_PATH + 'augustus.ttf', 42)
             # Bodge with '_' -> ' '
             self.image = option_font.render(self.option.name.replace('_', ' '), 10, const.C_GOLDEN)
         else:
-            option_font = pygame.font.Font("assets/fonts/augustus.ttf", 36)
+            option_font = pygame.font.Font(const.FNT_PATH + 'augustus.ttf', 36)
             self.image = option_font.render(self.option.name.replace('_', ' '), 10, const.C_RED)
         self.rect = self.image.get_rect(centerx=const.RESOLUTION[0] / 2,
                                         centery=const.RESOLUTION[1] / 2 + self.option.value * 100 - 100)
@@ -47,11 +48,11 @@ class Menu(State):
     def __init__(self):
         State.__init__(self)
         # LOAD SOUND
-        pygame.mixer.music.load('assets/sounds/S59-55 Final Stage 3.wav')
+        pygame.mixer.music.load(const.SND_PATH + 'S59-55 Final Stage 3.wav')
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(1)
-        self.CHANGE_SOUND = pygame.mixer.Sound('assets/sounds/ui_change_selection.wav')
-        self.OK_SOUND = pygame.mixer.Sound('assets/sounds/ui_button_confirm.wav')
+        self.CHANGE_SOUND = pygame.mixer.Sound(const.SND_PATH + 'ui_change_selection.wav')
+        self.OK_SOUND = pygame.mixer.Sound(const.SND_PATH + 'ui_button_confirm.wav')
 
         # OPTION AND TITLE INIT
         self.render_group = base.AdvancedLayeredUpdates()
@@ -63,7 +64,7 @@ class Menu(State):
         for i in Option:
             self.option_group.add(OptionSprite(self, i))
         self.render_group.add(*self.title_group.sprites(), *self.option_group.sprites())
-        self.blood = pygame.image.load('assets/images/menu_blood.png')
+        self.blood = pygame.image.load(const.IMG_PATH + 'menu_blood.png')
         # STATE INIT
         self.option = Option.PLAY
         self.option_group.update()

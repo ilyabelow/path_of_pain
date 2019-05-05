@@ -2,7 +2,8 @@ from enum import Enum
 
 import pygame
 
-from src.framework import base, clock, const
+from path_of_pain.src.framework import base, clock
+from path_of_pain.src.framework import const
 
 
 # TODO make template factories for different blood (abstract factory may be? bridge? WHO KNOWS???)

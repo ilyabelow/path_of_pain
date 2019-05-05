@@ -2,7 +2,7 @@ import random
 
 import pygame
 
-from src.framework import const
+from path_of_pain.src.framework import const
 
 
 def init(game):
@@ -28,9 +28,9 @@ def init(game):
         # MUSIC INITIALIZATION
         # TODO proper music controller
         if game.painful:
-            pygame.mixer.music.load('assets/sounds/Furious_Gods.wav')
+            pygame.mixer.music.load(const.SND_PATH + 'Furious_Gods.wav')
         else:
-            pygame.mixer.music.load('assets/sounds/Gods_and_Glory.wav')
+            pygame.mixer.music.load(const.SND_PATH + 'Gods_and_Glory.wav')
         pygame.mixer.music.set_volume(const.MUSIC_NORMAL_VOLUME)
         pygame.mixer.music.play(loops=-1)
 
@@ -91,9 +91,9 @@ def init(game):
         game.title = 'FALSE {}MASTER'.format(game.painful * 'PAIN ')
 
         if game.painful:
-            pygame.mixer.music.load('assets/sounds/S87-168 Nightmare Grimm.wav')
+            pygame.mixer.music.load(const.SND_PATH + 'S87-168 Nightmare Grimm.wav')
         else:
-            pygame.mixer.music.load('assets/sounds/S82-115 Grimm.wav')
+            pygame.mixer.music.load(const.SND_PATH + 'S82-115 Grimm.wav')
         pygame.mixer.music.set_volume(const.MUSIC_NORMAL_VOLUME)
         pygame.mixer.music.play(loops=-1)
 
@@ -103,7 +103,7 @@ def init(game):
         def on_zero_health(who):
             boss.bleed_all_dir(boss.pos)
             boss.game.player.surprise_me(30)
-            win_sound = pygame.mixer.Sound('assets/sounds/secret_discovered_temp.wav')
+            win_sound = pygame.mixer.Sound(const.SND_PATH + 'secret_discovered_temp.wav')
             win_sound.play()
             boss.game.door_factory.create((const.RESOLUTION[0] / 2 - 50, 125), 3, 0)
             boss.game.wall_factory.create((const.RESOLUTION[0] / 2 - 100, 0, 200, 100), 130)
@@ -112,7 +112,8 @@ def init(game):
         boss.on_zero_health = on_zero_health
         walls_rects = (100, 0, const.RESOLUTION[0] - 200, 100), (
             100, const.RESOLUTION[1], const.RESOLUTION[0] - 200, 100), (
-            0, 0, 100, const.RESOLUTION[1] + 100), (const.RESOLUTION[0] - 100, 0, 100, const.RESOLUTION[1] + 100)
+                          0, 0, 100, const.RESOLUTION[1] + 100), (
+                          const.RESOLUTION[0] - 100, 0, 100, const.RESOLUTION[1] + 100)
         for wall in walls_rects:
             game.wall_factory.create(wall[:4], wall[-1] if len(wall) == 5 else 50)
         # TODO do not recreate player each time
@@ -132,7 +133,7 @@ def init(game):
 
 def distribute_keys(game, keys):
     if len(game.enemy_group) < keys:
-        raise BaseException("um there is not enough enemies to distribute so much keys")
+        raise BaseException('um there is not enough enemies to distribute so much keys')
     while keys > 0:
         en = random.choice(game.enemy_group.sprites())
         if not en.has_key:

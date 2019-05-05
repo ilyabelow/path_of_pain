@@ -2,7 +2,8 @@ import random
 
 import pygame
 
-from src.framework import base, clock, const
+from path_of_pain.src.framework import base, clock
+from path_of_pain.src.framework import const
 
 
 class SwordFactory:
@@ -28,11 +29,11 @@ class SwordFactory:
 
 class SwordFlyweight:
     def __init__(self):
-        self.SPRITE = pygame.image.load("assets/images/sword.png").convert_alpha()
-        self.SWANG_SPRITE = pygame.image.load("assets/images/sword_swang.png").convert_alpha()
+        self.SPRITE = pygame.image.load(const.IMG_PATH + 'sword.png').convert_alpha()
+        self.SWANG_SPRITE = pygame.image.load(const.IMG_PATH + 'sword_swang.png').convert_alpha()
 
-        self.SWING_SOUNDS = [pygame.mixer.Sound('assets/sounds/sword_{}.wav'.format(i + 1)) for i in range(5)]
-        self.CLING_SOUND = pygame.mixer.Sound('assets/sounds/sword_hit_reject.wav')
+        self.SWING_SOUNDS = [pygame.mixer.Sound(const.SND_PATH + 'sword_{}.wav'.format(i + 1)) for i in range(5)]
+        self.CLING_SOUND = pygame.mixer.Sound(const.SND_PATH + 'sword_hit_reject.wav')
 
         self.SWING_WAIT = 3
         self.SWING_DURATION = 9
@@ -41,7 +42,7 @@ class SwordFlyweight:
 
 
 # TODO projectiles!
-# TODO base class with better name then "hitter"
+# TODO base class with better name then 'hitter'
 class Sword(base.AdvancedSprite):
     def __init__(self, flyweight, owner):
         super(Sword, self).__init__()

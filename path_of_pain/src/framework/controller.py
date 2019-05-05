@@ -1,7 +1,7 @@
 """Module with different implementations of player controlling. Btw needs to be rewritten"""
 import pygame
 
-from src.framework.const import Button, Axis
+from path_of_pain.src.framework.const import Button, Axis
 
 
 class Controller:

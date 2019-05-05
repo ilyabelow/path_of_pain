@@ -1,6 +1,7 @@
 import pygame
 
-from src.framework import base, const
+from path_of_pain.src.framework import base
+from path_of_pain.src.framework import const
 
 
 class HUDFlyweight:
@@ -10,11 +11,11 @@ class HUDFlyweight:
         self.HEARTS_COORDS = (30, 30)
         self.STAMINA_COORDS = (30, 120)
 
-        self.HEART_SPRITE = pygame.image.load("assets/images/heart.png").convert_alpha()
-        self.HEART_EMPTY_SPRITE = pygame.image.load("assets/images/heart_empty.png").convert_alpha()
-        self.STAMINA_SPRITE = pygame.image.load("assets/images/stamina_full.png").convert_alpha()
-        self.STAMINA_EMPTY_SPRITE = pygame.image.load("assets/images/stamina_empty.png").convert_alpha()
-        self.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()
+        self.HEART_SPRITE = pygame.image.load(const.IMG_PATH + 'heart.png').convert_alpha()
+        self.HEART_EMPTY_SPRITE = pygame.image.load(const.IMG_PATH + 'heart_empty.png').convert_alpha()
+        self.STAMINA_SPRITE = pygame.image.load(const.IMG_PATH + 'stamina_full.png').convert_alpha()
+        self.STAMINA_EMPTY_SPRITE = pygame.image.load(const.IMG_PATH + 'stamina_empty.png').convert_alpha()
+        self.KEY_SPRITE = pygame.image.load(const.IMG_PATH + 'key.png').convert_alpha()
 
 
 class HUD(base.AdvancedSprite):

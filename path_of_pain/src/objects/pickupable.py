@@ -2,7 +2,8 @@ import random
 
 import pygame
 
-from src.framework import base, clock, interface, const
+from path_of_pain.src.framework import base, clock
+from path_of_pain.src.framework import interface, const
 
 
 class HeartFactory:
@@ -28,7 +29,7 @@ class HeartFactory:
 
 class HeartFlyweight:
     def __init__(self):
-        self.LITTLE_HEART_SPRITE = pygame.image.load("assets/images/little_heart.png").convert_alpha()
+        self.LITTLE_HEART_SPRITE = pygame.image.load(const.IMG_PATH + 'little_heart.png').convert_alpha()
 
 
 class Heart(base.AdvancedSprite, interface.Pickupable):
@@ -72,7 +73,7 @@ class KeyFactory:
 
 class KeyFlyweight:
     def __init__(self):
-        self.KEY_SPRITE = pygame.image.load("assets/images/key.png").convert_alpha()
+        self.KEY_SPRITE = pygame.image.load(const.IMG_PATH + 'key.png').convert_alpha()
 
 
 class Key(base.AdvancedSprite, interface.Pickupable):

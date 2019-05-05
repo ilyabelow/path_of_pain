@@ -3,7 +3,8 @@ from enum import Enum
 
 import pygame
 
-from src.framework import base, interface, const
+from path_of_pain.src.framework import base
+from path_of_pain.src.framework import interface, const
 
 
 class DoorFactory:
@@ -29,11 +30,11 @@ class DoorFactory:
 
 class DoorFlyweight:
     def __init__(self):
-        self.DOOR_OPENED_SPRITE = pygame.image.load("assets/images/door_opened.png").convert_alpha()
-        self.DOOR_LOCKED_SPRITE = pygame.image.load("assets/images/door_locked.png").convert_alpha()
-        self.LOCK_SPRITE = pygame.image.load("assets/images/lock.png").convert_alpha()
-        self.KEY_TURN_SOUND = pygame.mixer.Sound('assets/sounds/shiny_item_pickup.wav')
-        self.OPENED_SOUND = pygame.mixer.Sound('assets/sounds/gate_open.wav')
+        self.DOOR_OPENED_SPRITE = pygame.image.load(const.IMG_PATH + 'door_opened.png').convert_alpha()
+        self.DOOR_LOCKED_SPRITE = pygame.image.load(const.IMG_PATH + 'door_locked.png').convert_alpha()
+        self.LOCK_SPRITE = pygame.image.load(const.IMG_PATH + 'lock.png').convert_alpha()
+        self.KEY_TURN_SOUND = pygame.mixer.Sound(const.SND_PATH + 'shiny_item_pickup.wav')
+        self.OPENED_SOUND = pygame.mixer.Sound(const.SND_PATH + 'gate_open.wav')
 
 
 class Door(base.AdvancedSprite, interface.Interactive):
@@ -137,9 +138,9 @@ class BoxFactory:
 
 class BoxFlyweight:
     def __init__(self):
-        self.BOX_SPRITE = pygame.image.load("assets/images/box.png").convert_alpha()
+        self.BOX_SPRITE = pygame.image.load(const.IMG_PATH + 'box.png').convert_alpha()
 
-        self.BOX_BREAK_SOUNDS = [pygame.mixer.Sound('assets/sounds/breakable_wall_hit_{}.wav'.format(i + 1))
+        self.BOX_BREAK_SOUNDS = [pygame.mixer.Sound(const.SND_PATH + 'breakable_wall_hit_{}.wav'.format(i + 1))
                                  for i in range(2)]
         self.BLEED_ONE_DIR_STATS = {'amount': 5, 'splash': 45, 'fade': 2, 'sizes': [10, 15], 'speed': 6, 'offset': 10}
         self.BLEED_ALL_DIR_STATS = {'amount': 15, 'fade': 2, 'sizes': [15, 20], 'speed': 6, 'offset': 0}

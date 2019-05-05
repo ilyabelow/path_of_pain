@@ -4,7 +4,8 @@ import random
 
 import pygame
 
-from src.framework import clock, const
+from path_of_pain.src.framework import clock
+from path_of_pain.src.framework import const
 
 
 class Healthy:

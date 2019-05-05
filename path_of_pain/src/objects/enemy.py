@@ -2,8 +2,9 @@ import random
 
 import pygame
 
-from src.framework import base, clock, interface, const
-from src.objects import pickupable
+from path_of_pain.src.framework import base, clock, const
+from path_of_pain.src.framework import interface
+from path_of_pain.src.objects import pickupable
 
 
 class EnemyFactory:
@@ -31,24 +32,24 @@ class EnemyFactory:
 class EnemyFlyweight:
     def __init__(self):
         # TEXTURES
-        self.STUNNED_SPRITE = pygame.image.load("assets/images/enemy_stunned.png").convert_alpha()
-        self.SURPRISED_SPRITE = pygame.image.load("assets/images/enemy_surprised.png").convert_alpha()
-        self.SPRITE = pygame.image.load("assets/images/enemy.png").convert_alpha()
-        self.KEY_TAKEN_SPRITE = pygame.image.load("assets/images/key_taken.png").convert_alpha()
+        self.STUNNED_SPRITE = pygame.image.load(const.IMG_PATH + 'enemy_stunned.png').convert_alpha()
+        self.SURPRISED_SPRITE = pygame.image.load(const.IMG_PATH + 'enemy_surprised.png').convert_alpha()
+        self.SPRITE = pygame.image.load(const.IMG_PATH + 'enemy.png').convert_alpha()
+        self.KEY_TAKEN_SPRITE = pygame.image.load(const.IMG_PATH + 'key_taken.png').convert_alpha()
 
         # SOUNDS
-        self.DASH_SOUND = pygame.mixer.Sound('assets/sounds/ruin_fat_sentry_sword.wav')
+        self.DASH_SOUND = pygame.mixer.Sound(const.SND_PATH + 'ruin_fat_sentry_sword.wav')
         self.DASH_SOUND.set_volume(0.5)  # TODO tune?
-        self.STARTLE_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_Fat_startle_0{}.wav'.format(i + 1))
+        self.STARTLE_SOUNDS = [pygame.mixer.Sound(const.SND_PATH + 'Ruins_Sentry_Fat_startle_0{}.wav'.format(i + 1))
                                for i in range(2)]
-        self.ATTACK_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_Fat_attack_0{}.wav'.format(i + 1))
+        self.ATTACK_SOUNDS = [pygame.mixer.Sound(const.SND_PATH + 'Ruins_Sentry_Fat_attack_0{}.wav'.format(i + 1))
                               for i in range(3)]
-        self.DEATH_SOUNDS = [pygame.mixer.Sound('assets/sounds/Ruins_Sentry_death_0{}.wav'.format(i + 1))
+        self.DEATH_SOUNDS = [pygame.mixer.Sound(const.SND_PATH + 'Ruins_Sentry_death_0{}.wav'.format(i + 1))
                              for i in range(3)]
-        self.HIT_SOUND = pygame.mixer.Sound('assets/sounds/enemy_damage.wav')
+        self.HIT_SOUND = pygame.mixer.Sound(const.SND_PATH + 'enemy_damage.wav')
 
         # TODO enums here
-        self.DASH_STATS = {"speed": 20, "length": 100, "rest": 30, "sound": self.DASH_SOUND}
+        self.DASH_STATS = {'speed': 20, 'length': 100, 'rest': 30, 'sound': self.DASH_SOUND}
         self.BACK_DASH_STATS = None  # Yet?
         self.BLEED_ONE_DIR_STATS = {'amount': 7, 'splash': 15, 'fade': 0.5, 'sizes': [6, 8], 'speed': 10, 'offset': 50}
         self.BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1, 'offset': 0}

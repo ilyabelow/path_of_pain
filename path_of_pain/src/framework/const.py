@@ -66,3 +66,8 @@ MUSIC_NORMAL_VOLUME = 0.3
 MUSIC_MUTED_VOLUME = 0.15
 MUSIC_FADE_OUT_DEATH = 2500
 MUSIC_FADE_OUT_WIN = 1000
+
+# ASSETS PATHS
+IMG_PATH = 'path_of_pain/assets/images/'
+SND_PATH = 'path_of_pain/assets/sounds/'
+FNT_PATH = 'path_of_pain/assets/fonts/'

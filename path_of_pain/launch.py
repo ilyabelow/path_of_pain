@@ -1,4 +1,4 @@
-from src.states.application import Application
+from path_of_pain.src.states.application import Application
 
 
 def main():

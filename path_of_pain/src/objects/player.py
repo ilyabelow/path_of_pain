@@ -1,8 +1,9 @@
 import pygame
 
-from src.framework import base
-from src.framework import clock, interface, const
-from src.objects import pickupable
+from path_of_pain.src.framework import base
+from path_of_pain.src.framework import clock
+from path_of_pain.src.framework import interface, const
+from path_of_pain.src.objects import pickupable
 
 
 class PlayerFactory:
@@ -29,21 +30,21 @@ class PlayerFactory:
 
 class PlayerFlyweight:
     def __init__(self):
-        self.SPRITE = pygame.image.load("assets/images/player.png").convert_alpha()
-        self.STUNNED_SPRITE = pygame.image.load("assets/images/player_stunned.png").convert_alpha()
-        self.SURPRISED_SPRITE = pygame.image.load("assets/images/player_surprised.png").convert_alpha()
+        self.SPRITE = pygame.image.load(const.IMG_PATH + 'player.png').convert_alpha()
+        self.STUNNED_SPRITE = pygame.image.load(const.IMG_PATH + 'player_stunned.png').convert_alpha()
+        self.SURPRISED_SPRITE = pygame.image.load(const.IMG_PATH + 'player_surprised.png').convert_alpha()
 
-        self.DASH_SOUND = pygame.mixer.Sound('assets/sounds/hero_dash.wav')
-        self.HIT_SOUND = pygame.mixer.Sound('assets/sounds/hero_damage.wav')
-        self.DEATH_SOUND = pygame.mixer.Sound('assets/sounds/hero_death_extra_details.wav')
-        self.HEAL_SOUND = pygame.mixer.Sound('assets/sounds/focus_health_heal.wav')
-        self.HEARTBEAT_SOUND = pygame.mixer.Sound('assets/sounds/heartbeat_B_01.wav')
-        self.STEPS_SOUND = pygame.mixer.Sound('assets/sounds/hero_run_footsteps_stone.wav')
+        self.DASH_SOUND = pygame.mixer.Sound(const.SND_PATH + 'hero_dash.wav')
+        self.HIT_SOUND = pygame.mixer.Sound(const.SND_PATH + 'hero_damage.wav')
+        self.DEATH_SOUND = pygame.mixer.Sound(const.SND_PATH + 'hero_death_extra_details.wav')
+        self.HEAL_SOUND = pygame.mixer.Sound(const.SND_PATH + 'focus_health_heal.wav')
+        self.HEARTBEAT_SOUND = pygame.mixer.Sound(const.SND_PATH + 'heartbeat_B_01.wav')
+        self.STEPS_SOUND = pygame.mixer.Sound(const.SND_PATH + 'hero_run_footsteps_stone.wav')
         self.STEPS_SOUND.set_volume(1.5)  # TODO tune
-        self.PICKUP_SOUND = pygame.mixer.Sound('assets/sounds/shiny_item_pickup.wav')
+        self.PICKUP_SOUND = pygame.mixer.Sound(const.SND_PATH + 'shiny_item_pickup.wav')
 
-        self.DASH_STATS = {"speed": 36, "length": 180, "rest": 5, "cost": 1, "sound": self.DASH_SOUND}  # TODO balance
-        self.BACK_DASH_STATS = {"speed": 25, "length": 100, "rest": 5, "cost": 1, "sound": self.DASH_SOUND}
+        self.DASH_STATS = {'speed': 36, 'length': 180, 'rest': 5, 'cost': 1, 'sound': self.DASH_SOUND}  # TODO balance
+        self.BACK_DASH_STATS = {'speed': 25, 'length': 100, 'rest': 5, 'cost': 1, 'sound': self.DASH_SOUND}
         self.BLEED_ONE_DIR_STATS = {'amount': 10, 'splash': 15, 'fade': 0.5, 'sizes': [6, 10], 'speed': 10,
                                     'offset': 100}
         self.BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1, 'offset': 0}

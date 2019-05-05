@@ -1,11 +1,13 @@
 import pygame
 
-from src.framework import base, const
-from src.framework import controller
-from src.framework.base import State
-from src.framework.const import Button
-from src.objects import enemy, obstacle, player, particle, pickupable, sword, hud
-from src.states import menu, level
+from path_of_pain.src.framework import base
+from path_of_pain.src.framework import const
+from path_of_pain.src.framework import controller
+from path_of_pain.src.framework.base import State
+from path_of_pain.src.framework.const import Button
+from path_of_pain.src.objects import hud, obstacle, enemy, pickupable
+from path_of_pain.src.objects import player, particle, sword
+from path_of_pain.src.states import menu, level
 
 
 class Game(State):
@@ -85,7 +87,7 @@ class Game(State):
     # TODO refactor these, for real though ^ >:(
 
     def deploy_logo(self):
-        title_font = pygame.font.Font("assets/fonts/augustus.ttf", 100)
+        title_font = pygame.font.Font(const.FNT_PATH + 'augustus.ttf', 100)
         # TODO not bodge-like outline drawing
         title = title_font.render(self.title, 10, const.C_BLACK)
         title.blit(title_font.render(self.title, 10, const.C_BLACK), (-1, 0))

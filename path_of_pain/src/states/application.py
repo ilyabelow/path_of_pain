@@ -1,7 +1,7 @@
 import pygame
 
-from src.framework import const
-from src.states.menu import Menu
+from path_of_pain.src.framework import const
+from path_of_pain.src.states.menu import Menu
 
 
 # Context for STATE PATTERN
@@ -12,7 +12,7 @@ class Application:
         pygame.mouse.set_visible(False)
         pygame.display.set_mode(const.RESOLUTION, pygame.FULLSCREEN)
         pygame.display.set_caption("Path of Pain")
-        pygame.display.set_icon(pygame.image.load("assets/images/enemy.png"))
+        pygame.display.set_icon(pygame.image.load(const.IMG_PATH + "enemy.png"))
 
         self.clock = pygame.time.Clock()
         self.state = None
