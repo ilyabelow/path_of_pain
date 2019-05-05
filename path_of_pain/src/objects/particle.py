@@ -1,3 +1,4 @@
+"""Module with a collection of particles"""
 from enum import Enum
 
 import pygame
@@ -21,7 +22,19 @@ class BloodFactory:
 
 # TODO rename and make more general?
 class Blood(base.AdvancedSprite):
+    """
+    Class for circular particle which moves ant const speed and fades out with time
+    """
     def __init__(self, pos, speed, size, fadeout, color):
+        """
+        Blood init
+
+        :param pos: initial position
+        :param speed: moving speed
+        :param size: initial size
+        :param fadeout: speed of fading out
+        :param color: color of particle
+        """
         base.AdvancedSprite.__init__(self)
         # TODO more customisable blood
         self.color = color
@@ -31,15 +44,18 @@ class Blood(base.AdvancedSprite):
         self.size = size
 
     def update(self, *args):
+        # Move and fade
         self.pos.x += self.speed.x
         self.pos.y += self.speed.y
+        self.fetch_layer(self.pos.y)
+        # Fade
         self.size -= self.fadeout
         if self.size < 0:
             self.kill()
             return
-        self.fetch_layer(self.pos.y)
 
     def draw(self, screen, window):
+        # TODO remove this buffer???
         image = pygame.Surface((int(self.size * 2), int(self.size * 2)), pygame.SRCALPHA, 32)
         pygame.draw.circle(image, self.color, [i // 2 for i in image.get_size()], int(self.size))
         return screen.blit(image, (self.pos.x - window.x, self.pos.y - window.y))
@@ -57,12 +73,22 @@ class ExclamationFactory:
 
 
 class Exclamation(base.AdvancedSprite):
+    """
+    Class for ! that appear when an enemy spots you
+    """
     def __init__(self, pos, lifetime):
+        """
+        ! init
+
+        :param pos: position
+        :param lifetime: ticks to dissapear
+        """
         base.AdvancedSprite.__init__(self)
         font = pygame.font.Font(None, 80)
         self.image = font.render("!", 3, const.C_BLACK)
         self.rect = self.image.get_rect(centerx=pos.x, centery=pos.y)
         self.postponed_fetch_layer(const.IMP_PARTICLE_Y)
+
         self.clock = clock.Clock(self.kill, lifetime)
         self.clock.wind_up()
 
@@ -70,6 +96,7 @@ class Exclamation(base.AdvancedSprite):
         self.clock.tick()
 
     def draw(self, screen, window):
+        # Trivial
         return screen.blit(self.image, (self.rect.x - window.x, self.rect.y - window.y))
 
 
