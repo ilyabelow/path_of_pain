@@ -17,6 +17,8 @@ script:
 # notify committer on EVERY build
 notifications:
   email:
+    recipients:
+      - belof.ilya@gmail.com
     on_success: always
     on_failure: always
 
