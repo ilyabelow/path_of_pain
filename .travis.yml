@@ -8,12 +8,12 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install setuptools wheel twine
-# Building and uploading package
+# Building and uploading package, not
+# TODO learn how to download files from Git LFS
 script:
   - python3 setup.py sdist bdist_wheel
-    # TODO learn how to download files from Git LFS
-    - python3 -m twine upload -u ${TEST_PYPI_USERNAME} -p ${TEST_PYPI_PASSWORD} --repository-url https://test.pypi.org/legacy/ dist/*
-# notify commiter on EVERY build
+  - python3 -m twine upload -u ${TEST_PYPI_USERNAME} -p ${TEST_PYPI_PASSWORD} --repository-url https://test.pypi.org/legacy/ dist/*
+# notify committer on EVERY build
 notifications:
   email:
     on_success: always
