@@ -1,3 +1,5 @@
+"""Module with objects that can be picked up"""
+
 import random
 
 import pygame
@@ -7,11 +9,18 @@ from path_of_pain.src.framework import interface, const
 
 
 class HeartFactory:
-    def __init__(self, *groups, load=False):
+    """
+    Creates new heart and places it in according groups
+    """
+
+    def __init__(self, *groups):
+        """
+        Factory init
+
+        :param groups: groups that new products will be added to
+        """
         self.groups = groups
         self.flyweight = None
-        if load:
-            self.load()
 
     def create(self, coords):
         product = Heart(self.flyweight, coords)

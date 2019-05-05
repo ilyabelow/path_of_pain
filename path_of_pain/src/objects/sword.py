@@ -1,3 +1,5 @@
+"""Module with player's sword"""
+
 import random
 
 import pygame
@@ -7,27 +9,53 @@ from path_of_pain.src.framework import const
 
 
 class SwordFactory:
-    def __init__(self, *groups, load=False):
+    """
+    Creates new assosiated product and places it in according groups
+    """
+
+    def __init__(self, *groups):
+        """
+        Factory init
+
+        :param groups: groups that new products will be added to
+        """
         self.groups = groups
         self.flyweight = None
-        if load:
-            self.load()
 
     def create(self, owner):
+        """
+        Create new product and place it in game groups
+
+        :param owner: sword's owner
+        :return: newly created product
+        """
         product = Sword(self.flyweight, owner)
         for group in self.groups:
             group.add(product)
         return product
 
     def load(self):
+        """
+        Load flyweight if necessary
+
+        :return: None
+        """
         if self.flyweight is None:
             self.flyweight = SwordFlyweight()
 
     def unload(self):
+        """
+        Unload flyweight if it is not needed
+
+        :return: None
+        """
         self.flyweight = None
 
 
 class SwordFlyweight:
+    """
+    Stores assets and constants
+    """
     def __init__(self):
         self.SPRITE = pygame.image.load(const.IMG_PATH + 'sword.png').convert_alpha()
         self.SWANG_SPRITE = pygame.image.load(const.IMG_PATH + 'sword_swang.png').convert_alpha()
@@ -56,36 +84,49 @@ class Sword(base.AdvancedSprite):
         self.right_hand = True
 
         # CLOCKS
-        self.current_swing_clock = clock.Clock()
-        self.next_swing_clock = clock.Clock()
+        self.current_swing_clock = clock.Clock()  # runs while the sword is swang
+        self.next_swing_clock = clock.Clock()  # avoid swing spamming
         self.clock_ticker = clock.ClockTicker(self)
 
         self.move()
 
     def swing(self):
+        """
+        Perform attack on enemies
+
+        :return: None
+        """
+        # check if you can swing at all
         if self.next_swing_clock.is_not_running and self.owner.stamina_available(self.flyweight.STAMINA_COST):
             self.next_swing_clock.wind_up(self.flyweight.SWING_WAIT)
             self.current_swing_clock.wind_up(self.flyweight.SWING_DURATION)
             self.right_hand = not self.right_hand  # switch hand, just for aesthetics
-
             self.owner.stamina_drain(self.flyweight.STAMINA_COST)
-            # HITTING
-            self.pos = self.owner.pos + self.owner.face * 70
+
+            # ACTUAL HITTING
+            self.move()
             # TODO good hitbox for sword
             self.rect = pygame.Rect(0, 0, 50, 50)
             self.rect.centerx = self.pos.x
             self.rect.centery = self.pos.y
+            # finding enemies that are hit
             got_hit = pygame.sprite.spritecollide(self, self.game.hittable_group, False)
             for entity in got_hit:
                 entity.hit(1, self)
 
             # SOUND EFFECTS
             random.choice(self.flyweight.SWING_SOUNDS).play()
+            # make cling noise if sword hit wall
             wall = pygame.sprite.spritecollideany(self, self.game.wall_group)
             if wall is not None:
                 self.flyweight.CLING_SOUND.play()
 
     def move(self):
+        """
+        Sync position with player
+
+        :return: None
+        """
         if self.current_swing_clock.is_not_running():
             self.pos = self.owner.pos + self.owner.face.rotate(90) * (80 * self.right_hand - 40)
         else:
