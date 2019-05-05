@@ -112,7 +112,17 @@ class FadeFactory:
 
 
 class Fade(base.AdvancedSprite):
+    """
+    Particle that covers the whole screen and makes it fade in/out
+    """
     def __init__(self, duration, to_black, when_stops=None):
+        """
+        Init
+
+        :param duration: duration of fade
+        :param to_black: True if fade to black, False if fade from black
+        :param when_stops: action to perform when fade is over
+        """
         base.AdvancedSprite.__init__(self)
         if when_stops is None:
             when_stops = self.kill
@@ -139,6 +149,9 @@ class Fade(base.AdvancedSprite):
 
 
 class TitleState(Enum):
+    """
+    States that title can have
+    """
     WAIT = 0
     FADE_IN = 1
     STAY = 2
@@ -158,7 +171,16 @@ class TitleFactory:
 
 # TODO make customizable positioning?
 class Title(base.AdvancedSprite):
+    """
+    Cool letters that fade in at the bottom of the screen and then fade out
+    """
     def __init__(self, image, state_durations):
+        """
+        Init
+
+        :param image: what image to operate on
+        :param state_durations: tuple of 4 duration of each of 4 states
+        """
         base.AdvancedSprite.__init__(self)
         self.image = image
         self.stage = TitleState.WAIT
@@ -185,6 +207,11 @@ class Title(base.AdvancedSprite):
         return pygame.Rect(0, 0, 0, 0)  # Nothing is drawn
 
     def next_stage(self):
+        """
+        Move to the next stage, kill self if this is the last stage
+
+        :return: None
+        """
         if self.stage == TitleState.FADE_OUT:
             self.kill()
         else:
