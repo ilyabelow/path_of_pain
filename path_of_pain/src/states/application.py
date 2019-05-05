@@ -6,6 +6,7 @@ from path_of_pain.src.states.menu import Menu
 
 
 # Context for STATE PATTERN
+# TODO singletone? Really good idea I believe
 class Application:
     """
     Class for creating pygame window, updating and drawing in it

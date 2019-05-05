@@ -1,3 +1,5 @@
+"""Module with main game controller"""
+
 import pygame
 
 from path_of_pain.src.framework import base
@@ -10,7 +12,11 @@ from path_of_pain.src.objects import player, particle, sword
 from path_of_pain.src.states import menu, level
 
 
+# TODO singletone?
 class Game(State):
+    """
+    Class that create, stores, updates, draws all actual game objects
+    """
     def __init__(self, painful=False):
         State.__init__(self)
         # TODO move level storage into another entity? or is it a little bit on an overstretch?
@@ -27,6 +33,7 @@ class Game(State):
         self.player_group = pygame.sprite.GroupSingle()
         self.interactive_group = pygame.sprite.Group()
         self.fade_group = pygame.sprite.GroupSingle()
+
         # FACTORIES INITIALIZATION
         self.enemy_factory = enemy.EnemyFactory(self, self.enemy_group, self.hittable_group, self.render_group)
         self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group,
@@ -51,42 +58,80 @@ class Game(State):
         # ADDITIONAL LEVEL INITIALIZATION
         # TODO sort there out
         self.painful = painful
+        # these None's will be filled later
         self.level_rect = None
         self.player = None
         self.title = None
-        self.room_num = 1  # tee hee
+        self.room_num = 1  # level number, room_num is, like, a PUN
         self.please_do_reset = False
         # DRAWING TOOLS INITIALIZATION
-        self.prev_rect = None
-        self.window = pygame.display.get_surface().get_rect()
+        self.prev_rect = None  # previously filled rects
+        self.window = pygame.display.get_surface().get_rect()  # window in which game is drawn
         # SET UP LEVEL
         self.do_reset_level()
 
     def to_main_menu(self):
+        """
+        Switches Game state to Menu state
+
+        :return: None
+        """
         self.app.switch_state(menu.Menu())
 
     # TODO sort out all these RESETS (may be good naming system will help)
     def reset_level(self, room_num=None):
+        """
+        Start fade after which the level will be reset
+
+        :param room_num: number of level which will be set up. don't pass anything and the old level will be reset
+        :return: None
+        """
         self.room_num = room_num if room_num is not None else self.room_num
         self.fade_out(self.mark_level_reset)
 
     def mark_level_reset(self):
+        """
+        Sets a flag to reset level after updating is over
+
+        This is made because level reset can happen before every object is updated.
+        If it will not be updated it will be invalid and cause an exception
+
+        :return: None
+        """
         self.please_do_reset = True
 
     def do_reset_level(self):
+        """
+        Actually reset level
+
+        :return: None
+        """
         level.init(self)
         self.please_do_reset = False
+        # redraw whole window
         self.prev_rect = [self.window]
+        # Start fade in and then logo
         self.fade_factory.create(const.GAME_FADE_IN, False, self.deploy_logo)
 
+    # TODO the same with fade in I guess
     def fade_out(self, action_after_faded):
+        """
+        Wrapper around creating fade out that also fade out all sounds
+
+        :param action_after_faded: action that will be performed after fade is over
+        :return: None
+        """
         self.fade_factory.create(const.GAME_FADE_OUT, True, action_after_faded)
         pygame.mixer.fadeout(const.GAME_FADE_OUT)
         pygame.mixer.music.fadeout(const.GAME_FADE_OUT * const.FRAME_RATE)
 
-    # TODO refactor these, for real though ^ >:(
 
     def deploy_logo(self):
+        """
+        Create cool logo with level name that will fade in and then fade out
+
+        :return: None
+        """
         title_font = pygame.font.Font(const.FNT_PATH + 'augustus.ttf', 100)
         # TODO not bodge-like outline drawing
         title = title_font.render(self.title, 10, const.C_BLACK)
@@ -98,10 +143,15 @@ class Game(State):
         self.title_factory.create(title, (5, 20, 30, 20))
 
     def update(self):
+        """
+        Updates all the object and handles exiting
+
+        :return: None
+        """
         # EVENT HANDLING (Now it is just exiting, hmm)
         for event in pygame.event.get():
             if self.fade_group.__len__() != 0:
-                break
+                break  # Do not try to exit again if fade is alredy running
             # TODO move to controller!!! and rewrite Controller to listen to events from queue
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -130,9 +180,15 @@ class Game(State):
             self.do_reset_level()
 
     def draw(self):
+        """
+        Draws all the objects
+
+        :return: None
+        """
         screen = pygame.display.get_surface()
         # screen.fill(const.C_BLACK, (0, 0, *const.RESOLUTION)) #  see what areas are updating
         for r in self.prev_rect:
+            # fill with background not thw whole space but only dirty places: where old objects were drawn
             screen.fill(const.C_BACKGROUND, r)
         # TODO don't draw objects that are not on screen (COMPLICATED)
         rect = self.render_group.draw_all(screen, self.window)

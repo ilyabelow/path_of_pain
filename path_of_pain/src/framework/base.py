@@ -136,6 +136,7 @@ class AdvancedLayeredUpdates(pygame.sprite.LayeredUpdates):
 
 
 # TODO move more functionality here?
+# TODO singletone?
 class State:
     """
     Base class for application states: Menu and Game
