@@ -1,3 +1,4 @@
+"""Module with class for player with all it's logic"""
 import pygame
 
 from path_of_pain.src.framework import base
@@ -29,11 +30,16 @@ class PlayerFactory:
 
 
 class PlayerFlyweight:
+    """
+    All the player's assets and constants
+    """
     def __init__(self):
+        # IMAGES
         self.SPRITE = pygame.image.load(const.IMG_PATH + 'player.png').convert_alpha()
         self.STUNNED_SPRITE = pygame.image.load(const.IMG_PATH + 'player_stunned.png').convert_alpha()
         self.SURPRISED_SPRITE = pygame.image.load(const.IMG_PATH + 'player_surprised.png').convert_alpha()
 
+        # SOUNDS
         self.DASH_SOUND = pygame.mixer.Sound(const.SND_PATH + 'hero_dash.wav')
         self.HIT_SOUND = pygame.mixer.Sound(const.SND_PATH + 'hero_damage.wav')
         self.DEATH_SOUND = pygame.mixer.Sound(const.SND_PATH + 'hero_death_extra_details.wav')
@@ -43,12 +49,14 @@ class PlayerFlyweight:
         self.STEPS_SOUND.set_volume(1.5)  # TODO tune
         self.PICKUP_SOUND = pygame.mixer.Sound(const.SND_PATH + 'shiny_item_pickup.wav')
 
+        # CONSTANTS FOR ACTIONS
         self.DASH_STATS = {'speed': 36, 'length': 180, 'rest': 5, 'cost': 1, 'sound': self.DASH_SOUND}  # TODO balance
         self.BACK_DASH_STATS = {'speed': 25, 'length': 100, 'rest': 5, 'cost': 1, 'sound': self.DASH_SOUND}
         self.BLEED_ONE_DIR_STATS = {'amount': 10, 'splash': 15, 'fade': 0.5, 'sizes': [6, 10], 'speed': 10,
                                     'offset': 100}
         self.BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1, 'offset': 0}
 
+        # MORE CONSTANTS
         self.MAX_HEALTH = 5
         self.MOVE_SPEED = 12
         self.INVULNERABILITY_DURATION = 25
@@ -63,8 +71,17 @@ class Player(base.AdvancedSprite,
              interface.Pickuping,
              interface.Bleeding,
              interface.Tired):
-
+    """
+    Class that controls player
+    """
     def __init__(self, flyweight, game, coords):
+        """
+        Init player
+
+        :param flyweight: flyweight with all assets and constants
+        :param game: game in which player is
+        :param coords: initial player coordinates
+        """
         base.AdvancedSprite.__init__(self)
         interface.Moving.__init__(self, coords, game.obstacle_group, flyweight.DASH_STATS, flyweight.BACK_DASH_STATS)
         interface.Healthy.__init__(
@@ -92,6 +109,7 @@ class Player(base.AdvancedSprite,
         self.rect = pygame.Rect(0, 0, 50, 50)  # hitbox
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
 
+        # hud inits
         self.health_hud = game.hud_factory.create_health(self)
         self.key_hud = game.hud_factory.create_keys(self)
         self.stamina_hud = game.hud_factory.create_stamina(self)
