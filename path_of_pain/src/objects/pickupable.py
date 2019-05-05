@@ -9,16 +9,7 @@ from path_of_pain.src.framework import interface, const
 
 
 class HeartFactory:
-    """
-    Creates new heart and places it in according groups
-    """
-
     def __init__(self, *groups):
-        """
-        Factory init
-
-        :param groups: groups that new products will be added to
-        """
         self.groups = groups
         self.flyweight = None
 
@@ -37,23 +28,37 @@ class HeartFactory:
 
 
 class HeartFlyweight:
+    """
+    Stores heart sprite
+    """
     def __init__(self):
         self.LITTLE_HEART_SPRITE = pygame.image.load(const.IMG_PATH + 'little_heart.png').convert_alpha()
 
 
 class Heart(base.AdvancedSprite, interface.Pickupable):
+    """
+    Pickupable heart that heals player on pickup
+    """
     def __init__(self, flyweight, coords):
+        """
+        Heart init
+
+        :param flyweight: flyweight with assets
+        :param coords: coordinates of new heart
+        """
         base.AdvancedSprite.__init__(self)
         interface.Pickupable.__init__(self)
-        self.rect = pygame.Rect(*coords, 30, 30)
-        self.image = None
-        self.image = flyweight.LITTLE_HEART_SPRITE
-        self.y = coords[1] - 50  # TODO improve because it is really flat and should me under everything
+        self.flyweight = flyweight
+        self.rect = pygame.Rect(*coords, 30, 30)  # hitbox for collisions
         self.death_clock = clock.Clock(self.kill, 90)
+        # the heart will dissaper after 3 seconds
         self.death_clock.wind_up()
+        # TODO improve because it is really flat and should be under everything
+        self.postponed_fetch_layer(coords[1] - 50)
 
     def draw(self, screen, window):
-        return screen.blit(self.image, (self.rect.x - window.x, self.rect.y - window.y))
+        # trivial
+        return screen.blit(self.flyweight.LITTLE_HEART_SPRITE, (self.rect.x - window.x, self.rect.y - window.y))
 
     def update(self):
         self.death_clock.tick()
@@ -81,24 +86,37 @@ class KeyFactory:
 
 
 class KeyFlyweight:
+    """
+    Flyweight with key sprite
+    """
     def __init__(self):
         self.KEY_SPRITE = pygame.image.load(const.IMG_PATH + 'key.png').convert_alpha()
 
 
 class Key(base.AdvancedSprite, interface.Pickupable):
+    """
+    Pickypable key that player and enemies can pickup
+    """
     def __init__(self, flyweight, coords, face=None):
+        """
+
+        :param flyweight: flyweight with assets
+        :param coords: coordinates of new key
+        :param face: direction the key will be pointed to
+        """
         base.AdvancedSprite.__init__(self)
         interface.Pickupable.__init__(self)
-        self.rect = pygame.Rect(0, 0, 25, 25)
+        self.rect = pygame.Rect(0, 0, 25, 25)  # hitbox for collision
         self.rect.centerx, self.rect.centery = coords[0], coords[1]
-        self.y = coords[1] - 100  # TODO improve because it is really flat and should me under everything
+        # TODO improve because it is really flat and should be under everything
+        self.postponed_fetch_layer(coords[1] - 50)
         if face is None:
-            self.face = const.V_LEFT.rotate(random.randint(-180, 180))
+            self.face = const.V_LEFT.rotate(random.randint(-180, 180))  # default direction
         else:
             self.face = face
         self.image = pygame.transform.rotate(flyweight.KEY_SPRITE, self.face.angle_to(const.V_UP))
         # TODO rethink
-        self.im_rect = self.image.get_rect(centerx=self.rect.centerx, centery=self.rect.centery)
+        self.image_rect = self.image.get_rect(centerx=self.rect.centerx, centery=self.rect.centery)
 
     def draw(self, screen, window):
-        return screen.blit(self.image, (self.im_rect.x - window.x, self.im_rect.y - window.y))
+        return screen.blit(self.image, (self.image_rect.x - window.x, self.image_rect.y - window.y))
