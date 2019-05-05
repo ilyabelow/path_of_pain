@@ -1,3 +1,4 @@
+"""Module for level generation"""
 import random
 
 import pygame
@@ -5,7 +6,14 @@ import pygame
 from path_of_pain.src.framework import const
 
 
+# TODO turn this whole thing into a builder
 def init(game):
+    """
+    Fill game with game objects according to level number (stored in game itself)
+
+    :param game: game to build level in
+    :return: None
+    """
     # RESET ALL GROUPS
     for v in dir(game):
         if v.rfind('_group') != -1:
@@ -126,16 +134,25 @@ def init(game):
         if health != -1:
             game.player.health = health
             game.player.health_hud.makeup()
+    # Plug
     if game.room_num == 3:
         print('yay you win now get out')
         game.to_main_menu()
 
 
 def distribute_keys(game, keys):
+    """
+    Give random enemies according number of keys
+
+    :param game: game in which enemies are stored
+    :param keys: amount of keys to be distributed
+    :return: None
+    """
     if len(game.enemy_group) < keys:
+        # foolproofing
         raise BaseException('um there is not enough enemies to distribute so much keys')
     while keys > 0:
-        en = random.choice(game.enemy_group.sprites())
-        if not en.has_key:
+        enemy = random.choice(game.enemy_group.sprites())
+        if not enemy.has_key:
             keys -= 1
-            en.has_key = True
+            enemy.has_key = True
