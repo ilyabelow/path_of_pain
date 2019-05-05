@@ -11,7 +11,8 @@ install:
 # Building and uploading package
 script:
   - python3 setup.py sdist bdist_wheel
-  - python3 -m twine upload -u ${TEST_PYPI_USERNAME} -p ${TEST_PYPI_PASSWORD} --repository-url https://test.pypi.org/legacy/ dist/*
+    # TODO learn how to download files from Git LFS
+    - python3 -m twine upload -u ${TEST_PYPI_USERNAME} -p ${TEST_PYPI_PASSWORD} --repository-url https://test.pypi.org/legacy/ dist/*
 # notify commiter on EVERY build
 notifications:
   email:
