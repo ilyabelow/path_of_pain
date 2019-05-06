@@ -98,11 +98,8 @@ class LevelBuilder:
         :param player_coords: initial player coordinates
         :return: None
         """
-        old_player = self.game.player
+        # TODO movement of player's health
         self.game.player = self.game.player_factory.create(player_coords)
-        if old_player is not None:
-            self.game.player.health = old_player.health
-            self.game.player.health_hud.makeup()
 
     def build_door(self, coords, next_level, locks):
         """
@@ -146,7 +143,7 @@ class LevelChooser:
 
     def choose_level(self, number, painful):
         if number == 1:
-            keys_on_level = 0
+            keys_on_level = 5
             self.builder.set_pain(painful)
             self.builder.set_level_size(3000, 2000)
             self.builder.set_title('{}STAGE ONE'.format(painful * 'PAINFUL '))
