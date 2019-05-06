@@ -67,11 +67,15 @@ class Healthy:
 class Tired:
     """Interface for objects with stamina"""
 
-    def __init__(self, max_stamina, rest_speed):
+    def __init__(self, max_stamina, wait_speed, rest_speed):
         self.rest_speed = rest_speed
         self.max_stamina = max_stamina
         self.stamina = max_stamina
         self.rest_clock = clock.Clock(self.stamina_rest, rest_speed)
+        self.wait_clock = clock.Clock(self.start_resting, wait_speed)
+
+    def start_resting(self):
+        self.rest_clock.wind_up()
 
     def stamina_rest(self):
         self.stamina += 1
@@ -82,7 +86,8 @@ class Tired:
 
     def stamina_drain(self, cost):
         self.stamina -= cost
-        self.rest_clock.wind_up()
+        self.wait_clock.wind_up()
+        self.rest_clock.stop()
 
     def stamina_available(self, desired):
         return self.stamina >= desired

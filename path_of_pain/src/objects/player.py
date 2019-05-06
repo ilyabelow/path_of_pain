@@ -41,8 +41,8 @@ class PlayerFlyweight:
         self.PICKUP_SOUND = pygame.mixer.Sound(const.SND_PATH + 'shiny_item_pickup.wav')
 
         # CONSTANTS FOR ACTIONS
-        self.DASH_STATS = {'speed': 36, 'length': 180, 'rest': 5, 'cost': 1, 'sound': self.DASH_SOUND}  # TODO balance
-        self.BACK_DASH_STATS = {'speed': 25, 'length': 100, 'rest': 5, 'cost': 1, 'sound': self.DASH_SOUND}
+        self.DASH_STATS = {'speed': 36, 'length': 180, 'rest': 8, 'cost': 2, 'sound': self.DASH_SOUND}  # TODO balance
+        self.BACK_DASH_STATS = {'speed': 25, 'length': 100, 'rest': 16, 'cost': 1, 'sound': self.DASH_SOUND}
         self.BLEED_ONE_DIR_STATS = {'amount': 10, 'splash': 15, 'fade': 0.5, 'sizes': [6, 10], 'speed': 10,
                                     'offset': 100}
         self.BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1, 'offset': 0}
@@ -91,7 +91,7 @@ class Player(base.AdvancedSprite,
             flyweight.BLEED_ALL_DIR_STATS,
             const.C_BLACK
         )
-        interface.Tired.__init__(self, 10, 7)  # TODO move to constants? TODO balance
+        interface.Tired.__init__(self, 10, 12, 2)  # TODO move to constants? TODO balance
         self.steps_are_stepping = False
         self.keys = 0
         self.look_away = const.V_ZERO
