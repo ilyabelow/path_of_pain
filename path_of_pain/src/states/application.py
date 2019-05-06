@@ -38,8 +38,10 @@ class Application:
         :param state: new state
         :return: None
         """
+        if self.switched:  # is state is switched twice in the iteration only the first will count
+            return
+        state.app = self
         self.state = state
-        self.state.app = self
         self.switched = True
 
     def run(self):

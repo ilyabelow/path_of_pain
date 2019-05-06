@@ -8,24 +8,15 @@ from path_of_pain.src.framework import interface, const
 
 
 class DoorFactory:
-    def __init__(self, *groups, load=False):
+    def __init__(self, *groups):
         self.groups = groups
-        self.flyweight = None
-        if load:
-            self.load()
+        self.flyweight = DoorFlyweight()
 
     def create(self, coords, next_level, locks):
         product = Door(self.flyweight, coords, next_level, locks)
         for group in self.groups:
             group.add(product)
         return product
-
-    def load(self):
-        if self.flyweight is None:
-            self.flyweight = DoorFlyweight()
-
-    def unload(self):
-        self.flyweight = None
 
 
 class DoorFlyweight:
@@ -115,11 +106,9 @@ class BoxType(Enum):
 
 
 class BoxFactory:
-    def __init__(self, game, *groups, load=False):
+    def __init__(self, game, *groups):
         self.groups = groups
-        self.flyweight = None
-        if load:
-            self.load()
+        self.flyweight = BoxFlyweight()
         self.game = game
 
     def create(self, coords):
@@ -127,13 +116,6 @@ class BoxFactory:
         for group in self.groups:
             group.add(product)
         return product
-
-    def load(self):
-        if self.flyweight is None:
-            self.flyweight = BoxFlyweight()
-
-    def unload(self):
-        self.flyweight = None
 
 
 class BoxFlyweight:
