@@ -20,7 +20,7 @@ class SwordFactory:
         :param groups: groups that new products will be added to
         """
         self.groups = groups
-        self.flyweight = None
+        self.flyweight = SwordFlyweight()
 
     def create(self, owner):
         """
@@ -34,28 +34,12 @@ class SwordFactory:
             group.add(product)
         return product
 
-    def load(self):
-        """
-        Load flyweight if necessary
-
-        :return: None
-        """
-        if self.flyweight is None:
-            self.flyweight = SwordFlyweight()
-
-    def unload(self):
-        """
-        Unload flyweight if it is not needed
-
-        :return: None
-        """
-        self.flyweight = None
-
 
 class SwordFlyweight:
     """
     Stores assets and constants
     """
+
     def __init__(self):
         self.SPRITE = pygame.image.load(const.IMG_PATH + 'sword.png').convert_alpha()
         self.SWANG_SPRITE = pygame.image.load(const.IMG_PATH + 'sword_swang.png').convert_alpha()

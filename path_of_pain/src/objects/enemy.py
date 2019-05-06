@@ -8,25 +8,16 @@ from path_of_pain.src.objects import pickupable
 
 
 class EnemyFactory:
-    def __init__(self, game, *groups, load=False):
+    def __init__(self, game, *groups):
         self.groups = groups
         self.game = game
-        self.flyweight = None
-        if load:
-            self.load()
+        self.flyweight = EnemyFlyweight()
 
     def create(self, coords):
         product = Enemy(self.flyweight, self.game, coords)
         for group in self.groups:
             group.add(product)
         return product
-
-    def load(self):
-        if self.flyweight is None:
-            self.flyweight = EnemyFlyweight()
-
-    def unload(self):
-        self.flyweight = None
 
 
 class EnemyFlyweight:

@@ -6,11 +6,9 @@ from path_of_pain.src.framework import const
 
 
 class HUDFactory:
-    def __init__(self, *groups, load=False):
+    def __init__(self, *groups):
         self.groups = groups
-        self.flyweight = None
-        if load:
-            self.load()
+        self.flyweight = HUDFlyweight()
 
     def create(self, hud_type, owner):
         product = hud_type(self.flyweight, owner)
@@ -26,13 +24,6 @@ class HUDFactory:
 
     def create_stamina(self, owner):
         return self.create(StaminaHUD, owner)
-
-    def load(self):
-        if self.flyweight is None:
-            self.flyweight = HUDFlyweight()
-
-    def unload(self):
-        self.flyweight = None
 
 
 class HUDFlyweight:

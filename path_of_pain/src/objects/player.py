@@ -8,11 +8,9 @@ from path_of_pain.src.objects import pickupable
 
 
 class PlayerFactory:
-    def __init__(self, game, *groups, load=False):
+    def __init__(self, game, *groups):
         self.groups = groups
-        self.flyweight = None
-        if load:
-            self.load()
+        self.flyweight = PlayerFlyweight()
         self.game = game
 
     def create(self, coords):
@@ -20,13 +18,6 @@ class PlayerFactory:
         for group in self.groups:
             group.add(product)
         return product
-
-    def load(self):
-        if self.flyweight is None:
-            self.flyweight = PlayerFlyweight()
-
-    def unload(self):
-        self.flyweight = None
 
 
 class PlayerFlyweight:

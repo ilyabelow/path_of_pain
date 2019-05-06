@@ -17,9 +17,9 @@ class Game(State):
     """
     Class that create, stores, updates, draws all actual game objects
     """
-    def __init__(self, painful=False):
+
+    def __init__(self):
         State.__init__(self)
-        # TODO move level storage into another entity? or is it a little bit on an overstretch?
         # GROUPS INITIALIZATION
         self.render_group = base.AdvancedLayeredUpdates()
         self.hittable_group = pygame.sprite.Group()
@@ -35,6 +35,8 @@ class Game(State):
         self.fade_group = pygame.sprite.GroupSingle()
 
         # FACTORIES INITIALIZATION
+        # TODO move factories inits to level builder
+        # TODO assets inside factories are loaded each level reset, NOT EFFECTIVE
         self.enemy_factory = enemy.EnemyFactory(self, self.enemy_group, self.hittable_group, self.render_group)
         self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group,
                                                self.render_group)
@@ -57,18 +59,16 @@ class Game(State):
             self.input_method = controller.Joystick()
         # ADDITIONAL LEVEL INITIALIZATION
         # TODO sort there out
-        self.painful = painful
         # these None's will be filled later
+        self.painful = None
         self.level_rect = None
         self.player = None
         self.title = None
-        self.room_num = 1  # level number, room_num is, like, a PUN
-        self.please_do_reset = False
+        self.room_num = None  # level number, room_num is, like, a PUN
         # DRAWING TOOLS INITIALIZATION
-        self.prev_rect = None  # previously filled rects
         self.window = pygame.display.get_surface().get_rect()  # window in which game is drawn
-        # SET UP LEVEL
-        self.do_reset_level()
+        self.prev_rect = [self.window]  # previously filled rects
+        self.fade_factory.create(const.GAME_FADE_IN, False, self.deploy_logo)
 
     def to_main_menu(self):
         """
@@ -87,18 +87,7 @@ class Game(State):
         :return: None
         """
         self.room_num = room_num if room_num is not None else self.room_num
-        self.fade_out(self.mark_level_reset)
-
-    def mark_level_reset(self):
-        """
-        Sets a flag to reset level after updating is over
-
-        This is made because level reset can happen before every object is updated.
-        If it will not be updated it will be invalid and cause an exception
-
-        :return: None
-        """
-        self.please_do_reset = True
+        self.fade_out(self.do_reset_level)
 
     def do_reset_level(self):
         """
@@ -106,12 +95,13 @@ class Game(State):
 
         :return: None
         """
-        level.init(self)
-        self.please_do_reset = False
-        # redraw whole window
-        self.prev_rect = [self.window]
-        # Start fade in and then logo
-        self.fade_factory.create(const.GAME_FADE_IN, False, self.deploy_logo)
+        # TODO move it somewhere
+        if self.room_num == 3:
+            print('yay you win now GET OUT')
+            self.to_main_menu()
+            return
+        game_chooser = level.LevelChooser(level.LevelBuilder())
+        self.app.switch_state(game_chooser.choose_level(self.room_num, self.painful))
 
     # TODO the same with fade in I guess
     def fade_out(self, action_after_faded):
@@ -124,7 +114,6 @@ class Game(State):
         self.fade_factory.create(const.GAME_FADE_OUT, True, action_after_faded)
         pygame.mixer.fadeout(const.GAME_FADE_OUT)
         pygame.mixer.music.fadeout(const.GAME_FADE_OUT * const.FRAME_RATE)
-
 
     def deploy_logo(self):
         """
@@ -174,10 +163,6 @@ class Game(State):
         self.enemy_group.update()
         self.particle_group.update()
         self.fade_group.update()
-
-        # not bad, ok solution! :P
-        if self.please_do_reset:  # actual level reset is performed after everything is updated
-            self.do_reset_level()
 
     def draw(self):
         """

@@ -8,7 +8,7 @@ from path_of_pain.src.framework import const
 from path_of_pain.src.framework.base import State
 from path_of_pain.src.framework.const import Button
 from path_of_pain.src.objects import particle
-from path_of_pain.src.states import game
+from path_of_pain.src.states import level
 
 
 class Option(Enum):
@@ -162,10 +162,9 @@ class Menu(State):
         """
         if self.option == Option.EXIT:
             self.app.stop()
-        if self.option == Option.PLAY:
-            self.app.switch_state(game.Game())
-        if self.option == Option.PLAY_PAINFUL:
-            self.app.switch_state(game.Game(True))
+        if self.option == Option.PLAY or self.option == Option.PLAY_PAINFUL:
+            game_chooser = level.LevelChooser(level.LevelBuilder())
+            self.app.switch_state(game_chooser.choose_level(1, self.option == Option.PLAY_PAINFUL))
 
     def shift_option(self, shift):
         """

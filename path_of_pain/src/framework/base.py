@@ -142,7 +142,7 @@ class State:
     Base class for application states: Menu and Game
     """
 
-    def __def__(self):
+    def __init__(self):
         self.app = None
 
     def update(self):

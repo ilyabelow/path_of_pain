@@ -11,20 +11,13 @@ from path_of_pain.src.framework import interface, const
 class HeartFactory:
     def __init__(self, *groups):
         self.groups = groups
-        self.flyweight = None
+        self.flyweight = HeartFlyweight()
 
     def create(self, coords):
         product = Heart(self.flyweight, coords)
         for group in self.groups:
             group.add(product)
         return product
-
-    def load(self):
-        if self.flyweight is None:
-            self.flyweight = HeartFlyweight()
-
-    def unload(self):
-        self.flyweight = None
 
 
 class HeartFlyweight:
@@ -65,24 +58,15 @@ class Heart(base.AdvancedSprite, interface.Pickupable):
 
 
 class KeyFactory:
-    def __init__(self, *groups, load=False):
+    def __init__(self, *groups):
         self.groups = groups
-        self.flyweight = None
-        if load:
-            self.load()
+        self.flyweight = KeyFlyweight()
 
     def create(self, coords, face):
         product = Key(self.flyweight, coords, face)
         for group in self.groups:
             group.add(product)
         return product
-
-    def load(self):
-        if self.flyweight is None:
-            self.flyweight = KeyFlyweight()
-
-    def unload(self):
-        self.flyweight = None
 
 
 class KeyFlyweight:
