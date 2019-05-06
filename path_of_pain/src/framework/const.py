@@ -1,4 +1,5 @@
 """Module with some application-wide constants"""
+import os
 from enum import Enum
 
 import pygame
@@ -68,7 +69,7 @@ MUSIC_FADE_OUT_DEATH = 2500
 MUSIC_FADE_OUT_WIN = 1000
 
 # ASSETS PATHS
-# TODO generate these based on current python paths
-IMG_PATH = 'path_of_pain/assets/images/'
-SND_PATH = 'path_of_pain/assets/sounds/'
-FNT_PATH = 'path_of_pain/assets/fonts/'
+ASS_PATH = os.getcwd() + '/path_of_pain/assets/'
+IMG_PATH = ASS_PATH + 'images/'
+SND_PATH = ASS_PATH + 'sounds/'
+FNT_PATH = ASS_PATH + 'fonts/'
