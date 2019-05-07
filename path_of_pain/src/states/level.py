@@ -1,5 +1,6 @@
 """Module for level generation"""
 import random
+from typing import Tuple
 
 import pygame
 
@@ -12,7 +13,7 @@ class LevelBuilder:
     def __init__(self):
         self.game = game.Game()
 
-    def set_level_size(self, width, height):
+    def set_level_size(self, width: int, height: int):
         """
         Configures rectangle of the level
 
@@ -22,7 +23,7 @@ class LevelBuilder:
         """
         self.game.level_rect = pygame.Rect(0, 0, width, height)
 
-    def set_pain(self, painful):
+    def set_pain(self, painful: bool):
         """
         Adjust pain
 
@@ -31,7 +32,7 @@ class LevelBuilder:
         """
         self.game.painful = painful
 
-    def set_level_number(self, number):
+    def set_level_number(self, number: int):
         """
         Lets game know what level it is in
 
@@ -40,7 +41,7 @@ class LevelBuilder:
         """
         self.game.room_num = number
 
-    def set_music(self, music_name):
+    def set_music(self, music_name: str):
         """
         Set music for the level
 
@@ -52,7 +53,7 @@ class LevelBuilder:
         pygame.mixer.music.set_volume(const.MUSIC_NORMAL_VOLUME)
         pygame.mixer.music.play(loops=-1)
 
-    def set_title(self, text):
+    def set_title(self, text: str):
         """
         Sets level title
 
@@ -61,7 +62,7 @@ class LevelBuilder:
         """
         self.game.title = text
 
-    def build_boxes(self, *box_coords):
+    def build_boxes(self, *box_coords: Tuple[int, int]):
         """
         Construct boxes from list of their coordinates
 
@@ -71,7 +72,7 @@ class LevelBuilder:
         for coords in box_coords:
             self.game.box_factory.create(coords)
 
-    def build_enemies(self, *enemies_coords):
+    def build_enemies(self, *enemies_coords: Tuple[int, int]):
         """
         Construct enemies from list of their coordinates
 
@@ -81,7 +82,7 @@ class LevelBuilder:
         for coords in enemies_coords:
             self.game.enemy_factory.create(coords)
 
-    def build_walls(self, *walls_params):
+    def build_walls(self, *walls_params: Tuple[int, int, int, int, int]):
         """
         Construct walls from the list of their coordinates, size and height
 
@@ -91,7 +92,7 @@ class LevelBuilder:
         for wall in walls_params:
             self.game.wall_factory.create(wall[:4], wall[4])
 
-    def build_player(self, player_coords):
+    def build_player(self, player_coords: Tuple[int, int]):
         """
         Construct player in designated coordinates. Moves health from player on previous level
 
@@ -101,7 +102,7 @@ class LevelBuilder:
         # TODO movement of player's health
         self.game.player = self.game.player_factory.create(player_coords)
 
-    def build_door(self, coords, next_level, locks):
+    def build_door(self, coords: Tuple[int, int], next_level: int, locks: int):
         """
         Construct door for the next level
 
@@ -112,7 +113,7 @@ class LevelBuilder:
         """
         self.game.door_factory.create(coords, next_level, locks)
 
-    def distribute_keys(self, keys):
+    def distribute_keys(self, keys: int):
         """
         Give random enemies according number of keys
 
@@ -128,7 +129,7 @@ class LevelBuilder:
                 keys -= 1
                 enemy.has_key = True
 
-    def get_result(self):
+    def get_result(self) -> game.Game:
         """
         Return constructed level
 
@@ -141,7 +142,7 @@ class LevelChooser:
     def __init__(self, builder: LevelBuilder):
         self.builder = builder
 
-    def choose_level(self, number, painful):
+    def choose_level(self, number: int, painful: bool) -> game.Game:
         if number == 1:
             keys_on_level = 5
             self.builder.set_pain(painful)
