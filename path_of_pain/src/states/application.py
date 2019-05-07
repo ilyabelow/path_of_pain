@@ -2,6 +2,7 @@
 import pygame
 
 from path_of_pain.src.framework import const
+from path_of_pain.src.framework.base import State
 from path_of_pain.src.states.menu import Menu
 
 
@@ -29,7 +30,7 @@ class Application:
         self.clock = pygame.time.Clock()
         self.running = True
 
-    def switch_state(self, state):
+    def switch_state(self, state: State):
         """
         Switches current state to state passed in arguments
 
