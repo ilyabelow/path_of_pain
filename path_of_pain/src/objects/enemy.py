@@ -1,4 +1,5 @@
 import random
+from typing import Tuple
 
 import pygame
 
@@ -8,12 +9,13 @@ from path_of_pain.src.objects import pickupable
 
 
 class EnemyFactory:
-    def __init__(self, game, *groups):
+    # TODO type validation for game cannot be done because it requires importing game
+    def __init__(self, game, *groups: pygame.sprite.AbstractGroup):
         self.groups = groups
         self.game = game
         self.flyweight = EnemyFlyweight()
 
-    def create(self, coords):
+    def create(self, coords: Tuple[int, int]):
         product = Enemy(self.flyweight, self.game, coords)
         for group in self.groups:
             group.add(product)
@@ -69,7 +71,7 @@ class EnemyFlyweight:
 # TODO MORE ENEMIES MORE CONTENT
 class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.Bleeding, interface.Pickuping):
 
-    def __init__(self, flyweight, game, coords):
+    def __init__(self, flyweight: EnemyFlyweight, game, coords: Tuple[int, int]):
         base.AdvancedSprite.__init__(self)
         interface.Moving.__init__(self, coords, game.obstacle_group, flyweight.DASH_STATS, None)
         interface.Healthy.__init__(
@@ -178,16 +180,14 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
             self.face.rotate_ip(random.randint(-180, 180))  # 360 degrees
             self.idle_clock.wind_up(random.randint(*self.flyweight.WANDER_TIME))
 
-    def do_pickup(self, what):
+    def do_pickup(self, what: interface.Pickupable):
         if isinstance(what, pickupable.Key):
             self.has_key = True
 
-    def can_pickup(self, what):
-        if isinstance(what, pickupable.Key) and not self.has_key:
-            return True
-        return False
+    def can_pickup(self, what: interface.Pickupable) -> bool:
+        return isinstance(what, pickupable.Key) and not self.has_key
 
-    def draw(self, screen, window):
+    def draw(self, screen: pygame.Surface, window: pygame.Rect) -> pygame.Rect:
         if self.stun_clock.is_running():
             image = self.flyweight.STUNNED_SPRITE
         elif self.spot_clock.is_running():
