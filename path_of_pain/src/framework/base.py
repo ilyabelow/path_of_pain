@@ -37,7 +37,8 @@ class AdvancedSprite(pygame.sprite.Sprite):
         :param y: y *coordinate* of the sprite
         :return: None
         """
-        self.render_group.change_layer(self, y // 50)  # TODO // 50? may be not?
+        if self.groups().__len__() > 0:
+            self.render_group.change_layer(self, y // 50)  # TODO // 50? may be not?
 
     def postponed_fetch_layer(self, y):
         """
