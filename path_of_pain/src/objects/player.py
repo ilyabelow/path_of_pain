@@ -4,7 +4,7 @@ import pygame
 from path_of_pain.src.framework import base
 from path_of_pain.src.framework import clock
 from path_of_pain.src.framework import interface, const
-from path_of_pain.src.objects import pickupable
+from path_of_pain.src.objects import pickupable, enemy, spikes
 
 
 class PlayerFactory:
@@ -172,10 +172,17 @@ class Player(base.AdvancedSprite,
         pygame.mixer.music.fadeout(const.MUSIC_FADE_OUT_DEATH)
 
     def on_ok_health(self, who):
-        self.throw_back((self.pos - who.pos).normalize(),
-                        self.flyweight.THROWBACK_SPEED,
-                        self.flyweight.THROWBACK_LENGTH,
-                        self.flyweight.STUN_DURATION)
+        # TODO move it to corresponding classes
+        if isinstance(who, enemy.Enemy):
+            self.throw_back((self.pos - who.pos).normalize(),
+                            self.flyweight.THROWBACK_SPEED,
+                            self.flyweight.THROWBACK_LENGTH,
+                            self.flyweight.STUN_DURATION)
+        if isinstance(who, spikes.Spikes):
+            self.throw_back((self.pos - who.pos).normalize(),
+                            7,
+                            21,
+                            10)
         self.can_be_moved = False
 
     def after_healing(self):

@@ -9,6 +9,7 @@ from path_of_pain.src.framework.base import State
 from path_of_pain.src.framework.const import Button
 from path_of_pain.src.objects import hud, obstacle, enemy, pickupable
 from path_of_pain.src.objects import player, particle, sword
+from path_of_pain.src.objects import spikes
 from path_of_pain.src.states import menu, level
 
 
@@ -48,6 +49,7 @@ class Game(State):
         self.player_factory = player.PlayerFactory(self, self.player_group, self.render_group)
         self.door_factory = obstacle.DoorFactory(self.interactive_group, self.render_group)
         self.fade_factory = particle.FadeFactory(self.fade_group, self.render_group)
+        self.spikes_factory = spikes.SpikesFactory(self, self.hitter_group, self.render_group)
         self.title_factory = particle.TitleFactory(self.particle_group, self.render_group)
         # TODO move these to associated classes => do not store them in Game
         self.blood_factory = particle.BloodFactory(self.particle_group, self.render_group)

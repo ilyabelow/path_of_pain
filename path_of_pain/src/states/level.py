@@ -76,11 +76,21 @@ class LevelBuilder:
         """
         Construct enemies from list of their coordinates
 
-        :param box_coords: list of tuples with box coordinates
+        :param enemies_coords: list of tuples with box coordinates
         :return: None
         """
         for coords in enemies_coords:
             self.game.enemy_factory.create(coords)
+
+    def build_spikes(self, *spikes_coords: Tuple[int, int]):
+        """
+        Construct spikes from list of their coordinates
+
+        :param spikes_coords: list of tuples with box coordinates
+        :return: None
+        """
+        for coords in spikes_coords:
+            self.game.spikes_factory.create(coords)
 
     def build_walls(self, *walls_params: Tuple[int, int, int, int, int]):
         """
@@ -172,6 +182,12 @@ class LevelChooser:
                                        (2200, 450), (2850, 150), (2850, 750), (2100, 1200),
                                        (2100, 1500), (1800, 1500), (2450, 1600), (2500, 1600),
                                        (2450, 1550), (2500, 1550))
+            # between ul and dl rooms
+            self.builder.build_spikes((600, 950), (650, 900), (700, 950), (750, 900), (800, 950), (850, 900),
+                                      (600, 1050), (650, 1000), (700, 1050), (750, 1000), (800, 1050), (850, 1000), )
+            # in ur room
+            self.builder.build_spikes((2500, 350), (2500, 600), (2600, 400), (2700, 450),
+                                      (2500, 500), (2700, 300), (2600, 550), (2400, 450))
             self.builder.distribute_keys(keys_on_level)
             self.builder.build_door((1450, 125), 2, keys_on_level)
             # vertical center walls
