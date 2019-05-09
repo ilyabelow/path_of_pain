@@ -48,7 +48,7 @@ class SpikesFlyweight:
 
         self.ATTACK_SOUND = pygame.mixer.Sound(const.SND_PATH + 'white_spikes_appear_03.wav')
         self.READY_SOUND = pygame.mixer.Sound(const.SND_PATH + 'white_spikes_disappear_01.wav')
-        self.state_durations = {SpikesState.SLEEP: 30, SpikesState.READY: 10, SpikesState.ATTACK: 20}
+        self.state_durations = {SpikesState.SLEEP: 40, SpikesState.READY: 10, SpikesState.ATTACK: 20}
 
 
 class Spikes(base.AdvancedSprite):
