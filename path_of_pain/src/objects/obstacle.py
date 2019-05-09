@@ -117,6 +117,7 @@ class Wall(base.AdvancedSprite):
     """
     Walls make up level structure
     """
+
     def __init__(self, rect, height):
         """
         Wall init
@@ -157,6 +158,7 @@ class BoxFactory:
     """
     Creates boxes and pots them into corresponding containers
     """
+
     def __init__(self, game, *groups):
         self.groups = groups
         self.flyweight = BoxFlyweight()
@@ -173,13 +175,16 @@ class BoxFlyweight:
     """
     Box image and sound assets + some constants
     """
+
     def __init__(self):
         self.BOX_SPRITE = pygame.image.load(const.IMG_PATH + 'box.png').convert_alpha()
 
         self.BOX_BREAK_SOUNDS = [pygame.mixer.Sound(const.SND_PATH + 'breakable_wall_hit_{}.wav'.format(i + 1))
                                  for i in range(2)]
-        self.BLEED_ONE_DIR_STATS = {'amount': 5, 'splash': 45, 'fade': 2, 'sizes': [10, 15], 'speed': 6, 'offset': 10}
-        self.BLEED_ALL_DIR_STATS = {'amount': 15, 'fade': 2, 'sizes': [15, 20], 'speed': 6, 'offset': 0}
+        self.BLEED_ONE_DIR_STATS = {'amount': 5, 'splash': 45, 'fade': 2, 'sizes': [10, 15], 'speed': 6, 'offset': 10,
+                                    'color': const.C_BOX}
+        self.BLEED_ALL_DIR_STATS = {'amount': 15, 'fade': 2, 'sizes': [15, 20], 'speed': 6, 'offset': 0,
+                                    'color': const.C_BOX}
 
 
 # TODO make this class more general to allow different boxes: jars, skulls, etc
@@ -187,6 +192,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
     """
     Boxes are static objects which you can destroy Zelda-style
     """
+
     def __init__(self, flyweight, game, coords):
         """
         Box init
@@ -202,7 +208,6 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
             game.blood_factory,
             flyweight.BLEED_ONE_DIR_STATS,
             flyweight.BLEED_ALL_DIR_STATS,
-            const.C_BOX
         )  # TODO square blood
         self.rect = pygame.Rect(*coords, 50, 35)  # hitbox
         self.flyweight = flyweight
@@ -236,7 +241,7 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         if self.mode == BoxType.HEALTH:
             self.heart_factory.create(self.rect.move(10, 10)[:2])  # move(10, 10) to center out the heart
         if self.mode == BoxType.ENEMY:
-            newborn_enemy = self.enemy_factory.create(self.rect[:2])
+            newborn_enemy = self.enemy_factory.create_enemy(self.rect[:2])
             newborn_enemy.stun(15)
 
         self.kill()

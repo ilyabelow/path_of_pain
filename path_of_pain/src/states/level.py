@@ -80,7 +80,7 @@ class LevelBuilder:
         :return: None
         """
         for coords in enemies_coords:
-            self.game.enemy_factory.create(coords)
+            self.game.enemy_factory.create_enemy(coords)
 
     def build_spikes(self, *spikes_coords: Tuple[int, int]):
         """
@@ -209,31 +209,45 @@ class LevelChooser:
             self.builder.set_level_number(number)
             self.builder.set_pain(painful)
             self.builder.set_level_size(*const.RESOLUTION)
-            self.builder.set_title('FALSE {}MASTER'.format(painful * 'PAIN '))
-
+            self.builder.set_title('BLOOD{} MASTER'.format(painful * '&PAIN '))
+            # TODO remove temp solution
+            const.MUSIC_MUTED_VOLUME = 0.5
+            const.MUSIC_NORMAL_VOLUME = 1
             if painful:
                 self.builder.set_music('S87-168 Nightmare Grimm.wav')
             else:
                 self.builder.set_music('S82-115 Grimm.wav')
 
-            boss = self.builder.game.enemy_factory.create((const.RESOLUTION[0] / 2, const.RESOLUTION[1] / 2))
+            self.builder.game.enemy_factory.create_boss((const.RESOLUTION[0] / 2, const.RESOLUTION[1] / 2 - 200))
 
-            # TODO OMG this bodge is SO DIRTY please, me, build proper architecture ALREADY I CAN'T STAND THIS ANYMORE
-            def on_zero_health(who):
-                boss.bleed_all_dir(boss.pos)
-                boss.game.player.surprise_me(30)
-                win_sound = pygame.mixer.Sound(const.SND_PATH + 'secret_discovered_temp.wav')
-                win_sound.play()
-                boss.game.door_factory.create((const.RESOLUTION[0] / 2 - 50, 125), 3, 0)
-                boss.game.wall_factory.create((const.RESOLUTION[0] / 2 - 100, 0, 200, 100), 130)
-                pygame.mixer.music.fadeout(const.MUSIC_FADE_OUT_WIN)
-                boss.kill()
-
-            boss.on_zero_health = on_zero_health
             self.builder.build_walls((100, 0, const.RESOLUTION[0] - 200, 100, 50),
                                      (100, const.RESOLUTION[1], const.RESOLUTION[0] - 200, 100, 50),
                                      (0, 0, 100, const.RESOLUTION[1] + 100, 50),
                                      (const.RESOLUTION[0] - 100, 0, 100, const.RESOLUTION[1] + 100, 50))
+            self.builder.build_walls((300, 300, 100, 75, 75),
+                                     (300, const.RESOLUTION[1] - 375, 100, 75, 75),
+                                     (const.RESOLUTION[0] - 400, 300, 100, 75, 75),
+                                     (const.RESOLUTION[0] - 400, const.RESOLUTION[1] - 375, 100, 75, 75))
+            self.builder.build_spikes((400, 250), (400, 400), (250, 250), (250, 400),
 
+                                      (400, const.RESOLUTION[1] - 375 - 50), (400, const.RESOLUTION[1] - 375 + 100),
+                                      (250, const.RESOLUTION[1] - 375 - 50), (250, const.RESOLUTION[1] - 375 + 100),
+
+                                      (const.RESOLUTION[0] - 400 + 100, 250), (const.RESOLUTION[0] - 400 + 100, 400),
+                                      (const.RESOLUTION[0] - 400 - 50, 250), (const.RESOLUTION[0] - 400 - 50, 400),
+
+                                      (const.RESOLUTION[0] - 400 + 100, const.RESOLUTION[1] - 375 - 50),
+                                      (const.RESOLUTION[0] - 400 + 100, const.RESOLUTION[1] - 375 + 100),
+                                      (const.RESOLUTION[0] - 400 - 50, const.RESOLUTION[1] - 375 - 50),
+                                      (const.RESOLUTION[0] - 400 - 50, const.RESOLUTION[1] - 375 + 100),
+
+                                      (const.RESOLUTION[0] / 2 - 250, const.RESOLUTION[1] / 2),
+                                      (const.RESOLUTION[0] / 2 - 250, const.RESOLUTION[1] / 2 + 200),
+                                      (const.RESOLUTION[0] / 2 - 250, const.RESOLUTION[1] / 2 - 200),
+                                      (const.RESOLUTION[0] / 2 + 200, const.RESOLUTION[1] / 2),
+                                      (const.RESOLUTION[0] / 2 + 200, const.RESOLUTION[1] / 2 + 200),
+                                      (const.RESOLUTION[0] / 2 + 200, const.RESOLUTION[1] / 2 - 200),
+
+                                      )
             self.builder.build_player((const.RESOLUTION[0] / 2, const.RESOLUTION[1] - 300))
             return self.builder.get_result()

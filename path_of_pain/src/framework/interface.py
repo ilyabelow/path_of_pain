@@ -97,11 +97,10 @@ class Tired:
 class Bleeding:
     """Interface for shortcut for bleeding in two modes - in one direction and in all directions"""
 
-    def __init__(self, factory, one_dir_stats, all_dir_stats, color):
+    def __init__(self, factory, one_dir_stats, all_dir_stats):
         self.all_dir_stats = all_dir_stats
         self.one_dir_stats = one_dir_stats
         self.factory = factory
-        self.color = color
 
     def bleed_one_dir(self, pos, main_direction):
         for i in range(self.one_dir_stats['amount']):
@@ -111,7 +110,7 @@ class Bleeding:
                                 direction * self.one_dir_stats['speed'],
                                 random.randint(self.one_dir_stats['sizes'][0], self.one_dir_stats['sizes'][1]),
                                 self.one_dir_stats['fade'],
-                                self.color)
+                                self.one_dir_stats['color'])
 
     def bleed_all_dir(self, pos):
         for i in range(self.all_dir_stats['amount']):
@@ -120,7 +119,7 @@ class Bleeding:
                                 direction * self.all_dir_stats['speed'],
                                 random.randint(self.all_dir_stats['sizes'][0], self.all_dir_stats['sizes'][1]),
                                 self.all_dir_stats['fade'],
-                                self.color)
+                                self.all_dir_stats['color'])
 
 
 # TODO move some functionality here???????
@@ -245,6 +244,7 @@ class Moving:
 
 class Interactive:
     """Interface for objects that can be interacted with"""
+
     def __init__(self):
         pass
 

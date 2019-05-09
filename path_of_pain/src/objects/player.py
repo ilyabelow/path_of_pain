@@ -24,6 +24,7 @@ class PlayerFlyweight:
     """
     All the player's assets and constants
     """
+
     def __init__(self):
         # IMAGES
         self.SPRITE = pygame.image.load(const.IMG_PATH + 'player.png').convert_alpha()
@@ -44,8 +45,9 @@ class PlayerFlyweight:
         self.DASH_STATS = {'speed': 36, 'length': 180, 'rest': 8, 'cost': 2, 'sound': self.DASH_SOUND}  # TODO balance
         self.BACK_DASH_STATS = {'speed': 25, 'length': 100, 'rest': 16, 'cost': 1, 'sound': self.DASH_SOUND}
         self.BLEED_ONE_DIR_STATS = {'amount': 10, 'splash': 15, 'fade': 0.5, 'sizes': [6, 10], 'speed': 10,
-                                    'offset': 100}
-        self.BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1, 'offset': 0}
+                                    'offset': 100, 'color': const.C_BLACK}
+        self.BLEED_ALL_DIR_STATS = {'amount': 20, 'fade': 0.3, 'sizes': [20, 30], 'speed': 1,
+                                    'offset': 0, 'color': const.C_BLACK}
 
         # MORE CONSTANTS
         self.MAX_HEALTH = 5
@@ -65,6 +67,7 @@ class Player(base.AdvancedSprite,
     """
     Class that controls player
     """
+
     def __init__(self, flyweight, game, coords):
         """
         Init player
@@ -89,7 +92,6 @@ class Player(base.AdvancedSprite,
             game.blood_factory,
             flyweight.BLEED_ONE_DIR_STATS,
             flyweight.BLEED_ALL_DIR_STATS,
-            const.C_BLACK
         )
         interface.Tired.__init__(self, 10, 12, 2)  # TODO move to constants? TODO balance
         self.steps_are_stepping = False

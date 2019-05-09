@@ -20,13 +20,16 @@ class Application:
         pygame.display.set_mode(const.RESOLUTION, pygame.FULLSCREEN)
         pygame.display.set_caption("Path of Pain")
         pygame.display.set_icon(pygame.image.load(const.IMG_PATH + "enemy.png"))
-
-        self.state = None
-        self.switched = False
-        self.switch_state(Menu())
         # Joystick init
         if pygame.joystick.get_count() != 0:
             pygame.joystick.Joystick(0).init()
+        self.state = None
+        self.switched = False
+        self.switch_state(Menu())
+        # to go right into the game
+        # game_chooser = level.LevelChooser(level.LevelBuilder())
+        # self.switch_state(game_chooser.choose_level(2, False))
+
         self.clock = pygame.time.Clock()
         self.running = True
 
