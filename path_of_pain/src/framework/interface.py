@@ -16,8 +16,10 @@ class Healthy:
                  heal_sounds=None,
                  hit_sounds=None,
                  death_sounds=None,
-                 invulnerability=-1):
+                 invulnerability=-1,
+                 low_health=0):
         self.max_health = max_health
+        self.low_health = low_health
         self.health = max_health
         self.invulnerability_clock = clock.Clock(None, invulnerability)
 
@@ -42,7 +44,7 @@ class Healthy:
                 random.choice(self.hit_sounds).play()
             self.on_any_health(who)
 
-            if self.health == 1:  # TODO generalize low health
+            if self.health == self.low_health:
                 self.on_low_health(who)
             if self.health == 0:
                 if self.death_sounds is not None:

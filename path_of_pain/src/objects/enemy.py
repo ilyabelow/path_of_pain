@@ -234,6 +234,7 @@ class BossFlyweight:
     def __init__(self):
         # TEXTURES
         self.STUNNED_SPRITE = pygame.image.load(const.IMG_PATH + 'boss_stunned.png').convert_alpha()
+        self.LOW_HEALTH_SPRITE = pygame.image.load(const.IMG_PATH + 'boss_low_health.png').convert_alpha()
         self.SURPRISED_SPRITE = pygame.image.load(const.IMG_PATH + 'boss_surprised.png').convert_alpha()
         self.SPRITE = pygame.image.load(const.IMG_PATH + 'boss.png').convert_alpha()
         self.KEY_TAKEN_SPRITE = None
@@ -275,7 +276,7 @@ class BossFlyweight:
         self.attack_time = 4  # FASTER
         self.throwback_length = 300  # never used
         self.throwback_speed = 50  # never used
-        self.stun_duration = 50
+        self.stun_duration = 40
 
 
 class Boss(Enemy):
@@ -285,8 +286,10 @@ class Boss(Enemy):
 
     def __init__(self, flyweight: BossFlyweight, game, coords: Tuple[int, int]):
         Enemy.__init__(self, flyweight, game, coords)
-        self.teleport_clock = clock.Clock(self.teleport_in, 30)
-        self.clock_ticker.add_clock(self.teleport_clock)
+        self.low_health = self.max_health / 4
+        self.teleport_clock = clock.Clock(self.teleport_in, 20)
+        self.win_clock = clock.Clock(self.teleport_out, 150)
+        self.clock_ticker.add_clock(self.teleport_clock, self.win_clock)
 
     def on_zero_health(self, who):
         # Generate exit
@@ -311,9 +314,13 @@ class Boss(Enemy):
         elif random.randint(0, 3) == 0:
             self.teleport_out()
 
-    # TODO remove bodge to :D ant the end
+    # TODO remove bodge
     def move_in_idle(self):
-        self.spot_clock.wind_up(10000)
+        if not self.game.player.alive():
+            self.win_clock.wind_up()
+
+    def on_low_health(self, direction):
+        self.flyweight.SPRITE = self.flyweight.LOW_HEALTH_SPRITE
 
     def teleport_in(self):
         """
@@ -334,5 +341,6 @@ class Boss(Enemy):
         """
         # TODO remove temp solution for teleportation
         self.flyweight.TELEPORT_OUT_SOUND.play()
-        self.teleport_clock.wind_up()
+        if self.win_clock.is_not_running():
+            self.teleport_clock.wind_up()
         self.pos = pygame.Vector2(0, self.game.level_rect[2] * 5)

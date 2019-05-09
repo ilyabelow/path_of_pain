@@ -84,7 +84,8 @@ class Player(base.AdvancedSprite,
             [flyweight.HEAL_SOUND],
             [flyweight.HIT_SOUND],
             [flyweight.DEATH_SOUND],
-            flyweight.INVULNERABILITY_DURATION
+            flyweight.INVULNERABILITY_DURATION,
+            1
         )
         interface.Pickuping.__init__(self, game.pickupable_group)
         interface.Bleeding.__init__(
