@@ -36,7 +36,7 @@ class Game(State):
         self.fade_group = pygame.sprite.GroupSingle()
 
         # FACTORIES INITIALIZATION
-        # TODO move factories inits to level builder
+        # TODO move factories inits to level builder?
         # TODO assets inside factories are loaded each level reset, NOT EFFECTIVE
         self.enemy_factory = enemy.EnemyFactory(self, self.enemy_group, self.hittable_group, self.render_group)
         self.box_factory = obstacle.BoxFactory(self, self.box_group, self.hittable_group, self.obstacle_group,
@@ -51,9 +51,10 @@ class Game(State):
         self.fade_factory = particle.FadeFactory(self.fade_group, self.render_group)
         self.spikes_factory = spikes.SpikesFactory(self, self.hitter_group, self.render_group)
         self.title_factory = particle.TitleFactory(self.particle_group, self.render_group)
-        # TODO move these to associated classes => do not store them in Game
-        self.blood_factory = particle.BloodFactory(self.particle_group, self.render_group)
         self.exclamation_factory = particle.ExclamationFactory(self.particle_group, self.render_group)
+        # ABSTRACT FACTORIES INITIALIZATION
+        self.blood_factory_factory = particle.BloodFactoryFactory(self.particle_group, self.render_group)
+
         # CONTROLLER INITIALIZATION
         if pygame.joystick.get_count() == 0:
             self.input_method = controller.Keyboard()

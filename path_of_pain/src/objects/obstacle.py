@@ -9,6 +9,7 @@ import pygame
 
 from path_of_pain.src.framework import base
 from path_of_pain.src.framework import interface, const
+from path_of_pain.src.objects import particle
 
 
 class DoorFactory:
@@ -205,10 +206,10 @@ class Box(base.AdvancedSprite, interface.Healthy, interface.Bleeding):
         interface.Healthy.__init__(self, random.randint(1, 3), None, flyweight.BOX_BREAK_SOUNDS, None)
         interface.Bleeding.__init__(
             self,
-            game.blood_factory,
+            game.blood_factory_factory.create(particle.BoxBlood()),
             flyweight.BLEED_ONE_DIR_STATS,
             flyweight.BLEED_ALL_DIR_STATS,
-        )  # TODO square blood
+        )
         self.rect = pygame.Rect(*coords, 50, 35)  # hitbox
         self.flyweight = flyweight
         self.heart_factory = game.heart_factory

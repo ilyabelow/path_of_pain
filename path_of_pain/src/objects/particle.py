@@ -1,5 +1,7 @@
 """Module with a collection of particles"""
 from enum import Enum
+from typing import Tuple
+from typing import Union
 
 import pygame
 
@@ -7,37 +9,133 @@ from path_of_pain.src.framework import base, clock
 from path_of_pain.src.framework import const
 
 
-# TODO make template factories for different blood (abstract factory may be? bridge? WHO KNOWS???)
+# Abstract class for implementations for bridge pattern
+class Speck:
+    def draw_shape(self, screen: pygame.Surface, centerx: Union[float, int], centery: Union[float, int],
+                   radius: Union[float, int]) -> pygame.Rect:
+        """
+        Abstract method with blood type
 
-class BloodFactory:
-    def __init__(self, *groups):
+        :param screen: surface to draw on
+        :param centerx: x coordinate of the center of the particle
+        :param centery: y coordinate of the center of the particle
+        :param radius: particle "radius", but not really
+        :return: rectangle that was drawn
+        """
+        pass
+
+    def get_color(self) -> Tuple[int, int, int]:
+        """
+        Shortcut for choosing color
+
+        :return: Color tuple
+        """
+        pass
+
+
+# Note: we don't need specks with EVERY shape and EVERY color
+class Round(Speck):
+    """
+    Round specks
+    """
+
+    def draw_shape(self, screen: pygame.Surface, centerx: Union[float, int], centery: Union[float, int],
+                   radius: Union[float, int]) -> pygame.Rect:
+        image = pygame.Surface((int(radius * 2), int(radius * 2)), pygame.SRCALPHA, 32)
+        pygame.draw.circle(image, self.get_color(), [i // 2 for i in image.get_size()], int(radius))
+        return screen.blit(image, (int(centerx - radius), int(centery - radius)))
+
+
+class PlayerBlood(Round):
+    """
+    Player blood is round and black
+    """
+
+    def get_color(self) -> Tuple:
+        return const.C_BLACK
+
+
+class EnemyBlood(Round):
+    """
+    Enemy color is round and red
+    """
+
+    def get_color(self):
+        return const.C_RED
+
+
+class BossBlood(Round):
+    """
+    Boss color is round and dark red
+    """
+
+    def get_color(self):
+        return (160, 0, 0)
+
+
+class Square(Speck):
+    """
+    Square specks
+    """
+
+    def draw_shape(self, screen, centerx, centery, radius):
+        image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA, 32)
+        image.fill(self.get_color())
+        return screen.blit(image, (centerx - radius, centery - radius))
+
+
+class BoxBlood(Square):
+    """
+    Box "blood" is square and brown
+    """
+
+    def get_color(self):
+        return const.C_BOX
+
+
+class BloodFactoryFactory:
+    """
+    Abstract factory that produces factories of different blood (but all these factories have identical groups!)
+    """
+
+    def __init__(self, *groups: pygame.sprite.AbstractGroup):
         self.groups = groups
 
-    def create(self, pos, speed, size, fadeout, color):
-        product = Blood(pos, speed, size, fadeout, color)
+    def create(self, speck: Speck):
+        return BloodFactory(speck, *self.groups)
+
+
+class BloodFactory:
+    def __init__(self, speck: Speck, *groups: pygame.sprite.AbstractGroup):
+        self.groups = groups
+        self.speck = speck
+
+    def create(self, pos, speed, size, fadeout):
+        product = Blood(self.speck, pos, speed, size, fadeout)
         for group in self.groups:
             group.add(product)
         return product
 
 
-# TODO rename and make more general?
+# TODO make blood that rise up and that falls on parabola
+# Abstraction for bridge pattern
 class Blood(base.AdvancedSprite):
     """
     Class for circular particle which moves ant const speed and fades out with time
     """
-    def __init__(self, pos, speed, size, fadeout, color):
+
+    def __init__(self, shape: Speck, pos: pygame.Vector2, speed: pygame.Vector2, size: int, fadeout: int):
         """
         Blood init
 
+        :type shape: blood shape
         :param pos: initial position
         :param speed: moving speed
         :param size: initial size
-        :param fadeout: speed of fading out
-        :param color: color of particle
         """
         base.AdvancedSprite.__init__(self)
         # TODO more customisable blood
-        self.color = color
+        self.shape = shape
         self.speed = speed
         self.fadeout = fadeout
         self.pos = pos
@@ -55,10 +153,8 @@ class Blood(base.AdvancedSprite):
             return
 
     def draw(self, screen, window):
-        # TODO remove this buffer???
-        image = pygame.Surface((int(self.size * 2), int(self.size * 2)), pygame.SRCALPHA, 32)
-        pygame.draw.circle(image, self.color, [i // 2 for i in image.get_size()], int(self.size))
-        return screen.blit(image, (self.pos.x - window.x, self.pos.y - window.y))
+        # Delegate to implementation
+        return self.shape.draw_shape(screen, self.pos.x - window.x, self.pos.y - window.y, self.size)
 
 
 class ExclamationFactory:
@@ -76,6 +172,7 @@ class Exclamation(base.AdvancedSprite):
     """
     Class for ! that appear when an enemy spots you
     """
+
     def __init__(self, pos, lifetime):
         """
         ! init
@@ -115,6 +212,7 @@ class Fade(base.AdvancedSprite):
     """
     Particle that covers the whole screen and makes it fade in/out
     """
+
     def __init__(self, duration, to_black, when_stops=None):
         """
         Init
@@ -174,6 +272,7 @@ class Title(base.AdvancedSprite):
     """
     Cool letters that fade in at the bottom of the screen and then fade out
     """
+
     def __init__(self, image, state_durations):
         """
         Init

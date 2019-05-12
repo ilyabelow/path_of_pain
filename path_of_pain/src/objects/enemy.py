@@ -5,7 +5,7 @@ import pygame
 
 from path_of_pain.src.framework import base, clock, const
 from path_of_pain.src.framework import interface
-from path_of_pain.src.objects import pickupable
+from path_of_pain.src.objects import pickupable, particle
 
 
 class EnemyFactory:
@@ -51,10 +51,8 @@ class EnemyFlyweight:
         # TODO enums here
         self.DASH_STATS = {'speed': 20, 'length': 100, 'rest': 30, 'sound': self.DASH_SOUND}
         self.BACK_DASH_STATS = None  # Yet?
-        self.BLEED_ONE_DIR_STATS = {'amount': 7, 'splash': 15, 'fade': 0.5, 'sizes': [6, 8], 'speed': 10, 'offset': 50,
-                                    'color': const.C_RED}
-        self.BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1, 'offset': 0,
-                                    'color': const.C_RED}
+        self.BLEED_ONE_DIR_STATS = {'amount': 7, 'splash': 15, 'fade': 0.5, 'sizes': [6, 8], 'speed': 10, 'offset': 50}
+        self.BLEED_ALL_DIR_STATS = {'amount': 14, 'fade': 1, 'sizes': [15, 25], 'speed': 1, 'offset': 0}
 
         self.STAY_TIME = (50, 90)
         self.WANDER_TIME = (20, 40)
@@ -92,7 +90,7 @@ class Enemy(base.AdvancedSprite, interface.Moving, interface.Healthy, interface.
         )
         interface.Bleeding.__init__(
             self,
-            game.blood_factory,
+            game.blood_factory_factory.create(particle.EnemyBlood()),
             flyweight.BLEED_ONE_DIR_STATS,
             flyweight.BLEED_ALL_DIR_STATS,
         )
@@ -255,9 +253,8 @@ class BossFlyweight:
         self.DASH_STATS = {'speed': 50, 'length': 250, 'rest': 50, 'sound': self.DASH_SOUND}
         self.BACK_DASH_STATS = None
         self.BLEED_ONE_DIR_STATS = {'amount': 14, 'splash': 15, 'fade': 0.75, 'sizes': [10, 15], 'speed': 10,
-                                    'offset': 75, 'color': (160, 0, 0)}
-        self.BLEED_ALL_DIR_STATS = {'amount': 30, 'fade': 0.5, 'sizes': [25, 30], 'speed': 1, 'offset': 20,
-                                    'color': (160, 0, 0)}
+                                    'offset': 75}
+        self.BLEED_ALL_DIR_STATS = {'amount': 30, 'fade': 0.5, 'sizes': [25, 30], 'speed': 1, 'offset': 20}
 
         self.STAY_TIME = (100000, 100000)  # will be used once
         self.WANDER_TIME = (0, 0)  # will be used once
@@ -288,8 +285,8 @@ class Boss(Enemy):
         Enemy.__init__(self, flyweight, game, coords)
         self.low_health = self.max_health / 4
         self.teleport_clock = clock.Clock(self.teleport_in, 20)
-        self.win_clock = clock.Clock(self.teleport_out, 150)
-        self.clock_ticker.add_clock(self.teleport_clock, self.win_clock)
+        self.factory = game.blood_factory_factory.create(particle.BossBlood())
+        self.clock_ticker.add_clock(self.teleport_clock)
 
     def on_zero_health(self, who):
         # Generate exit
@@ -313,11 +310,6 @@ class Boss(Enemy):
             self.flyweight.STUN_SOUND.play()
         elif random.randint(0, 3) == 0:
             self.teleport_out()
-
-    # TODO remove bodge
-    def move_in_idle(self):
-        if not self.game.player.alive():
-            self.win_clock.wind_up()
 
     def on_low_health(self, direction):
         self.flyweight.SPRITE = self.flyweight.LOW_HEALTH_SPRITE

@@ -111,8 +111,7 @@ class Bleeding:
             self.factory.create(pos + direction * self.one_dir_stats['offset'],
                                 direction * self.one_dir_stats['speed'],
                                 random.randint(self.one_dir_stats['sizes'][0], self.one_dir_stats['sizes'][1]),
-                                self.one_dir_stats['fade'],
-                                self.one_dir_stats['color'])
+                                self.one_dir_stats['fade'])
 
     def bleed_all_dir(self, pos):
         for i in range(self.all_dir_stats['amount']):
@@ -120,8 +119,7 @@ class Bleeding:
             self.factory.create(pos + direction * self.all_dir_stats['offset'],
                                 direction * self.all_dir_stats['speed'],
                                 random.randint(self.all_dir_stats['sizes'][0], self.all_dir_stats['sizes'][1]),
-                                self.all_dir_stats['fade'],
-                                self.all_dir_stats['color'])
+                                self.all_dir_stats['fade'])
 
 
 # TODO move some functionality here???????
