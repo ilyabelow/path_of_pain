@@ -1,12 +1,18 @@
 # Path of Pain
 
-the best game ever
+Simple top view slasher build on pygame
 
-## Controls (outdated)
+To download the game, you have to install Git LFS
 
-|   | move  |  attack |  dash | backdash  | exit  |  restart | switch mode  |
-| :------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: |
-| keyboard  | arrows  | s  |  d |  a |  Esc | Tab  | p  |
-|  gamepad | LS  | X  | A  | B  | Back  | Start  |  Home |
+### Controls
 
-> TODO: better README.md
+|    | move  | look around |  attack |  dash | backdash  | interact | exit/menu  |  restart |
+| :------------: | :------------: |:------------: | :------------: | :------------: | :------------: | :------------: | :------------: | :------------: |
+| keyboard  | arrows  | None |s  |  d |  a | f | Esc | Tab  | 
+|  gamepad | LS  | RS  |X  | A  | B | Y | Back  | Start  | 
+
+Works best with gamepad
+
+### Launching the game
+
+> python3 launch.py

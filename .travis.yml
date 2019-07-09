@@ -1,0 +1,24 @@
+# This project is written on python indeed
+language: python
+# I run it on python3.5 on my machine so test it on 3.5 I guess
+python:
+  - "3.5"
+# command to install dependencies
+# I know it's is default, I want to state it explicitly
+install:
+  - pip install -r requirements.txt
+  - pip install setuptools wheel twine
+# Building package, uploading is cancelled before I don't do these:
+# TODO learn how to download files from Git LFS
+# TODO learn how to delete old files and upload new files
+script:
+  - python3 setup.py sdist bdist_wheel
+#  - python3 -m twine upload -u ${TEST_PYPI_USERNAME} -p ${TEST_PYPI_PASSWORD} --repository-url https://test.pypi.org/legacy/ dist/*
+# notify committer on EVERY build
+notifications:
+  email:
+    recipients:
+      - belof.ilya@gmail.com
+    on_success: always
+    on_failure: always
+
