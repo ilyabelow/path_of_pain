@@ -2,6 +2,8 @@
 
 Simple top view slasher build on pygame
 
+To download the game, you have to install Git LFS
+
 ### Controls
 
 |    | move  | look around |  attack |  dash | backdash  | interact | exit/menu  |  restart |
@@ -14,7 +16,3 @@ Works best with gamepad
 ### Launching the game
 
 > python3 launch.py
-
-### Installing via pip
-
-Still in development
