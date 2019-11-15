@@ -2,6 +2,8 @@
 
 Simple top view slasher build on pygame
 
+![alt text](https://raw.githubusercontent.com/ilyabelow/resourses/master/screenshot1.png?token=ALHFTWMRDXJ5B46WFIYMFNC5264GY)
+
 To download the game, you have to install Git LFS
 
 ### Controls
