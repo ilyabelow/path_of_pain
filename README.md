@@ -20,9 +20,11 @@ Works best with gamepad
 You need to have python vene package to install in virtal enviroment
 
 > bash install.sh
+
 > bash play.sh
 
 Or you can install pygame directly with pip:
 
 > pip install pygame --user
+
 > python launch.py
