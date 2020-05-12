@@ -4,7 +4,7 @@ Simple top view slasher build on pygame
 
 ![alt text](https://i.imgur.com/j1OqoOF.png)
 
-To download the game, you have to install Git LFS. If you don't have it, you can download th game from [here](https://drive.google.com/drive/folders/1-Vqp55Vg_-xMW0tJXuf5D8RHRGseUsaw?usp=sharing)
+To download the game, you have to install Git LFS. If you don't have it, you can download the game from [here](https://drive.google.com/drive/folders/1-Vqp55Vg_-xMW0tJXuf5D8RHRGseUsaw?usp=sharing)
 
 ### Controls
 
@@ -17,7 +17,7 @@ Works best with gamepad
 
 ### Installing and launcing
 
-You need to have python vene package to install in virtal enviroment
+You need to have python venv package to install in virtual enviroment
 
 > bash install.sh
 
