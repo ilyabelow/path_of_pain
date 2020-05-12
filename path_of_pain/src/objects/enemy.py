@@ -333,6 +333,6 @@ class Boss(Enemy):
         """
         # TODO remove temp solution for teleportation
         self.flyweight.TELEPORT_OUT_SOUND.play()
-        if self.win_clock.is_not_running():
-            self.teleport_clock.wind_up()
+        # if self.win_clock.is_not_running():
+        self.teleport_clock.wind_up()
         self.pos = pygame.Vector2(0, self.game.level_rect[2] * 5)
